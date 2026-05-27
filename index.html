@@ -1,0 +1,2036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Acumed Digital Surgery</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://use.typekit.net">
+<link rel="stylesheet" href="https://use.typekit.net/yfu1doh.css">
+
+<!-- Brand tokens -->
+<link rel="stylesheet" href="styles/tokens.css">
+
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  /* Form controls don't inherit font-family by default — force Proxima Nova everywhere */
+  button, input, select, textarea { font-family: inherit; }
+
+  /* ---------- Layout ---------- */
+  .app {
+    display: grid;
+    grid-template-columns: var(--sidebar-w) 1fr;
+    min-height: 100vh;
+  }
+  /* Collapsed: sidebar fully hidden, content spans full width.
+     Single 1fr track so .main fills the row once .sidebar is removed. */
+  .app.collapsed { grid-template-columns: 1fr; }
+  .app.collapsed .sidebar { display: none; }
+
+  /* ---------- Left sidebar ---------- */
+  .sidebar {
+    background: var(--cool-gray-11);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--topbar-h);
+    padding: 0 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .brand-lockup { display: flex; align-items: center; }
+  .brand-lockup-img {
+    width: 100px;
+    height: auto;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  .collapse-btn {
+    background: transparent;
+    border: 0;
+    color: rgba(255,255,255,0.6);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: var(--radius-sm);
+    transition: background 0.15s, color 0.15s;
+  }
+  .collapse-btn:hover {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+  }
+
+  /* Nav */
+  .nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    color: rgba(255,255,255,0.82);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+    user-select: none;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+  .nav-item.active { background: rgba(0,179,239,0.12); color: #fff; }
+  .nav-item .nav-icon { width: 18px; height: 18px; flex-shrink: 0; opacity: 0.85; }
+  .nav-item .nav-label { flex: 1; }
+
+  /* Chevron — shared by every expandable row, rotates when expanded */
+  .nav-chevron {
+    width: 14px; height: 14px; opacity: 0.6;
+    flex-shrink: 0;
+    transition: transform 0.18s;
+  }
+  .nav-toggle.expanded > .nav-chevron { transform: rotate(180deg); }
+
+  /* Collapsible children container */
+  .nav-children { display: none; flex-direction: column; }
+  .nav-children.open { display: flex; }
+
+  /* Sub-items: full-width rows — indentation comes from left padding only,
+     so the hover/active background spans the full nav width (not indented). */
+  .nav-sub-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 12px 9px 38px;
+    color: rgba(255,255,255,0.72);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+    user-select: none;
+  }
+  .nav-sub-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+  .nav-sub-item.active { background: rgba(0,179,239,0.12); color: #fff; }
+  .nav-sub-item .nav-sub-label { flex: 1; }
+  .nav-sub-item .nav-chevron { opacity: 0.5; width: 12px; height: 12px; }
+
+  /* Second nesting level (List, Cases of Crosscheck 2) — indent further */
+  .nav-children-2 .nav-sub-item { padding-left: 58px; }
+
+  .sidebar-footer {
+    padding: 12px 20px 16px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.03em;
+  }
+
+  /* ---------- Main column ---------- */
+  .main { display: flex; flex-direction: column; min-width: 0; }
+
+  /* ---------- Top bar ---------- */
+  .topbar {
+    height: var(--topbar-h);
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .topbar-left { display: flex; align-items: center; gap: 12px; flex: 1; }
+
+  /* Top-bar sidebar toggle — only shown when the sidebar is collapsed.
+     Selector is scoped to .topbar to outrank the later .icon-btn display rule. */
+  .topbar .topbar-toggle { display: none; }
+  .app.collapsed .topbar-toggle { display: inline-flex; }
+  .topbar-actions { display: flex; align-items: center; gap: 6px; }
+
+  .icon-btn {
+    background: transparent;
+    border: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--cool-gray-9);
+    position: relative;
+    transition: background 0.12s, color 0.12s;
+  }
+  .icon-btn:hover { background: var(--hover); color: var(--cool-gray-11); }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  .icon-btn.has-dot::after {
+    content: '';
+    position: absolute;
+    top: 8px; right: 9px;
+    width: 7px; height: 7px;
+    background: var(--cerulean);
+    border-radius: 50%;
+    border: 2px solid #fff;
+  }
+
+  .lang-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: transparent;
+    border: 1px solid var(--cool-gray-2);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--cool-gray-10);
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s;
+  }
+  .lang-pill:hover { background: var(--hover); }
+
+  /* US flag — real flag colors are intentional, not Acumed-brand. */
+  .flag-us {
+    width: 18px; height: 13px;
+    border-radius: 2px;
+    background: linear-gradient(to bottom,
+      #b22234 0 10%, #fff 10% 20%, #b22234 20% 30%, #fff 30% 40%,
+      #b22234 40% 50%, #fff 50% 60%, #b22234 60% 70%, #fff 70% 80%,
+      #b22234 80% 90%, #fff 90% 100%);
+    position: relative; overflow: hidden; flex-shrink: 0;
+  }
+  .flag-us::before {
+    content: '';
+    position: absolute; top: 0; left: 0;
+    width: 8px; height: 7px;
+    background: #3c3b6e;
+  }
+
+  .topbar-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-left: 14px;
+    margin-left: 6px;
+    border-left: 1px solid var(--border);
+    position: relative;
+    cursor: pointer;
+  }
+  .user-caret {
+    width: 16px; height: 16px;
+    color: var(--cool-gray-7);
+    transition: transform 0.18s;
+    flex-shrink: 0;
+  }
+  .topbar-user.open .user-caret { transform: rotate(180deg); }
+  .topbar-user .who {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.15;
+  }
+  .topbar-user .name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .topbar-user .role {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* ---------- User dropdown menu ---------- */
+  .user-menu {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    min-width: 220px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: 0 10px 28px rgba(52,55,65,0.16);
+    padding: 6px;
+    display: none;
+    z-index: 30;
+  }
+  .topbar-user.open .user-menu { display: block; }
+  .user-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--cool-gray-10);
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+  }
+  .user-menu-item:hover { background: var(--hover); color: var(--cool-gray-11); }
+  .user-menu-item svg { width: 18px; height: 18px; opacity: 0.85; flex-shrink: 0; }
+
+  /* ---------- Content ---------- */
+  .content { flex: 1; padding: 0; background: #fff; }
+
+  /* Sticky bar: only the breadcrumb + action row stays pinned under the top bar */
+  .case-sticky {
+    position: sticky;
+    top: var(--topbar-h);
+    z-index: 5;
+    background: var(--bg-subtle);
+    border-bottom: 1px solid var(--hairline);
+    padding: 14px 32px;
+  }
+
+  /* Scrolling panel: progress + case details + record, stacked */
+  .case-body { max-width: 1440px; margin: 0 auto; padding: 24px 32px 56px; display: flex; flex-direction: column; gap: 16px; }
+
+  /* Breadcrumb title — click "All cases" to navigate back */
+  .breadcrumb { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .crumb {
+    font-size: 22px; color: var(--cool-gray-8);
+    background: transparent; border: 0; padding: 0; cursor: pointer;
+    text-decoration: none; transition: color 0.12s; font-family: inherit;
+  }
+  .crumb:hover { color: var(--cerulean); }
+  .crumb.current { color: var(--cool-gray-11); font-weight: 700; cursor: default; font-variant-numeric: tabular-nums; }
+  .crumb-sep { display: inline-flex; color: var(--cool-gray-4); }
+  .crumb-sep svg { width: 19px; height: 19px; }
+  .copy-btn {
+    background: transparent; border: 0; padding: 5px; border-radius: var(--radius-sm);
+    color: var(--cool-gray-7); cursor: pointer; display: inline-flex; position: relative;
+    transition: background 0.12s, color 0.12s;
+  }
+  .copy-btn:hover { background: var(--hover); color: var(--cool-gray-11); }
+  .copy-btn svg { width: 17px; height: 17px; }
+  /* Deviation flag — same grey as the copy icon, clickable to view the case */
+  .deviation-flag {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: transparent; border: 0; padding: 5px; border-radius: var(--radius-sm);
+    color: var(--cool-gray-7); cursor: pointer; transition: background 0.12s, color 0.12s;
+  }
+  .deviation-flag:hover { background: var(--hover); color: var(--cool-gray-11); }
+  .deviation-flag svg { width: 17px; height: 17px; }
+
+  /* Hover tooltip for icon-only controls (::before, leaves ::after for "Copied") */
+  .tip { position: relative; }
+  .tip::before {
+    content: attr(data-tip);
+    position: absolute; top: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+    background: var(--cool-gray-11); color: #fff; font-size: 11px; font-weight: 500; line-height: 1.3;
+    padding: 5px 8px; border-radius: var(--radius-sm); white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(52,55,65,0.18);
+    opacity: 0; visibility: hidden; transition: opacity 0.12s; pointer-events: none; z-index: 40;
+  }
+  .tip:hover::before, .tip:focus-visible::before { opacity: 1; visibility: visible; }
+  /* tip-up: show the tooltip above the control instead of below */
+  .tip-up::before { top: auto; bottom: calc(100% + 6px); }
+  .copy-btn.copied::before { opacity: 0; visibility: hidden; }
+  .copy-btn.copied::after {
+    content: 'Copied'; position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%);
+    background: var(--cool-gray-11); color: #fff; font-size: 11px; font-weight: 600;
+    padding: 3px 7px; border-radius: var(--radius-sm); white-space: nowrap;
+  }
+
+  /* Top row: breadcrumb on the left, action cluster on the right */
+  .header-topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+
+  /* Progress card — containerized like Case details for consistency */
+  .progress-card { border: 1px solid var(--hairline); border-radius: var(--radius-md); background: #fff; overflow: hidden; }
+  .progress-card-head { display: flex; align-items: center; min-height: 36px; padding: 0 16px; border-bottom: 1px solid var(--hairline); background: var(--bg-subtle); }
+  .progress-card-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--cool-gray-9); font-weight: 700; margin: 0; }
+  .progress-card-body { padding: 20px 16px 16px; }
+
+  /* Horizontal state timeline — neutral-gray progression, status color only on
+     the current node + its label (brand: states neutral, status carries color). */
+  .timeline { display: flex; align-items: flex-start; list-style: none; margin: 0; padding: 0; }
+  .tl-step { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; position: relative; padding-top: 6px; }
+  .tl-step::before {
+    content: ''; position: absolute; top: 17px; left: -50%; width: 100%; height: 2px;
+    background: var(--cool-gray-2); z-index: 0;
+  }
+  .tl-step:first-child::before { display: none; }
+  .tl-step.is-done::before, .tl-step.is-current::before { background: var(--cool-gray-7); }
+
+  .tl-node {
+    position: relative; z-index: 1; width: 22px; height: 22px; border-radius: 50%;
+    background: #fff; border: 2px solid var(--cool-gray-3);
+    display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0;
+  }
+  .tl-node svg { width: 12px; height: 12px; }
+  .tl-step.is-done .tl-node { background: var(--cool-gray-7); border-color: var(--cool-gray-7); }
+  .tl-step.is-upcoming .tl-node { border-color: var(--cool-gray-2); }
+  /* current node: solid status-color fill with a soft halo */
+  .tl-step.is-current .tl-node {
+    background: var(--cerulean);
+    border-color: var(--cerulean);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--cerulean) 16%, #fff);
+  }
+
+  .tl-label { margin-top: 9px; font-size: 15px; line-height: 1.25; text-align: center; color: var(--cool-gray-9); max-width: 110px; }
+  .tl-step.is-upcoming .tl-label { color: var(--cool-gray-7); }
+  .tl-step.is-current .tl-label { color: var(--cool-gray-11); font-weight: 700; }
+  /* minimal status label under the current state */
+  .tl-step .status-pill { margin-top: 7px; }
+
+  /* current-step status drives the node + pill color */
+  .tl-step.is-in-process { --status-color: var(--status-in-process); }
+  .tl-step.is-review     { --status-color: var(--status-review); }
+  .tl-step.is-complete   { --status-color: var(--status-complete); }
+  .tl-step.is-rework     { --status-color: var(--status-rework); }
+  .tl-step.is-blocked    { --status-color: var(--status-blocked); }
+  .tl-step.is-on-hold    { --status-color: var(--status-on-hold); }
+  .tl-step.is-canceled   { --status-color: var(--status-canceled); }
+
+  .status-pill {
+    display: inline-flex; align-items: center;
+    padding: 5px 11px; border-radius: 999px;
+    font-size: 12px; font-weight: 600; line-height: 1;
+    color: var(--status-color, var(--cerulean));
+    background: color-mix(in srgb, var(--status-color, var(--cerulean)) 12%, #fff);
+    border: 1px solid color-mix(in srgb, var(--status-color, var(--cerulean)) 28%, #fff);
+  }
+  .status-pill.sm { font-size: 11px; padding: 3px 9px; }
+  .status-pill.is-in-process { --status-color: var(--status-in-process); }
+  .status-pill.is-review     { --status-color: var(--status-review); }
+  .status-pill.is-complete   { --status-color: var(--status-complete); }
+  .status-pill.is-rework     { --status-color: var(--status-rework); }
+  .status-pill.is-blocked    { --status-color: var(--status-blocked); }
+  .status-pill.is-on-hold    { --status-color: var(--status-on-hold); }
+  .status-pill.is-canceled   { --status-color: var(--status-canceled); }
+  .status-pill.is-completed  { --status-color: var(--status-completed); }
+  /* Solid variant — filled status color, white text (used for the Rework status) */
+  .status-pill.solid { color: #fff; border-color: transparent; background: var(--status-color, var(--cerulean)); }
+
+  /* Case details — full-width, white card with a title + privacy toggle.
+     Labels use cool-gray-9 on white (~5.8:1) to meet WCAG AA for small text. */
+  .case-details { border: 1px solid var(--hairline); border-radius: var(--radius-md); background: #fff; overflow: hidden; }
+  .case-details-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 36px; padding: 0 16px; border-bottom: 1px solid var(--hairline); background: var(--bg-subtle); }
+  .case-details-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--cool-gray-9); font-weight: 700; margin: 0; }
+  .privacy-toggle {
+    display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 0;
+    padding: 4px 8px; border-radius: var(--radius-sm); color: var(--cool-gray-9);
+    font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.12s, color 0.12s;
+  }
+  .privacy-toggle:hover { background: var(--hover); color: var(--cool-gray-11); }
+  .privacy-toggle svg { width: 15px; height: 15px; }
+  .privacy-toggle .icon-eye-off { display: none; }
+  .case-details.privacy-hidden .icon-eye { display: none; }
+  .case-details.privacy-hidden .icon-eye-off { display: inline-flex; }
+
+  .case-meta {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px 24px; padding: 14px 16px;
+  }
+  .case-meta .meta-item { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .case-meta .meta-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--cool-gray-9); font-weight: 600; }
+  .case-meta .meta-value { font-size: 13.5px; color: var(--cool-gray-11); font-weight: 500; }
+  .case-details.privacy-hidden .case-meta { display: none; }
+
+  .privacy-note { display: none; align-items: center; gap: 8px; padding: 14px 16px; font-size: 13px; color: var(--text-muted); }
+  .case-details.privacy-hidden .privacy-note { display: flex; }
+  .privacy-note svg { width: 16px; height: 16px; }
+
+  .deviation-banner {
+    display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 8px 12px;
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--gold-tips) 14%, #fff);
+    border: 1px solid color-mix(in srgb, var(--gold-tips) 40%, #fff);
+    font-size: 13px; color: var(--cool-gray-11);
+  }
+  .deviation-banner svg { width: 16px; height: 16px; color: var(--gold-tips); flex-shrink: 0; }
+  .is-hidden { display: none !important; }
+
+  .header-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .action-btn {
+    display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 12px;
+    border-radius: var(--radius-md); border: 1px solid var(--cool-gray-2); background: #fff;
+    color: var(--cool-gray-10); font-size: 13px; font-weight: 600; cursor: pointer; position: relative;
+    transition: background 0.12s, border-color 0.12s, color 0.12s;
+  }
+  .action-btn:hover { background: var(--hover); color: var(--cool-gray-11); }
+  .action-btn svg { width: 16px; height: 16px; }
+  .action-btn.icon-only { padding: 0; width: 34px; justify-content: center; }
+  .action-btn .unread {
+    display: inline-flex; align-items: center; justify-content: center; min-width: 17px; height: 17px;
+    padding: 0 4px; border-radius: 999px; background: var(--notify-green); color: #fff; font-size: 10px; font-weight: 700; line-height: 1;
+  }
+
+  /* ---------- Record panel (state stack) ---------- */
+  .state-stack { background: #fff; border: 1px solid var(--hairline); border-radius: var(--radius-md); overflow: hidden; }
+  .stack-head { display: flex; align-items: center; min-height: 36px; padding: 0 16px; border-bottom: 1px solid var(--hairline); background: var(--bg-subtle); }
+  .stack-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--cool-gray-9); font-weight: 700; margin: 0; }
+  .state-row { display: grid; grid-template-columns: 48px 1fr; }
+
+  .state-rail { position: relative; }
+  .state-rail::before, .state-rail::after {
+    content: ''; position: absolute; left: 24px; transform: translateX(-50%);
+    width: 2px; background: var(--cool-gray-2);
+  }
+  .state-rail::before { top: 0; height: 28px; }
+  .state-rail::after  { top: 28px; bottom: 0; }
+  .state-row.is-first .state-rail::before { display: none; }
+  .state-row.is-last  .state-rail::after  { display: none; }
+
+  .marker {
+    position: absolute; left: 24px; top: 28px; transform: translate(-50%, -50%);
+    width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 2px solid var(--cool-gray-3);
+    display: flex; align-items: center; justify-content: center; z-index: 1; color: #fff;
+  }
+  .marker svg { width: 12px; height: 12px; }
+  .state-row.is-completed .marker { background: var(--cool-gray-7); border-color: var(--cool-gray-7); }
+  .state-row.is-active .marker { background: var(--cerulean); border-color: var(--cerulean); box-shadow: 0 0 0 4px color-mix(in srgb, var(--cerulean) 16%, #fff); }
+  .state-row.is-upcoming .marker { border-color: var(--cool-gray-2); }
+
+  .state-main { padding: 16px 18px 16px 2px; border-bottom: 1px solid var(--hairline); min-width: 0; }
+  .state-row.is-last .state-main { border-bottom: 0; }
+
+  .state-head { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+  .state-row.is-upcoming .state-head { cursor: default; }
+  .state-titletext { font-size: 15px; font-weight: 600; color: var(--cool-gray-11); }
+  .state-row.is-upcoming .state-titletext { color: var(--cool-gray-7); }
+  .state-head .spacer { flex: 1; }
+  .state-when { font-size: 12.5px; color: var(--text-muted); }
+  .state-when b { color: var(--cool-gray-10); font-weight: 600; }
+  .state-chevron { width: 16px; height: 16px; color: var(--cool-gray-7); transition: transform 0.18s; flex-shrink: 0; }
+  .state-row.open .state-chevron { transform: rotate(180deg); }
+
+  /* Completed → expandable read-only detail */
+  .state-detail { display: none; margin-top: 14px; }
+  .state-row.open .state-detail { display: block; }
+  .field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 28px; }
+
+  /* Completed sub-steps inside a state's detail box */
+  .substep-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .substep { border: 1px solid var(--hairline); border-radius: var(--radius-md); overflow: hidden; background: #fff; }
+  .substep-top { display: flex; align-items: center; gap: 9px; padding: 9px 12px; background: var(--bg-subtle); }
+  .substep-check { width: 18px; height: 18px; border-radius: 50%; background: var(--notify-green); color: #fff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .substep-check svg { width: 11px; height: 11px; }
+  .substep-name { font-size: 13.5px; font-weight: 600; color: var(--cool-gray-11); }
+  .substep-meta { margin-left: auto; font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+  .substep-detail { padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+  .substep-chev { width: 16px; height: 16px; color: var(--cool-gray-7); transition: transform 0.18s; flex-shrink: 0; }
+  .substep.collapsible .substep-top { cursor: pointer; }
+  .substep.collapsible .substep-detail { display: none; }
+  .substep.collapsible.open .substep-detail { display: flex; }
+  .substep.collapsible.open .substep-chev { transform: rotate(180deg); }
+  .ss-field { font-size: 13px; }
+  .ss-field .ss-k { color: var(--cool-gray-9); }
+  .ss-field .ss-v { color: var(--cool-gray-11); font-weight: 500; }
+  .ss-file { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; font-size: 12.5px; color: var(--cool-gray-10); background: #fff; border: 1px solid var(--cool-gray-2); border-radius: var(--radius-sm); padding: 4px 9px; text-decoration: none; }
+  .ss-file:hover { border-color: var(--cool-gray-3); color: var(--cool-gray-11); }
+  .ss-file svg { width: 13px; height: 13px; color: var(--cool-gray-7); flex-shrink: 0; }
+  .substep-note { margin: 0; font-size: 13.5px; color: var(--cool-gray-9); }
+  .field { display: flex; flex-direction: column; gap: 3px; }
+  .field .k { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--cool-gray-7); font-weight: 600; }
+  .field .v { font-size: 13.5px; color: var(--cool-gray-11); }
+  .rewind-link {
+    margin-top: 14px; display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 0;
+    color: var(--cool-gray-8); font-size: 12.5px; font-weight: 600; cursor: pointer; padding: 0;
+  }
+  .rewind-link:hover { color: var(--cerulean); }
+  .rewind-link svg { width: 14px; height: 14px; }
+
+  /* Active state body */
+  .active-body { margin-top: 14px; }
+  /* Step alert — shown atop a step in Review / Rework / Blocked / On Hold; tinted by status */
+  .step-alert {
+    display: flex; align-items: flex-start; gap: 9px; margin-bottom: 14px;
+    padding: 10px 12px; border-radius: var(--radius-md); font-size: 13px; line-height: 1.45; color: var(--cool-gray-11);
+    background: color-mix(in srgb, var(--status-color, var(--status-rework)) 10%, #fff);
+    border: 1px solid color-mix(in srgb, var(--status-color, var(--status-rework)) 32%, #fff);
+  }
+  .step-alert .sa-icon { width: 17px; height: 17px; color: var(--status-color, var(--status-rework)); flex-shrink: 0; margin-top: 1px; }
+  .step-alert b { color: var(--status-color, var(--status-rework)); }
+  .step-alert .sa-link { color: var(--status-color, var(--status-rework)); font-weight: 600; white-space: nowrap; }
+  .step-alert.is-review { --status-color: var(--status-review); }
+  .step-alert.is-rework { --status-color: var(--status-rework); }
+  .step-alert.is-blocked { --status-color: var(--status-blocked); }
+  .step-alert.is-on-hold { --status-color: var(--status-on-hold); }
+
+  /* Pre-Production sub-steps (accordion) */
+  .pp-steps { display: flex; flex-direction: column; gap: 10px; }
+  .pp-step { border: 1px solid var(--hairline); border-radius: var(--radius-md); overflow: hidden; background: #fff; }
+  .pp-step-head { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; background: var(--bg-subtle); border: 0; cursor: pointer; font: inherit; text-align: left; }
+  .pp-num { width: 22px; height: 22px; border-radius: 50%; background: var(--cool-gray-7); color: #fff; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .pp-num svg { width: 13px; height: 13px; }
+  .pp-step.is-current .pp-num { background: var(--cerulean); }
+  .pp-step.done .pp-num { background: var(--notify-green); }
+  .pp-title { flex: 1; font-size: 14px; font-weight: 600; color: var(--cool-gray-11); }
+  .pp-attach { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 600; color: var(--cool-gray-8); flex-shrink: 0; }
+  .pp-attach svg { width: 14px; height: 14px; }
+  .pp-meta { font-size: 12px; color: var(--text-muted); flex-shrink: 0; }
+  .pp-chev { width: 16px; height: 16px; color: var(--cool-gray-7); transition: transform 0.18s; flex-shrink: 0; }
+  .pp-step.open .pp-chev { transform: rotate(180deg); }
+  .pp-step.is-current .pp-chev { display: none; }
+  .pp-step.is-current .pp-step-head { cursor: default; }
+  .pp-step-body { display: none; padding: 14px 12px; }
+  .pp-step.open .pp-step-body { display: block; }
+  .pp-complete { margin-top: 4px; }
+
+  /* Optional file upload zone */
+  .upload-zone { display: flex; align-items: center; gap: 10px; padding: 11px 12px; margin-bottom: 16px; border: 1px dashed var(--cool-gray-3); border-radius: var(--radius-md); color: var(--text-muted); font-size: 13px; cursor: pointer; transition: border-color 0.12s, color 0.12s; }
+  .upload-zone:hover { border-color: var(--cerulean); color: var(--cool-gray-10); }
+  .upload-zone svg { width: 18px; height: 18px; color: var(--cool-gray-7); flex-shrink: 0; }
+  .upload-zone em { font-style: normal; color: var(--cool-gray-7); }
+
+  /* Large drag-and-drop zone (current upload step) */
+  .dropzone {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+    gap: 6px; padding: 32px 16px; margin-bottom: 16px;
+    border: 2px dashed var(--cool-gray-3); border-radius: var(--radius-lg);
+    background: var(--bg-subtle); color: var(--text-muted); cursor: pointer;
+    transition: border-color 0.12s, background 0.12s;
+  }
+  .dropzone:hover { border-color: var(--cerulean); background: color-mix(in srgb, var(--cerulean) 5%, #fff); }
+  .dropzone svg { width: 30px; height: 30px; color: var(--cool-gray-7); margin-bottom: 2px; }
+  .dz-title { font-size: 14px; font-weight: 600; color: var(--cool-gray-11); }
+  .dz-sub { font-size: 12.5px; color: var(--text-muted); }
+  .dz-browse { color: var(--cerulean); font-weight: 600; text-decoration: underline; }
+  .dz-label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--cool-gray-9); font-weight: 600; margin-bottom: 6px; }
+  .dz-label em { font-style: normal; font-weight: 400; color: var(--cool-gray-7); }
+
+  /* Comments — chat thread */
+  .chat { display: flex; flex-direction: column; gap: 14px; flex: 1; min-height: 0; overflow-y: auto; }
+  .msg { display: flex; gap: 8px; align-items: flex-start; }
+  .msg.out { flex-direction: row-reverse; }
+  .av { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .av-ss { background: var(--cerulean); color: #fff; }
+  .av-aj { background: var(--gold-tips); color: var(--cool-gray-11); }
+  .av-jh { background: var(--cerulean); color: #fff; }
+  .msg-col { display: flex; flex-direction: column; max-width: 78%; min-width: 0; }
+  .msg.out .msg-col { align-items: flex-end; }
+  .msg-bubble { background: #fff; border: 1px solid var(--cool-gray-2); border-radius: 12px; padding: 9px 12px; font-size: 13.5px; line-height: 1.45; color: var(--cool-gray-11); }
+  .msg-meta { display: flex; align-items: center; gap: 6px; margin-top: 4px; font-size: 11.5px; color: var(--text-muted); }
+  .like { display: inline-flex; color: var(--cool-gray-7); cursor: pointer; border-radius: var(--radius-sm); transition: color 0.12s; }
+  .like:hover { color: var(--gold-tips); }
+  .like svg { width: 14px; height: 14px; }
+  .like.liked { color: var(--gold-tips); }
+  .like.liked:hover { color: var(--cool-gray-7); }
+
+  .last-read { display: flex; align-items: center; gap: 10px; margin: 2px 0; color: var(--notify-green); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+  .last-read span { flex-shrink: 0; }
+  .last-read::before, .last-read::after { content: ''; flex: 1; height: 1px; background: color-mix(in srgb, var(--notify-green) 45%, #fff); }
+
+  .msg-image { position: relative; width: 240px; max-width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid var(--cool-gray-2); }
+  .img-ph { aspect-ratio: 4 / 3; background: linear-gradient(135deg, #cdd62f, #a7b026); display: flex; align-items: center; justify-content: center; color: rgba(52,55,65,0.45); font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+  .img-expand { position: absolute; right: 8px; bottom: 8px; width: 28px; height: 28px; border-radius: var(--radius-sm); background: rgba(255,255,255,0.92); border: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .img-expand svg { width: 14px; height: 14px; color: var(--cool-gray-11); }
+
+  .composer { flex-shrink: 0; margin-top: 14px; border: 1px solid var(--cool-gray-2); border-radius: 14px; padding: 10px 12px; background: #fff; }
+  .composer-input { width: 100%; border: 0; font: inherit; font-size: 14px; color: var(--text); padding: 2px 0 8px; background: transparent; }
+  .composer-input:focus { outline: none; }
+  .composer-row { display: flex; align-items: center; justify-content: space-between; }
+  .composer-img { background: transparent; border: 0; color: var(--cool-gray-9); cursor: pointer; display: inline-flex; padding: 4px; border-radius: var(--radius-sm); }
+  .composer-img:hover { background: var(--hover); color: var(--cool-gray-11); }
+  .composer-img svg { width: 20px; height: 20px; }
+  .composer-send { width: 32px; height: 32px; border-radius: 50%; border: 0; background: var(--cool-gray-2); color: var(--cool-gray-7); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: background 0.12s, color 0.12s; }
+  .composer-send svg { width: 16px; height: 16px; }
+  .composer-send.active { background: var(--cerulean); color: #fff; }
+
+  /* ---------- Buttons ---------- */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 34px; padding: 0 16px; border-radius: var(--radius-md); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid var(--cool-gray-2); background: #fff; color: var(--cool-gray-10); transition: background 0.12s, border-color 0.12s; }
+  .btn:hover { background: var(--hover); }
+  .btn-primary { background: var(--cerulean); border-color: var(--cerulean); color: #fff; }
+  .btn-primary:hover { background: #019fd4; }
+  .btn:disabled, .btn[disabled] { background: var(--cool-gray-2); border-color: var(--cool-gray-2); color: var(--cool-gray-7); cursor: not-allowed; }
+  .btn svg { width: 16px; height: 16px; }
+
+  /* ---------- Modal / overlay ---------- */
+  .overlay { position: fixed; inset: 0; background: rgba(52,55,65,0.45); display: none; align-items: flex-start; justify-content: center; padding: 72px 16px 32px; z-index: 50; overflow: auto; }
+  .overlay.open { display: flex; }
+  .modal { background: #fff; border-radius: var(--radius-lg); width: 100%; max-width: 560px; box-shadow: 0 24px 64px rgba(0,0,0,0.28); }
+  .modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 18px 22px; border-bottom: 1px solid var(--border); }
+  .modal-head h3 { margin: 0; font-size: 19px; color: var(--cool-gray-11); }
+  .modal-head p { margin: 3px 0 0; font-size: 13px; color: var(--text-muted); }
+  .modal-close { background: transparent; border: 0; color: var(--cool-gray-8); cursor: pointer; padding: 4px; border-radius: var(--radius-sm); display: inline-flex; }
+  .modal-close:hover { background: var(--hover); color: var(--cool-gray-11); }
+  .modal-close svg { width: 18px; height: 18px; }
+  .modal-body { padding: 20px 22px; }
+  .modal-foot { display: flex; justify-content: flex-end; gap: 10px; padding: 16px 22px; border-top: 1px solid var(--border); }
+
+  .form-row { margin-bottom: 16px; }
+  .form-row:last-child { margin-bottom: 0; }
+  .form-row label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--cool-gray-7); margin-bottom: 6px; }
+  .form-row input, .form-row select, .form-row textarea {
+    width: 100%; border: 1px solid var(--cool-gray-2); border-radius: var(--radius-md); padding: 9px 12px; font: inherit; font-size: 14px; color: var(--text); background: #fff;
+  }
+  .form-row input:focus, .form-row select:focus, .form-row textarea:focus { outline: none; border-color: var(--cerulean); }
+  .form-row textarea { min-height: 84px; resize: vertical; }
+  .form-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+  .form-3col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 16px; }
+
+  /* Date field with trailing calendar icon */
+  .date-field { position: relative; }
+  .date-field input { padding-right: 34px; }
+  .date-field svg { position: absolute; right: 10px; top: 9px; width: 16px; height: 16px; color: var(--cool-gray-7); pointer-events: none; }
+
+  /* Read-only value (e.g. computed expiration date) */
+  .ro-value { font-size: 14px; color: var(--cool-gray-11); padding: 9px 0; }
+
+  /* Radio group */
+  .radio-group { display: flex; gap: 22px; padding-top: 2px; }
+  .radio { display: inline-flex; align-items: center; font-size: 14px; color: var(--cool-gray-11); cursor: pointer; }
+  .radio span { margin-left: 8px; line-height: 16px; position: relative; top: -1px; }
+  .radio input {
+    appearance: none; -webkit-appearance: none; position: relative; flex-shrink: 0; box-sizing: border-box;
+    width: 16px; height: 16px; min-width: 16px; padding: 0; margin: 0;
+    border: 1.5px solid var(--cool-gray-5); border-radius: 50%; cursor: pointer;
+  }
+  .radio input:checked { border-color: var(--cool-gray-11); }
+  .radio input:checked::after {
+    content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 8px; height: 8px; border-radius: 50%; background: var(--cool-gray-11);
+  }
+
+  /* Sub-section title + dotted divider (inside a step) */
+  .pp-section-title { font-size: 13px; font-weight: 700; color: var(--cool-gray-11); margin: 0 0 12px; }
+  .pp-divider { border-top: 1px dotted var(--cool-gray-3); margin: 16px 0; }
+  .pp-actions { display: flex; flex-wrap: nowrap; align-items: center; gap: 10px; margin-top: 4px; }
+  .pp-actions .btn { margin: 0; }
+
+  /* History — vertical audit timeline */
+  .hist { list-style: none; margin: 0; padding: 0; }
+  .hist-item { position: relative; display: grid; grid-template-columns: 26px 1fr; gap: 12px; padding-bottom: 18px; }
+  .hist-item::before { content: ''; position: absolute; left: 12px; top: 22px; bottom: -2px; width: 2px; background: var(--cool-gray-2); }
+  .hist-item.is-last::before { display: none; }
+  .hist-mark { position: relative; z-index: 1; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: #fff; color: var(--cool-gray-9); }
+  .hist-mark svg { width: 18px; height: 18px; }
+  .hist-mark.hist-complete { color: var(--cool-gray-11); }
+  .hist-text { font-size: 13px; line-height: 1.5; color: var(--text-muted); padding-top: 2px; min-width: 0; }
+  .hist-text.hist-strong { color: var(--cool-gray-11); font-weight: 600; }
+  .hist-more { display: none; }
+  .hist-text.open .hist-more { display: inline; }
+  .hist-expand { display: inline-flex; align-items: center; gap: 3px; background: transparent; border: 0; padding: 0; margin-left: 2px; font: inherit; font-size: 12.5px; font-weight: 600; color: var(--cool-gray-9); cursor: pointer; }
+  .hist-expand:hover { color: var(--cerulean); }
+  .hist-expand svg { width: 13px; height: 13px; transition: transform 0.18s; }
+  .hist-text.open .hist-expand svg { transform: rotate(180deg); }
+
+  /* Settings rows */
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--cool-gray-1); }
+  .toggle-row:last-of-type { border-bottom: 0; }
+  .toggle-row .t-label { font-size: 14px; font-weight: 600; color: var(--cool-gray-11); }
+  .toggle-row .t-desc { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+  .danger-zone { margin-top: 8px; padding-top: 16px; border-top: 1px solid var(--cool-gray-1); }
+  .btn-danger { color: var(--pantone-7417); border-color: color-mix(in srgb, var(--pantone-7417) 40%, #fff); background: #fff; }
+  .btn-danger:hover { background: color-mix(in srgb, var(--pantone-7417) 8%, #fff); }
+
+  /* ---------- Products drawer ---------- */
+  .drawer { position: fixed; top: 0; right: 0; height: 100vh; width: 440px; max-width: 92vw; background: #fff; transform: translateX(100%); transition: transform 0.25s ease; z-index: 60; display: flex; flex-direction: column; }
+  .drawer.open { transform: translateX(0); box-shadow: -16px 0 48px rgba(0,0,0,0.18); }
+  .drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid var(--border); }
+  .drawer-head h3 { margin: 0; font-size: 19px; color: var(--cool-gray-11); }
+  .drawer-body { padding: 20px 22px; overflow: auto; flex: 1; display: flex; flex-direction: column; }
+  .drawer-section { margin-bottom: 26px; }
+  .drawer-section h4 { margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--cool-gray-7); font-weight: 700; }
+  .prod-line { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border: 1px solid var(--cool-gray-1); border-radius: var(--radius-md); margin-bottom: 8px; font-size: 13.5px; }
+  .prod-line .p-name { color: var(--cool-gray-11); font-weight: 500; }
+  .prod-line .p-qty { color: var(--text-muted); font-size: 12.5px; }
+  .ship-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+
+  /* Action button reflects its open drawer */
+  .action-btn.is-open { background: var(--cool-gray-1); border-color: var(--cool-gray-3); color: var(--cool-gray-11); }
+
+  /* Ellipsis (kebab) menu */
+  .kebab { position: relative; }
+  .kebab-menu {
+    position: absolute; top: calc(100% + 8px); right: 0; min-width: 210px;
+    background: #fff; border: 1px solid var(--border); border-radius: var(--radius-md);
+    box-shadow: 0 10px 28px rgba(52,55,65,0.16); padding: 6px; display: none; z-index: 30;
+  }
+  .kebab.open .kebab-menu { display: block; }
+  .kebab-item {
+    display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+    padding: 9px 12px; border-radius: var(--radius-sm); border: 0; background: transparent;
+    font: inherit; font-size: 14px; font-weight: 500; color: var(--cool-gray-10); cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+  }
+  .kebab-item:hover { background: var(--hover); color: var(--cool-gray-11); }
+  .kebab-item svg { width: 17px; height: 17px; opacity: 0.85; flex-shrink: 0; }
+  .kebab-divider { height: 1px; background: var(--cool-gray-1); margin: 6px 4px; }
+
+  /* Side panel — swappable content per button */
+  .drawer-panel { display: none; }
+  .drawer-panel.active { display: block; }
+  /* Comments panel fills the drawer height so the composer anchors to the bottom */
+  .drawer-panel[data-drawer-panel="comments"].active { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+  .file-card { border: 1px solid var(--cool-gray-1); border-radius: var(--radius-md); margin-bottom: 8px; overflow: hidden; }
+  .file-line { display: flex; align-items: center; gap: 12px; padding: 10px 12px; }
+  .file-settings { display: none; padding: 4px 14px 14px; border-top: 1px solid var(--hairline); }
+  .file-card.open .file-settings { display: block; }
+  .file-card.open .file-settings-btn { color: var(--cool-gray-11); background: var(--hover); }
+  .file-info { flex: 1; min-width: 0; }
+  .file-line .f-name { font-size: 13.5px; color: var(--cool-gray-11); font-weight: 500; }
+  .file-line .f-sub { font-size: 12px; color: var(--text-muted); }
+  .file-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
+  .file-act { background: transparent; border: 0; padding: 6px; border-radius: var(--radius-sm); color: var(--cool-gray-7); cursor: pointer; display: inline-flex; transition: background 0.12s, color 0.12s; }
+  .file-act:hover { background: var(--hover); color: var(--cool-gray-11); }
+  .file-act svg { width: 16px; height: 16px; }
+  .panel-export { margin-top: 14px; width: 100%; }
+  .panel-foot { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--hairline); }
+
+  /* "Choose who can view" — inline in the file card */
+  .who-title { font-size: 13px; font-weight: 700; color: var(--cool-gray-11); margin-bottom: 12px; }
+  .who-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; font-size: 14px; color: var(--cool-gray-11); cursor: pointer; }
+  .who-row:last-child { margin-bottom: 0; }
+  .file-save { margin-top: 16px; }
+
+  /* Toggle switch — small; cerulean when on */
+  .switch { position: relative; display: inline-flex; width: 28px; height: 16px; flex-shrink: 0; }
+  .switch input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+  .switch .track { position: absolute; inset: 0; border-radius: 999px; background: var(--cool-gray-3); transition: background 0.15s; }
+  .switch .track::before { content: ''; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: #fff; transition: transform 0.15s; box-shadow: 0 1px 2px rgba(52,55,65,0.3); }
+  .switch input:checked + .track { background: var(--cerulean); }
+  .switch input:checked + .track::before { transform: translateX(12px); }
+
+  /* Checkbox sections (Settings panel) */
+  .check-row { display: flex; align-items: center; gap: 10px; cursor: pointer; margin: 2px 0 12px; }
+  .check-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--cool-gray-11); cursor: pointer; flex-shrink: 0; }
+  .check-label { font-size: 14px; font-weight: 700; color: var(--cool-gray-11); }
+  .check-body { padding-left: 26px; margin-bottom: 20px; }
+  .check-body.collapsed { display: none; }
+  .check-note { margin: -8px 0 16px; padding-left: 26px; font-size: 12.5px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ========= LEFT SIDEBAR ========= -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-lockup">
+        <img class="brand-lockup-img"
+             src="../assets/acumed-lockup.png"
+             alt="Acumed Digital Surgery" />
+      </div>
+      <button class="collapse-btn" aria-label="Collapse sidebar" title="Collapse sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6"  x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="15" y2="12"/>
+          <line x1="3" y1="18" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <nav class="nav">
+      <!-- Cases (expanded, active) -->
+      <div class="nav-item nav-toggle active" data-target="grp-cases">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="16" rx="2"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+          <line x1="9" y1="4"  x2="9"  y2="20"/>
+        </svg>
+        <span class="nav-label">Cases</span>
+        <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+      <div class="nav-children" id="grp-cases">
+        <!-- My cases (sub-group, expandable) -->
+        <div class="nav-sub-item nav-toggle expanded" data-target="grp-mycases">
+          <span class="nav-sub-label">My cases</span>
+          <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+        <div class="nav-children nav-children-2 open" id="grp-mycases">
+          <div class="nav-sub-item">
+            <span class="nav-sub-label">List</span>
+          </div>
+          <div class="nav-sub-item active">
+            <span class="nav-sub-label">Cases of Crosscheck 2</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Community (share / network icon) -->
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"/>
+          <circle cx="6" cy="12" r="3"/>
+          <circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+          <line x1="15.41" y1="6.51"  x2="8.59"  y2="10.49"/>
+        </svg>
+        <span class="nav-label">Community</span>
+      </div>
+
+      <!-- Configs -->
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        <span class="nav-label">Configs</span>
+        <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+
+      <!-- Support -->
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <circle cx="12" cy="12" r="4"/>
+          <line x1="4.93"  y1="4.93"  x2="9.17"  y2="9.17"/>
+          <line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/>
+          <line x1="14.83" y1="9.17"  x2="19.07" y2="4.93"/>
+          <line x1="4.93"  y1="19.07" x2="9.17"  y2="14.83"/>
+        </svg>
+        <span class="nav-label">Support</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">v2.0</div>
+  </aside>
+
+  <!-- ========= MAIN ========= -->
+  <div class="main">
+    <!-- ========= TOP BAR ========= -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="icon-btn topbar-toggle" id="expandBtn" aria-label="Open sidebar" title="Open sidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="6"  x2="21" y2="6"/>
+            <line x1="3" y1="12" x2="15" y2="12"/>
+            <line x1="3" y1="18" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="icon-btn has-dot" aria-label="Announcements" title="Announcements">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11l18-5v12L3 14v-3z"/>
+            <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>
+          </svg>
+        </button>
+
+        <button class="lang-pill" aria-label="Language">
+          <span class="flag-us" aria-hidden="true"></span>
+          <span>EN</span>
+        </button>
+
+        <button class="icon-btn" aria-label="Text size" title="Text size">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="4 7 4 4 20 4 20 7"/>
+            <line x1="9" y1="20" x2="15" y2="20"/>
+            <line x1="12" y1="4" x2="12" y2="20"/>
+          </svg>
+        </button>
+
+        <button class="icon-btn" aria-label="Fullscreen" title="Fullscreen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="4 8 4 4 8 4"/>
+            <polyline points="16 4 20 4 20 8"/>
+            <polyline points="20 16 20 20 16 20"/>
+            <polyline points="8 20 4 20 4 16"/>
+          </svg>
+        </button>
+
+        <button class="icon-btn" aria-label="Messages" title="Messages">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </button>
+
+        <button class="icon-btn" aria-label="Notifications" title="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+        </button>
+
+        <div class="topbar-user" id="userMenuTrigger" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false">
+          <div class="who">
+            <span class="name">Jamie Holland</span>
+            <span class="role">Administrator</span>
+          </div>
+          <span class="av av-jh" aria-hidden="true">JH</span>
+          <svg class="user-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+
+          <div class="user-menu" id="userMenu" role="menu">
+            <div class="user-menu-item" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="18" cy="5" r="3"/>
+                <circle cx="6" cy="12" r="3"/>
+                <circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+              </svg>
+              Share Feedback
+            </div>
+            <div class="user-menu-item" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="8" y="6" width="8" height="14" rx="4"/>
+                <path d="M19 7l-3 2"/>
+                <path d="M5 7l3 2"/>
+                <path d="M12 20v-9"/>
+                <line x1="8" y1="13" x2="4" y2="13"/>
+                <line x1="8" y1="17" x2="4" y2="17"/>
+                <line x1="16" y1="13" x2="20" y2="13"/>
+                <line x1="16" y1="17" x2="20" y2="17"/>
+                <path d="M9 6a3 3 0 0 1 6 0"/>
+              </svg>
+              Report a bug
+            </div>
+            <div class="user-menu-item" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+              Logout
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ========= CONTENT ========= -->
+    <main class="content">
+
+      <!-- Sticky: breadcrumb + actions only -->
+      <header class="case-sticky">
+        <div class="header-topbar">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+              <button class="crumb" type="button">All cases</button>
+              <span class="crumb-sep" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+              <span class="crumb current">ID: <span id="caseId">26A0089</span></span>
+              <button class="deviation-flag tip" type="button" aria-label="View Deviation" data-tip="View Deviation">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+              </button>
+              <button class="copy-btn tip" id="copyBtn" aria-label="Copy case ID" data-tip="Copy case ID">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+              </button>
+            </nav>
+
+            <div class="header-actions">
+              <button class="action-btn" data-drawer="comments">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Comments<span class="unread">3</span>
+              </button>
+              <button class="action-btn" data-drawer="history">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+                History
+              </button>
+              <button class="action-btn" data-drawer="files">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                Files
+              </button>
+              <div class="kebab">
+                <button class="action-btn icon-only" id="kebabBtn" aria-label="More actions" aria-haspopup="true" aria-expanded="false" title="More">
+                  <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                </button>
+                <div class="kebab-menu" role="menu">
+                  <button class="kebab-item" role="menuitem">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    Create PDF
+                  </button>
+                  <button class="kebab-item" role="menuitem">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                    3D viewer
+                  </button>
+                  <button class="kebab-item" role="menuitem" data-drawer="products">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+                    Products
+                  </button>
+                  <button class="kebab-item" role="menuitem" data-drawer="settings">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="10" y1="8" x2="14" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+                    Settings
+                  </button>
+                  <button class="kebab-item" role="menuitem" data-drawer="rewind">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                    Rewind
+                  </button>
+                  <div class="kebab-divider"></div>
+                  <button class="kebab-item" role="menuitem" data-drawer="planning">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                    Planning
+                  </button>
+                  <button class="kebab-item" role="menuitem" data-drawer="home">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    Home
+                  </button>
+                </div>
+              </div>
+            </div>
+        </div>
+      </header>
+
+      <div class="case-body">
+        <section class="progress-card">
+                <div class="progress-card-head">
+                  <h2 class="progress-card-title">Progress</h2>
+                </div>
+                <div class="progress-card-body">
+                  <ol class="timeline" aria-label="Case progress">
+                <li class="tl-step is-done">
+                  <span class="tl-node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                  <span class="tl-label">Intake</span>
+                </li>
+                <li class="tl-step is-done">
+                  <span class="tl-node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                  <span class="tl-label">Case Prep</span>
+                </li>
+                <li class="tl-step is-done">
+                  <span class="tl-node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                  <span class="tl-label">Planning</span>
+                </li>
+                <li class="tl-step is-done">
+                  <span class="tl-node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                  <span class="tl-label">Design</span>
+                </li>
+                <li class="tl-step is-done">
+                  <span class="tl-node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                  <span class="tl-label">Approval</span>
+                </li>
+                <li class="tl-step is-current is-rework" aria-current="step">
+                  <span class="tl-node"></span>
+                  <span class="tl-label">Pre-Production</span>
+                  <span class="status-pill sm is-rework solid" title="Rework — a step was sent back for changes and needs to be redone.">Rework</span>
+                </li>
+                <li class="tl-step is-upcoming">
+                  <span class="tl-node"></span>
+                  <span class="tl-label">Production</span>
+                </li>
+                  </ol>
+                </div>
+              </section>
+
+              <section class="case-details" id="caseDetails">
+                <div class="case-details-head">
+                  <h2 class="case-details-title">Case details</h2>
+                  <button class="privacy-toggle" id="privacyToggle" type="button" aria-pressed="false">
+                    <svg class="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    <span class="pt-label">Hide</span>
+                  </button>
+                </div>
+                <div class="case-meta">
+                  <span class="meta-item"><span class="meta-label">Surgery</span><span class="meta-value">02JUN2026</span></span>
+                  <span class="meta-item"><span class="meta-label">Sales rep</span><span class="meta-value">Sarah Chen</span></span>
+                  <span class="meta-item"><span class="meta-label">Surgeon</span><span class="meta-value">Dr. R. Alvarez</span></span>
+                  <span class="meta-item"><span class="meta-label">Hospital</span><span class="meta-value">Mercy Surgical Center</span></span>
+                  <span class="meta-item"><span class="meta-label">Patient</span><span class="meta-value">Maria L.</span></span>
+                  <span class="meta-item"><span class="meta-label">Solution</span><span class="meta-value">Mandibular plate system</span></span>
+                  <span class="meta-item"><span class="meta-label">Approval</span><span class="meta-value">V1 · 27APR2026</span></span>
+                </div>
+                <div class="privacy-note">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  Details hidden for privacy
+                </div>
+              </section>
+
+              <div class="deviation-banner is-hidden" id="deviationBanner">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <span><strong>Deviation #DV-014</strong> recorded on this case.</span>
+              </div>
+        <div class="state-stack">
+          <div class="stack-head">
+            <h2 class="stack-title">Record</h2>
+          </div>
+
+            <!-- Intake (completed) -->
+            <div class="state-row is-completed is-first" data-state>
+              <div class="state-rail"><span class="marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></div>
+              <div class="state-main">
+                <div class="state-head" data-toggle-state>
+                  <span class="state-titletext">Intake</span>
+                  <span class="spacer"></span>
+                  <span class="state-when"><b>04MAY2026</b> · Sarah Chen</span>
+                  <svg class="state-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="state-detail">
+                  <p class="substep-note">Done</p>
+                  <button class="rewind-link" data-drawer="rewind">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                    Rewind to this state
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Case Prep (completed) -->
+            <div class="state-row is-completed" data-state>
+              <div class="state-rail"><span class="marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></div>
+              <div class="state-main">
+                <div class="state-head" data-toggle-state>
+                  <span class="state-titletext">Case Prep</span>
+                  <span class="spacer"></span>
+                  <span class="state-when"><b>07MAY2026</b> · Marcus Webb</span>
+                  <svg class="state-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="state-detail">
+                  <ul class="substep-list">
+                    <li class="substep">
+                      <div class="substep-top"><span class="substep-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="substep-name">Input review</span><span class="substep-meta">John Doe · 05MAY2026</span></div>
+                      <div class="substep-detail">
+                        <div class="ss-field"><span class="ss-k">Input data:</span> <span class="ss-v">Complete</span></div>
+                        <a class="ss-file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>input-review.pdf</a>
+                      </div>
+                    </li>
+                    <li class="substep">
+                      <div class="substep-top"><span class="substep-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="substep-name">Segmentation</span><span class="substep-meta">John Doe · 05MAY2026</span></div>
+                      <div class="substep-detail">
+                        <div class="ss-field"><span class="ss-k">Segments:</span> <span class="ss-v">Mandible, maxilla</span></div>
+                        <a class="ss-file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>segmentation.stl</a>
+                      </div>
+                    </li>
+                    <li class="substep">
+                      <div class="substep-top"><span class="substep-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="substep-name">Preparation</span><span class="substep-meta">Steve Smith · 06MAY2026</span></div>
+                      <div class="substep-detail">
+                        <div class="ss-field"><span class="ss-k">Cuts:</span> <span class="ss-v">Osteotomy planes set</span></div>
+                      </div>
+                    </li>
+                    <li class="substep">
+                      <div class="substep-top"><span class="substep-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="substep-name">Quality check</span><span class="substep-meta">Michael Jordan · 07MAY2026</span></div>
+                      <div class="substep-detail">
+                        <div class="ss-field"><span class="ss-k">Result:</span> <span class="ss-v">Passed</span></div>
+                      </div>
+                    </li>
+                  </ul>
+                  <button class="rewind-link" data-drawer="rewind">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                    Rewind to this state
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Planning (completed) -->
+            <div class="state-row is-completed" data-state>
+              <div class="state-rail"><span class="marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></div>
+              <div class="state-main">
+                <div class="state-head" data-toggle-state>
+                  <span class="state-titletext">Planning</span>
+                  <span class="spacer"></span>
+                  <span class="state-when"><b>10MAY2026</b> · Dr. Lin</span>
+                  <svg class="state-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="state-detail">
+                  <ul class="substep-list">
+                    <li class="substep">
+                      <div class="substep-top"><span class="substep-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="substep-name">Planning</span><span class="substep-meta">Dr. Lin · 10MAY2026</span></div>
+                      <div class="substep-detail">
+                        <div class="ss-field"><span class="ss-k">Plan:</span> <span class="ss-v">Finalized, confirmed with surgeon</span></div>
+                        <a class="ss-file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>surgical-plan.pdf</a>
+                      </div>
+                    </li>
+                  </ul>
+                  <button class="rewind-link" data-drawer="rewind">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                    Rewind to this state
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Design (completed) -->
+            <div class="state-row is-completed" data-state>
+              <div class="state-rail"><span class="marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></div>
+              <div class="state-main">
+                <div class="state-head" data-toggle-state>
+                  <span class="state-titletext">Design</span>
+                  <span class="spacer"></span>
+                  <span class="state-when"><b>14MAY2026</b> · Priya Nair</span>
+                  <svg class="state-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="state-detail">
+                  <ul class="substep-list">
+                    <li class="substep">
+                      <div class="substep-top"><span class="substep-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="substep-name">Design</span><span class="substep-meta">Priya Nair · 12MAY2026</span></div>
+                      <div class="substep-detail">
+                        <div class="ss-field"><span class="ss-k">Implants:</span> <span class="ss-v">2 plates, patient-matched</span></div>
+                        <a class="ss-file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>implant-design-v2.stl</a>
+                      </div>
+                    </li>
+                    <li class="substep">
+                      <div class="substep-top"><span class="substep-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="substep-name">Design quality check</span><span class="substep-meta">Marcus Webb · 13MAY2026</span></div>
+                      <div class="substep-detail">
+                        <div class="ss-field"><span class="ss-k">Result:</span> <span class="ss-v">Passed</span></div>
+                      </div>
+                    </li>
+                    <li class="substep">
+                      <div class="substep-top"><span class="substep-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="substep-name">Case report</span><span class="substep-meta">Priya Nair · 14MAY2026</span></div>
+                      <div class="substep-detail">
+                        <div class="ss-field"><span class="ss-k">Report:</span> <span class="ss-v">Drafted</span></div>
+                        <a class="ss-file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>case-report.pdf</a>
+                      </div>
+                    </li>
+                    <li class="substep">
+                      <div class="substep-top"><span class="substep-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="substep-name">Case report quality check</span><span class="substep-meta">Marcus Webb · 14MAY2026</span></div>
+                      <div class="substep-detail">
+                        <div class="ss-field"><span class="ss-k">Result:</span> <span class="ss-v">Passed</span></div>
+                      </div>
+                    </li>
+                  </ul>
+                  <button class="rewind-link" data-drawer="rewind">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                    Rewind to this state
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Approval (completed) -->
+            <div class="state-row is-completed" data-state>
+              <div class="state-rail"><span class="marker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></div>
+              <div class="state-main">
+                <div class="state-head" data-toggle-state>
+                  <span class="state-titletext">Approval</span>
+                  <span class="spacer"></span>
+                  <span class="state-when"><b>18MAY2026</b> · Dr. Alvarez</span>
+                  <svg class="state-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="state-detail">
+                  <ul class="substep-list">
+                    <li class="substep">
+                      <div class="substep-top"><span class="substep-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="substep-name">Request approval</span><span class="substep-meta">Sarah Chen · 15MAY2026</span></div>
+                      <div class="substep-detail">
+                        <div class="ss-field"><span class="ss-k">Sent to:</span> <span class="ss-v">Dr. R. Alvarez</span></div>
+                      </div>
+                    </li>
+                    <li class="substep">
+                      <div class="substep-top"><span class="substep-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="substep-name">Surgeon approval</span><span class="substep-meta">Dr. R. Alvarez · 18MAY2026</span></div>
+                      <div class="substep-detail">
+                        <div class="ss-field"><span class="ss-k">Outcome:</span> <span class="ss-v">Approved v2</span></div>
+                        <a class="ss-file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>approval-sign-off.pdf</a>
+                      </div>
+                    </li>
+                  </ul>
+                  <button class="rewind-link" data-drawer="rewind">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                    Rewind to this state
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pre-Production (ACTIVE) -->
+            <div class="state-row is-active" data-state>
+              <div class="state-rail"><span class="marker"></span></div>
+              <div class="state-main">
+                <div class="state-head">
+                  <span class="state-titletext">Pre-Production</span>
+                  <span class="status-pill sm is-rework solid">Rework</span>
+                  <span class="spacer"></span>
+                  <span class="state-when">Current step</span>
+                </div>
+
+                <div class="active-body">
+                  <div class="pp-steps">
+
+                    <!-- Step 1 — completed -->
+                    <div class="substep collapsible">
+                      <div class="substep-top">
+                        <span class="substep-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                        <span class="substep-name">Submit sales order</span>
+                        <span class="substep-meta">John Doe · 24APR2026</span>
+                        <svg class="substep-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                      </div>
+                      <div class="substep-detail">
+                        <div class="ss-field"><span class="ss-k">Sales order number:</span> <span class="ss-v">SO-44821</span></div>
+                        <div class="ss-field"><span class="ss-k">Order date:</span> <span class="ss-v">24APR2026</span></div>
+                        <div class="ss-field"><span class="ss-k">Notes:</span> <span class="ss-v">Standard order</span></div>
+                        <a class="ss-file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>sales-order.pdf</a>
+                      </div>
+                    </div>
+
+                    <!-- Step 2 — completed -->
+                    <div class="substep collapsible">
+                      <div class="substep-top">
+                        <span class="substep-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                        <span class="substep-name">Define requirements</span>
+                        <span class="substep-meta">John Doe · 25APR2026</span>
+                        <svg class="substep-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                      </div>
+                      <div class="substep-detail">
+                        <div class="ss-field"><span class="ss-k">Indication / procedure:</span> <span class="ss-v">Mandibular reconstruction</span></div>
+                        <div class="ss-field"><span class="ss-k">Requirements:</span> <span class="ss-v">2 titanium plates, patient-matched</span></div>
+                        <a class="ss-file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>requirements.pdf</a>
+                      </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="pp-step open is-current">
+                      <button class="pp-step-head" type="button">
+                        <span class="pp-num">3</span>
+                        <span class="pp-title">Programming</span>
+                        <svg class="pp-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                      </button>
+                      <div class="pp-step-body">
+                        <div class="step-alert is-rework">
+                          <svg class="sa-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                          <div class="sa-text"><b>Attention</b> — Rejected by Michael Jordan on 25APR2026. 7702-1005R Program hole size incorrect… <a class="sa-link" href="#">View details</a></div>
+                        </div>
+                        <div class="pp-section-title">DICOM validation</div>
+                        <div class="form-3col">
+                          <div class="form-row"><label>DICOM type</label><select><option>CBCT</option><option>CT</option><option>MRI</option></select></div>
+                          <div class="form-row"><label>Acquisition date</label><div class="date-field"><input type="text" value="28APR2026" aria-label="Acquisition date" /><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div></div>
+                          <div class="form-row"><label>Expiration date</label><div class="ro-value">24JUL2026</div></div>
+                        </div>
+                        <div class="form-row">
+                          <label>DICOM conforms</label>
+                          <div class="radio-group">
+                            <label class="radio"><input type="radio" name="dicomConforms" checked /><span>Yes</span></label>
+                            <label class="radio"><input type="radio" name="dicomConforms" /><span>No</span></label>
+                          </div>
+                        </div>
+
+                        <div class="pp-divider"></div>
+
+                        <div class="pp-section-title">Dental data validation</div>
+                        <div class="form-row">
+                          <label>Dental data required</label>
+                          <div class="radio-group">
+                            <label class="radio"><input type="radio" name="dentalRequired" /><span>Yes</span></label>
+                            <label class="radio"><input type="radio" name="dentalRequired" checked /><span>No</span></label>
+                          </div>
+                        </div>
+
+                        <span class="dz-label">Files <em>(optional)</em></span>
+                        <label class="dropzone">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                          <div class="dz-title">Drag &amp; drop files here</div>
+                          <div class="dz-sub">or <span class="dz-browse">browse</span> to upload</div>
+                        </label>
+
+                        <div class="pp-actions">
+                          <button class="btn" type="button">Save</button>
+                          <button class="btn btn-primary pp-complete" type="button" disabled>Complete programming</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="pp-step">
+                      <button class="pp-step-head" type="button">
+                        <span class="pp-num">4</span>
+                        <span class="pp-title">3D file prep</span>
+                        <svg class="pp-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                      </button>
+                      <div class="pp-step-body">
+                        <div class="form-2col">
+                          <div class="form-row"><label>File format</label><select><option value="" disabled selected hidden></option><option>STL</option><option>3MF</option><option>STEP</option></select></div>
+                          <div class="form-row"><label>Build orientation</label><input type="text" placeholder="e.g. Z-up" /></div>
+                        </div>
+                        <div class="form-row"><label>Prep notes</label><textarea placeholder="Supports, layout, slicing notes…"></textarea></div>
+                        <label class="upload-zone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>Attach 3D file <em>(optional)</em></span></label>
+                        <button class="btn btn-primary pp-complete" type="button">Mark complete</button>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Production (upcoming) -->
+            <div class="state-row is-upcoming is-last" data-state>
+              <div class="state-rail"><span class="marker"></span></div>
+              <div class="state-main">
+                <div class="state-head">
+                  <span class="state-titletext">Production</span>
+                  <span class="spacer"></span>
+                  <span class="state-when">Upcoming</span>
+                </div>
+              </div>
+            </div>
+
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ========= STEP RECORD MODAL ========= -->
+<div class="overlay" id="stepModal" data-overlay>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="stepModalTitle">
+    <div class="modal-head">
+      <div>
+        <h3 id="stepModalTitle">Record step — Pre-Production</h3>
+        <p>Saving this step advances the case to Production.</p>
+      </div>
+      <button class="modal-close" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-2col">
+        <div class="form-row">
+          <label for="stepWho">Performed by</label>
+          <input id="stepWho" type="text" value="Jamie Holland" />
+        </div>
+        <div class="form-row">
+          <label for="stepWhen">Date</label>
+          <input id="stepWhen" type="date" value="2026-05-26" />
+        </div>
+      </div>
+      <div class="form-row">
+        <label for="stepStatus">Resulting status</label>
+        <select id="stepStatus">
+          <option>Completed — advance to Production</option>
+          <option>Rework</option>
+          <option>Blocked</option>
+          <option>On Hold</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label for="stepNotes">What was done</label>
+        <textarea id="stepNotes" placeholder="Describe the work completed in this step…"></textarea>
+      </div>
+      <div class="form-row">
+        <label for="stepReason">Reason (required if rework / blocked)</label>
+        <input id="stepReason" type="text" placeholder="Why was the step rejected or held?" />
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" data-close>Cancel</button>
+      <button class="btn btn-primary" data-close>Save &amp; advance</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========= SIDE PANEL (Comments / History / Files / Products / Settings / Rewind / Planning / Home) ========= -->
+<div class="overlay" id="panelOverlay"></div>
+<aside class="drawer" id="sidePanel" aria-hidden="true">
+  <div class="drawer-head">
+    <h3 id="panelTitle">Comments</h3>
+    <button class="modal-close" id="panelClose" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <div class="drawer-body">
+
+    <!-- Comments -->
+    <div class="drawer-panel" data-drawer-panel="comments">
+      <div class="chat">
+        <!-- Sarah Shepard (incoming) -->
+        <div class="msg in">
+          <span class="av av-ss">SS</span>
+          <div class="msg-col">
+            <div class="msg-bubble">@Adam Jensen this case has pre-exisiting hardware that will be removed.</div>
+            <div class="msg-meta">
+              <span class="like"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></span>
+              23APR2026 10:30 AM
+            </div>
+          </div>
+        </div>
+
+        <!-- Adam Jensen (outgoing) -->
+        <div class="msg out">
+          <span class="av av-aj">AJ</span>
+          <div class="msg-col">
+            <div class="msg-bubble">@Sarah Shepard, noted, thank you</div>
+            <div class="msg-meta">
+              23APR2026 10:35 AM
+              <span class="like liked"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="last-read"><span>Last Read</span></div>
+
+        <!-- Adam Jensen — image (outgoing) -->
+        <div class="msg out">
+          <span class="av av-aj">AJ</span>
+          <div class="msg-col">
+            <div class="msg-image">
+              <div class="img-ph">3D scan</div>
+              <button class="img-expand" aria-label="Expand image"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Adam Jensen (outgoing) -->
+        <div class="msg out">
+          <span class="av av-aj">AJ</span>
+          <div class="msg-col">
+            <div class="msg-bubble">Patients mouth slightly open in scan.</div>
+            <div class="msg-meta">
+              23APR2026 11:15 AM
+              <span class="like"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sarah Shepard (incoming) -->
+        <div class="msg in">
+          <span class="av av-ss">SS</span>
+          <div class="msg-col">
+            <div class="msg-bubble">@Adam Jensen this should be fine. Thanks for letting me know.</div>
+            <div class="msg-meta">
+              <span class="like liked"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></span>
+              23APR2026 11:20 AM
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="composer">
+        <input class="composer-input" type="text" placeholder="message…" aria-label="Message" />
+        <div class="composer-row">
+          <button class="composer-img tip tip-up" type="button" aria-label="Add file" data-tip="Add file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></button>
+          <button class="composer-send" type="button" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="drawer-panel" data-drawer-panel="history">
+      <ol class="hist">
+        <li class="hist-item">
+          <span class="hist-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>
+          <div class="hist-text">(R1) 24APR2026—Input Review started by John Doe. Input data requires approval to proceed</div>
+        </li>
+        <li class="hist-item">
+          <span class="hist-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <div class="hist-text">(R1) 24APR2026—Input Review completed by John Doe.</div>
+        </li>
+        <li class="hist-item">
+          <span class="hist-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <div class="hist-text">(R1) 24APR2026—Segmentation completed by John Doe</div>
+        </li>
+        <li class="hist-item">
+          <span class="hist-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <div class="hist-text">(R1) 24APR2026—Preparation completed by Steve Smith</div>
+        </li>
+        <li class="hist-item">
+          <span class="hist-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+          <div class="hist-text">(R1) 25APR2026—Quality check failed. Rejected by Michael Jordan. Reason: Segmentation of Mandible incorrect on inferior border. Slices 245–248.<span class="hist-more"> Re-segment the inferior border and resubmit for quality review.</span>
+            <button class="hist-expand" type="button">Expand <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+          </div>
+        </li>
+        <li class="hist-item">
+          <span class="hist-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <div class="hist-text">(R2) 25APR2026—Segmentation re-work completed by John Doe</div>
+        </li>
+        <li class="hist-item">
+          <span class="hist-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <div class="hist-text">(R2) 25APR2026—Preparation re-work completed by Steve Smith</div>
+        </li>
+        <li class="hist-item">
+          <span class="hist-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <div class="hist-text">(R2) 25APR2026—Quality check rework passed. Accepted by Michael Jordan.</div>
+        </li>
+        <li class="hist-item is-last">
+          <span class="hist-mark hist-complete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
+          <div class="hist-text hist-strong">25APR2026—State complete</div>
+        </li>
+      </ol>
+      <button class="btn btn-primary panel-export">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export as text
+      </button>
+    </div>
+
+    <!-- Files -->
+    <div class="drawer-panel" data-drawer-panel="files">
+      <div class="file-card">
+        <div class="file-line">
+          <div class="file-info"><div class="f-name">CT scan — DICOM set</div><div class="f-sub">412 slices · uploaded 04MAY2026 · Intake</div></div>
+          <div class="file-actions">
+            <button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+            <button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+        </div>
+        <div class="file-settings">
+          <div class="form-row file-rename"><label>File name</label><input type="text" /></div>
+          <div class="who-title">Choose who can view</div>
+          <label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label>
+          <label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label>
+          <label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label>
+          <button class="btn btn-primary file-save" type="button">Save</button>
+        </div>
+      </div>
+      <div class="file-card">
+        <div class="file-line">
+          <div class="file-info"><div class="f-name">Implant design — v2.stl</div><div class="f-sub">Priya Nair · 14MAY2026 · Design</div></div>
+          <div class="file-actions">
+            <button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+            <button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+        </div>
+        <div class="file-settings">
+          <div class="form-row file-rename"><label>File name</label><input type="text" /></div>
+          <div class="who-title">Choose who can view</div>
+          <label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label>
+          <label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label>
+          <label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label>
+          <button class="btn btn-primary file-save" type="button">Save</button>
+        </div>
+      </div>
+      <div class="file-card">
+        <div class="file-line">
+          <div class="file-info"><div class="f-name">Surgical plan.pdf</div><div class="f-sub">Dr. Lin · 10MAY2026 · Planning</div></div>
+          <div class="file-actions">
+            <button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+            <button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+        </div>
+        <div class="file-settings">
+          <div class="form-row file-rename"><label>File name</label><input type="text" /></div>
+          <div class="who-title">Choose who can view</div>
+          <label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label>
+          <label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label>
+          <label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label>
+          <button class="btn btn-primary file-save" type="button">Save</button>
+        </div>
+      </div>
+      <div class="file-card">
+        <div class="file-line">
+          <div class="file-info"><div class="f-name">Approval sign-off.pdf</div><div class="f-sub">Dr. R. Alvarez · 18MAY2026 · Approval</div></div>
+          <div class="file-actions">
+            <button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+            <button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+        </div>
+        <div class="file-settings">
+          <div class="form-row file-rename"><label>File name</label><input type="text" /></div>
+          <div class="who-title">Choose who can view</div>
+          <label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label>
+          <label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label>
+          <label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label>
+          <button class="btn btn-primary file-save" type="button">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Products & Fulfillment -->
+    <div class="drawer-panel" data-drawer-panel="products">
+      <div class="drawer-section">
+        <h4>Manufactured products</h4>
+        <div class="prod-line"><span class="p-name">Mandibular plate — left</span><span class="p-qty">Qty 1</span></div>
+        <div class="prod-line"><span class="p-name">Mandibular plate — right</span><span class="p-qty">Qty 1</span></div>
+        <div class="prod-line"><span class="p-name">Cut guide set</span><span class="p-qty">Qty 2</span></div>
+      </div>
+      <div class="drawer-section">
+        <h4>Invoice products</h4>
+        <div class="prod-line"><span class="p-name">Patient-matched implant system</span><span class="p-qty">PMI-2200</span></div>
+        <div class="prod-line"><span class="p-name">Surgical guide kit</span><span class="p-qty">SGK-104</span></div>
+      </div>
+      <div class="drawer-section">
+        <h4>Shipping</h4>
+        <div class="ship-grid">
+          <div class="field"><span class="k">Carrier</span><span class="v">FedEx Priority</span></div>
+          <div class="field"><span class="k">Tracking</span><span class="v">— not yet shipped</span></div>
+          <div class="field"><span class="k">Ship to</span><span class="v">Mercy Surgical Center</span></div>
+          <div class="field"><span class="k">Need by</span><span class="v">30MAY2026</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="drawer-panel" data-drawer-panel="settings">
+      <!-- Cancel / On Hold -->
+      <label class="check-row">
+        <input type="checkbox" id="statusToggle" checked />
+        <span class="check-label">Cancel or place case On Hold</span>
+      </label>
+      <div class="check-body" id="statusBody">
+        <div class="form-row">
+          <label for="statusTo">Change status to</label>
+          <select id="statusTo">
+            <option>On Hold</option>
+            <option>Canceled</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="statusReason">Reason for Change *</label>
+          <textarea id="statusReason" placeholder="Document reason for change. This reason will be listed in the case audit history…"></textarea>
+        </div>
+      </div>
+
+      <!-- Deviation -->
+      <label class="check-row">
+        <input type="checkbox" id="devToggle" checked />
+        <span class="check-label">Deviation</span>
+      </label>
+      <div class="check-body" id="devBody">
+        <div class="form-row">
+          <label for="devNum">List Deviation Number</label>
+          <input id="devNum" type="text" placeholder="Deviation #" />
+        </div>
+      </div>
+
+      <!-- Demo case -->
+      <label class="check-row">
+        <input type="checkbox" id="demoToggle" />
+        <span class="check-label">Demo case</span>
+      </label>
+      <p class="check-note">Exclude from reporting (admin only)</p>
+
+      <div class="panel-foot">
+        <button class="btn" data-panel-close>Cancel</button>
+        <button class="btn btn-primary" data-panel-close>Save Changes</button>
+      </div>
+    </div>
+
+    <!-- Rewind -->
+    <div class="drawer-panel" data-drawer-panel="rewind">
+      <div class="form-row">
+        <label for="rewindState">Set case state</label>
+        <select id="rewindState">
+          <option>Intake</option>
+          <option>Case Prep</option>
+          <option>Planning</option>
+          <option selected>Design</option>
+          <option>Approval</option>
+          <option>Pre-Production</option>
+          <option>Production</option>
+          <option>Done</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label for="rewindStep">Set case step</label>
+        <select id="rewindStep">
+          <option>Case Report</option>
+          <option>Modeling &amp; Cuts</option>
+          <option>Surgical Plan</option>
+          <option>Design Review</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label for="rewindReason">Reason for Change *</label>
+        <textarea id="rewindReason" placeholder="Document reason for change. This reason will be listed in the case audit history…"></textarea>
+      </div>
+      <div class="panel-foot">
+        <button class="btn" data-panel-close>Cancel</button>
+        <button class="btn btn-primary" data-panel-close>Save Changes</button>
+      </div>
+    </div>
+
+    <!-- Planning -->
+    <div class="drawer-panel" data-drawer-panel="planning">
+      <p style="margin:0; font-size:14px; color:var(--cool-gray-10);">Surgical planning summary and links will live here.</p>
+    </div>
+
+    <!-- Home -->
+    <div class="drawer-panel" data-drawer-panel="home">
+      <p style="margin:0; font-size:14px; color:var(--cool-gray-10);">Quick links and case overview will live here.</p>
+    </div>
+
+  </div>
+</aside>
+
+<script>
+  // Collapse / expand the whole sidebar
+  const appEl = document.querySelector('.app');
+  const toggleSidebar = () => appEl.classList.toggle('collapsed');
+  document.querySelector('.collapse-btn').addEventListener('click', toggleSidebar);
+  document.getElementById('expandBtn').addEventListener('click', toggleSidebar);
+
+  // Expand/collapse any sidebar group (Cases, My cases, …)
+  document.querySelectorAll('.nav-toggle').forEach((toggle) => {
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const children = document.getElementById(toggle.dataset.target);
+      const expanded = toggle.classList.toggle('expanded');
+      if (children) children.classList.toggle('open', expanded);
+    });
+  });
+
+  // User dropdown menu — toggle on click, dismiss on outside click / Esc
+  const userTrigger = document.getElementById('userMenuTrigger');
+  const userMenu = document.getElementById('userMenu');
+
+  function setUserMenu(open) {
+    userTrigger.classList.toggle('open', open);
+    userTrigger.setAttribute('aria-expanded', String(open));
+  }
+
+  userTrigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    setUserMenu(!userTrigger.classList.contains('open'));
+  });
+  userMenu.addEventListener('click', (e) => e.stopPropagation());
+  document.addEventListener('click', () => setUserMenu(false));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') setUserMenu(false);
+  });
+
+  // ---------- Case detail interactions ----------
+
+  // Copy case ID
+  const copyBtn = document.getElementById('copyBtn');
+  copyBtn.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(document.getElementById('caseId').textContent.trim()); } catch (e) {}
+    copyBtn.classList.add('copied');
+    setTimeout(() => copyBtn.classList.remove('copied'), 1200);
+  });
+
+  // Privacy toggle — hide/show patient details
+  const caseDetails = document.getElementById('caseDetails');
+  const privacyToggle = document.getElementById('privacyToggle');
+  privacyToggle.addEventListener('click', () => {
+    const hidden = caseDetails.classList.toggle('privacy-hidden');
+    privacyToggle.setAttribute('aria-pressed', String(hidden));
+    privacyToggle.querySelector('.pt-label').textContent = hidden ? 'Show' : 'Hide';
+  });
+
+  // Comments composer — activate send button when there's text
+  const composerInput = document.querySelector('.composer-input');
+  const composerSend = document.querySelector('.composer-send');
+  if (composerInput && composerSend) {
+    composerInput.addEventListener('input', () => {
+      composerSend.classList.toggle('active', composerInput.value.trim().length > 0);
+    });
+  }
+
+  // History — expand/collapse truncated audit entries
+  document.querySelectorAll('.hist-expand').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const text = btn.closest('.hist-text');
+      const open = text.classList.toggle('open');
+      btn.firstChild.textContent = open ? 'Collapse ' : 'Expand ';
+    });
+  });
+
+  // Settings panel — each checkbox reveals/hides its sub-section
+  [['statusToggle', 'statusBody'], ['devToggle', 'devBody']].forEach(([cbId, bodyId]) => {
+    const cb = document.getElementById(cbId);
+    const body = document.getElementById(bodyId);
+    if (!cb || !body) return;
+    const sync = () => body.classList.toggle('collapsed', !cb.checked);
+    cb.addEventListener('change', sync);
+    sync();
+  });
+
+  // Expand / collapse completed state rows
+  document.querySelectorAll('[data-toggle-state]').forEach((head) => {
+    head.addEventListener('click', () => head.closest('.state-row').classList.toggle('open'));
+  });
+
+  // Completed sub-step cards that are collapsible (e.g., Submit sales order)
+  document.querySelectorAll('.substep.collapsible .substep-top').forEach((top) => {
+    top.addEventListener('click', () => top.closest('.substep').classList.toggle('open'));
+  });
+
+  // Pre-Production sub-steps — current step stays open; others toggle independently
+  document.querySelectorAll('.pp-step-head').forEach((head) => {
+    head.addEventListener('click', () => {
+      const step = head.closest('.pp-step');
+      if (step.classList.contains('is-current')) return; // current step is pinned open
+      step.classList.toggle('open');
+    });
+  });
+  // "Mark complete" → check the step, collapse it, open the next
+  document.querySelectorAll('.pp-complete').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const step = btn.closest('.pp-step');
+      step.classList.add('done');
+      step.classList.remove('open');
+      step.querySelector('.pp-num').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+      const next = step.nextElementSibling;
+      if (next && next.classList.contains('pp-step')) next.classList.add('open');
+    });
+  });
+
+  // Modals (open / close / backdrop)
+  const closeOverlay = (el) => el.classList.remove('open');
+  document.querySelectorAll('[data-open]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const el = document.getElementById(btn.dataset.open);
+      if (el) el.classList.add('open');
+    });
+  });
+  document.querySelectorAll('[data-overlay]').forEach((ov) => {
+    ov.addEventListener('click', (e) => { if (e.target === ov) closeOverlay(ov); });
+  });
+  document.querySelectorAll('[data-close]').forEach((btn) => {
+    btn.addEventListener('click', () => { const ov = btn.closest('[data-overlay]'); if (ov) closeOverlay(ov); });
+  });
+
+  // File settings — gear expands the panel; rename syncs the displayed name
+  document.querySelectorAll('.file-card').forEach((card) => {
+    const btn = card.querySelector('.file-settings-btn');
+    const nameEl = card.querySelector('.f-name');
+    const input = card.querySelector('.file-rename input');
+    if (btn) btn.addEventListener('click', () => card.classList.toggle('open'));
+    const saveBtn = card.querySelector('.file-save');
+    if (saveBtn) saveBtn.addEventListener('click', () => card.classList.remove('open'));
+    if (nameEl && input) {
+      input.value = nameEl.textContent.trim();
+      input.addEventListener('input', () => { nameEl.textContent = input.value; });
+    }
+  });
+
+  // Side panel (Comments / History / Files) — each button toggles its panel
+  const panel = document.getElementById('sidePanel');
+  const panelOverlay = document.getElementById('panelOverlay');
+  const panelTitle = document.getElementById('panelTitle');
+  const drawerButtons = document.querySelectorAll('[data-drawer]');
+  const drawerPanels = panel.querySelectorAll('[data-drawer-panel]');
+  const panelTitles = {
+    comments: 'Case Prep Comments', history: 'Case Prep History', files: 'Files', products: 'Products & Fulfillment',
+    settings: 'Case Record Settings', rewind: 'Rewind Case Progress', planning: 'Planning', home: 'Home',
+  };
+  let openPanelName = null;
+
+  const closeDrawer = () => {
+    openPanelName = null;
+    panel.classList.remove('open');
+    panelOverlay.classList.remove('open');
+    panel.setAttribute('aria-hidden', 'true');
+    drawerButtons.forEach((b) => b.classList.remove('is-open'));
+  };
+  const openPanel = (name) => {
+    openPanelName = name;
+    panelTitle.textContent = panelTitles[name] || name;
+    drawerPanels.forEach((p) => p.classList.toggle('active', p.dataset.drawerPanel === name));
+    drawerButtons.forEach((b) => b.classList.toggle('is-open', b.dataset.drawer === name));
+    panel.classList.add('open');
+    panelOverlay.classList.add('open');
+    panel.setAttribute('aria-hidden', 'false');
+  };
+  drawerButtons.forEach((btn) => btn.addEventListener('click', () => {
+    const name = btn.dataset.drawer;
+    if (openPanelName === name) closeDrawer(); else openPanel(name);
+  }));
+  document.getElementById('panelClose').addEventListener('click', closeDrawer);
+  panelOverlay.addEventListener('click', closeDrawer);
+  // In-panel action buttons (Save settings, Rewind case) close the panel
+  panel.querySelectorAll('[data-panel-close]').forEach((btn) => btn.addEventListener('click', closeDrawer));
+
+  // Ellipsis (kebab) menu — toggle, dismiss on outside click / item click / Esc
+  const kebab = document.querySelector('.kebab');
+  const kebabBtn = document.getElementById('kebabBtn');
+  const closeKebab = () => { kebab.classList.remove('open'); kebabBtn.setAttribute('aria-expanded', 'false'); };
+  kebabBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = kebab.classList.toggle('open');
+    kebabBtn.setAttribute('aria-expanded', String(open));
+  });
+  kebab.querySelector('.kebab-menu').addEventListener('click', (e) => e.stopPropagation());
+  kebab.querySelectorAll('.kebab-item').forEach((item) => item.addEventListener('click', closeKebab));
+  document.addEventListener('click', closeKebab);
+
+  // Esc closes any overlay, the side panel, and the kebab menu
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll('.overlay.open').forEach(closeOverlay);
+    closeDrawer();
+    closeKebab();
+  });
+</script>
+
+</body>
+</html>
