@@ -617,6 +617,7 @@
   .msg.out .msg-col { align-items: flex-end; }
   .msg-bubble { background: #fff; border: 1px solid var(--cool-gray-2); border-radius: 12px; padding: 9px 12px; font-size: 13.5px; line-height: 1.45; color: var(--cool-gray-11); }
   .msg-meta { display: flex; align-items: center; gap: 6px; margin-top: 4px; font-size: 11.5px; color: var(--text-muted); }
+  .msg-state { color: var(--cool-gray-9); font-weight: 600; }
   .like { display: inline-flex; color: var(--cool-gray-7); cursor: pointer; border-radius: var(--radius-sm); transition: color 0.12s; }
   .like:hover { color: var(--gold-tips); }
   .like svg { width: 14px; height: 14px; }
@@ -915,7 +916,7 @@
       </div>
 
       <div class="topbar-actions">
-        <button class="icon-btn has-dot" aria-label="Announcements" title="Announcements">
+        <button class="icon-btn" aria-label="Announcements" title="Announcements">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 11l18-5v12L3 14v-3z"/>
             <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>
@@ -1531,6 +1532,7 @@
             <div class="msg-meta">
               <span class="like"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></span>
               23APR2026 10:30 AM
+              <span class="msg-state">· Case Prep</span>
             </div>
           </div>
         </div>
@@ -1542,6 +1544,7 @@
             <div class="msg-bubble">@Sarah Shepard, noted, thank you</div>
             <div class="msg-meta">
               23APR2026 10:35 AM
+              <span class="msg-state">· Case Prep</span>
               <span class="like liked"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></span>
             </div>
           </div>
@@ -1567,6 +1570,7 @@
             <div class="msg-bubble">Patients mouth slightly open in scan.</div>
             <div class="msg-meta">
               23APR2026 11:15 AM
+              <span class="msg-state">· Case Prep</span>
               <span class="like"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></span>
             </div>
           </div>
@@ -1580,6 +1584,7 @@
             <div class="msg-meta">
               <span class="like liked"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></span>
               23APR2026 11:20 AM
+              <span class="msg-state">· Case Prep</span>
             </div>
           </div>
         </div>
@@ -1980,7 +1985,7 @@
   const drawerButtons = document.querySelectorAll('[data-drawer]');
   const drawerPanels = panel.querySelectorAll('[data-drawer-panel]');
   const panelTitles = {
-    comments: 'Case Prep Comments', history: 'Case Prep History', files: 'Files', products: 'Products & Fulfillment',
+    comments: 'Comments', history: 'History', files: 'Files', products: 'Products & Fulfillment',
     settings: 'Case Record Settings', rewind: 'Rewind Case Progress', planning: 'Planning', home: 'Home',
   };
   let openPanelName = null;
