@@ -444,6 +444,9 @@
   .status-pill.is-on-hold    { --status-color: #debb46; }  /* warm gold */
   .status-pill.is-canceled   { --status-color: #cb2457; }  /* pink-red */
   .status-pill.is-completed  { --status-color: #22733d; }
+  .status-pill.is-cancelled  { --status-color: #cb2457; }  /* alt spelling — same pink-red */
+  .status-pill.is-shipped    { --status-color: #22733d; }  /* green — terminal: in transit */
+  .status-pill.is-delivered  { --status-color: #22733d; }  /* green — terminal: arrived */
   /* .solid retained as a no-op alias (base pill is already solid now) */
   .status-pill.solid { background: var(--status-color, #007aa8); }
 
@@ -1139,8 +1142,23 @@
   .lane { width: 280px; flex-shrink: 0; background: var(--bg-subtle); border: 1px solid var(--hairline); border-radius: var(--radius-md); padding: 14px 12px; display: flex; flex-direction: column; gap: 10px; }
   .lane-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 4px 10px; background: transparent; border: 0; }
   .lane-name { font-size: 15px; font-weight: 600; color: var(--cool-gray-11); }
+  .lane-head-meta { display: inline-flex; align-items: center; gap: 6px; }
   .lane-count { width: 22px; height: 22px; border-radius: 50%; background: var(--cool-gray-2); color: var(--cool-gray-10); font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0; }
   .lane-body { display: flex; flex-direction: column; gap: 14px; min-height: 60px; }
+
+  /* Lane sort menu — small icon button + dropdown */
+  .lane-sort { position: relative; }
+  .lane-sort-btn { width: 22px; height: 22px; padding: 0; border-radius: 50%; background: transparent; border: 0; color: var(--cool-gray-9); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: background 0.12s, color 0.12s; }
+  .lane-sort-btn:hover { background: var(--cool-gray-2); color: var(--cool-gray-11); }
+  .lane-sort.open .lane-sort-btn { background: var(--cool-gray-2); color: var(--cool-gray-11); }
+  .lane-sort-btn svg { width: 14px; height: 14px; }
+  .lane-sort-menu { display: none; position: absolute; top: calc(100% + 4px); right: 0; min-width: 160px; background: #fff; border: 1px solid var(--cool-gray-2); border-radius: var(--radius-md); box-shadow: 0 6px 20px rgba(52,55,65,0.12); padding: 4px; z-index: 4; }
+  .lane-sort.open .lane-sort-menu { display: block; }
+  .lane-sort-item { display: flex; align-items: center; gap: 8px; width: 100%; padding: 7px 10px; background: transparent; border: 0; border-radius: var(--radius-sm); font: inherit; font-size: 13px; color: var(--cool-gray-10); cursor: pointer; text-align: left; }
+  .lane-sort-item:hover { background: var(--hover); color: var(--cool-gray-11); }
+  .lane-sort-item.is-active { background: var(--cool-gray-1); color: var(--cool-gray-11); font-weight: 600; }
+  .lane-sort-item-check { width: 14px; height: 14px; color: var(--cerulean); opacity: 0; flex-shrink: 0; }
+  .lane-sort-item.is-active .lane-sort-item-check { opacity: 1; }
 
   /* Case cards (compact spec) */
   .case-card { display: block; background: #fff; border: 1px solid var(--cool-gray-2); border-radius: var(--radius-md); padding: 15px 17px; text-decoration: none; color: inherit; cursor: pointer; transition: border-color 0.12s, transform 0.06s, box-shadow 0.12s; }
@@ -1453,14 +1471,52 @@
             </div>
 
             <div class="lane">
-              <div class="lane-head"><span class="lane-name">Done</span><span class="lane-count">1</span></div>
+              <div class="lane-head">
+                <span class="lane-name">Done</span>
+                <span class="lane-head-meta">
+                  <div class="lane-sort" data-lane-filter="done">
+                    <button class="lane-sort-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Filter by status">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                    </button>
+                    <div class="lane-sort-menu" role="menu">
+                      <button class="lane-sort-item is-active" type="button" data-filter="all"><svg class="lane-sort-item-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>All</button>
+                      <button class="lane-sort-item" type="button" data-filter="complete"><svg class="lane-sort-item-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Complete</button>
+                      <button class="lane-sort-item" type="button" data-filter="shipped"><svg class="lane-sort-item-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Shipped</button>
+                      <button class="lane-sort-item" type="button" data-filter="delivered"><svg class="lane-sort-item-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Delivered</button>
+                      <button class="lane-sort-item" type="button" data-filter="cancelled"><svg class="lane-sort-item-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Cancelled</button>
+                    </div>
+                  </div>
+                  <span class="lane-count">4</span>
+                </span>
+              </div>
               <div class="lane-body">
-                <a class="case-card" href="#case/done">
+                <a class="case-card" href="#case/done" data-status="complete" data-surgeon="Dr. R. Alvarez" data-surgery-date="2026-06-02" data-id="26A0058">
                   <div class="case-card-id"><span><b>ID:</b>26A0058</span><span class="status-pill is-complete">Complete</span></div>
                   <div class="case-card-field"><b>Surgeon:</b> Dr. R. Alvarez</div>
                   <div class="case-card-field"><b>Hospital:</b> Mercy Surgical Center (101284)</div>
                   <div class="case-card-field"><b>Surgery Date:</b> 02JUN2026</div>
                   <div class="case-card-field"><b>Solution:</b> Diagnostic Models</div>
+                </a>
+                <a class="case-card" href="#case/done-shipped" data-status="shipped" data-surgeon="Dr. Park" data-surgery-date="2026-05-31" data-id="26A0057">
+                  <div class="case-card-id"><span><b>ID:</b>26A0057</span><span class="status-pill is-shipped">Shipped</span></div>
+                  <div class="case-card-field"><b>Surgeon:</b> Dr. Park</div>
+                  <div class="case-card-field"><b>Hospital:</b> University Medical (103490)</div>
+                  <div class="case-card-field"><b>Surgery Date:</b> 31MAY2026</div>
+                  <div class="case-card-field"><b>Solution:</b> Maxillofacial Reconstruction Plates</div>
+                </a>
+                <a class="case-card" href="#case/done-delivered" data-status="delivered" data-surgeon="Dr. Patel" data-surgery-date="2026-05-28" data-id="26A0055">
+                  <div class="case-card-id"><span><b>ID:</b>26A0055</span><span class="status-pill is-delivered">Delivered</span></div>
+                  <div class="case-card-field"><b>Surgeon:</b> Dr. Patel</div>
+                  <div class="case-card-field"><b>Hospital:</b> St. Vincent Medical (101675)</div>
+                  <div class="case-card-field"><b>Surgery Date:</b> 28MAY2026</div>
+                  <div class="case-card-field"><b>Solution:</b> Orthognathic Surgery</div>
+                </a>
+                <a class="case-card" href="#case/done-cancelled" data-status="cancelled" data-surgeon="Dr. Chen" data-surgery-date="2026-05-24" data-id="26A0051">
+                  <div class="case-card-id"><span><b>ID:</b>26A0051</span><span class="status-pill is-cancelled">Cancelled</span></div>
+                  <div class="case-card-field"><b>Surgeon:</b> Dr. Chen</div>
+                  <div class="case-card-field"><b>Hospital:</b> Northwest Regional (102219)</div>
+                  <div class="case-card-field"><b>Surgery Date:</b> 24MAY2026</div>
+                  <div class="case-card-field"><b>Solution:</b> Mandibular Reconstruction</div>
                 </a>
               </div>
             </div>
@@ -1602,6 +1658,7 @@
                 <li class="tl-step is-upcoming">
                   <span class="tl-node"></span>
                   <span class="tl-label">Done</span>
+                  <span class="tl-sub is-hidden" id="doneSubStatus">Complete</span>
                 </li>
                   </ol>
                 </div>
@@ -3089,7 +3146,18 @@
     'pre-production': '26A0069',
     'production': '26A0067',
     'done': '26A0058',
+    'done-shipped': '26A0057',
+    'done-delivered': '26A0055',
+    'done-cancelled': '26A0051',
     'inactive': '26A0023'
+  };
+
+  // Sub-status label for the Done timeline step (set when route is a done variant)
+  const DONE_SUB_STATUS = {
+    'done': 'Complete',
+    'done-shipped': 'Shipped',
+    'done-delivered': 'Delivered',
+    'done-cancelled': 'Cancelled'
   };
 
   // Map state slug → status of the case in that lane (drives the status pill
@@ -3517,9 +3585,15 @@
   }
 
   function applyStateToTimeline(state) {
+    // 'done-shipped' / 'done-delivered' / 'done-cancelled' are sub-variants of done.
+    // Treat them like 'done' for timeline + state-row class logic; the sub-status
+    // text + breadcrumb ID lookup keep the variant intact.
+    const isDoneVariant = state && state.indexOf('done') === 0;
+    const baseState = isDoneVariant ? 'done' : state;
+
     // Done: everything is_done; no current
     // Inactive: freeze at INACTIVE_FREEZE_STATE
-    const targetStep = state === 'inactive' ? INACTIVE_FREEZE_STATE : state;
+    const targetStep = baseState === 'inactive' ? INACTIVE_FREEZE_STATE : baseState;
     const idx = WORKFLOW_STEPS.indexOf(targetStep);
 
     // Status-color classes that may have been attached to the original
@@ -3530,7 +3604,7 @@
     // Top horizontal timeline (.tl-step)
     document.querySelectorAll('.tl-step').forEach((el, i) => {
       el.classList.remove('is-done', 'is-current', 'is-upcoming', ...STATUS_CLASSES);
-      if (state === 'done') {
+      if (baseState === 'done') {
         el.classList.add('is-done');
       } else if (i < idx) {
         el.classList.add('is-done');
@@ -3544,7 +3618,7 @@
     // Vertical state rows (.state-row) — uses is-completed / is-active / is-upcoming
     document.querySelectorAll('.state-row').forEach((el, i) => {
       el.classList.remove('is-completed', 'is-active', 'is-upcoming');
-      if (state === 'done') {
+      if (baseState === 'done') {
         el.classList.add('is-completed');
       } else if (i < idx) {
         el.classList.add('is-completed');
@@ -3568,7 +3642,7 @@
         }
         activeBody.style.display = '';
         // Swap content for states that have a custom template; otherwise restore default
-        setActiveBodyContent(state);
+        setActiveBodyContent(baseState);
       } else {
         activeBody.style.display = 'none';
       }
@@ -3582,8 +3656,8 @@
 
     // Show a fresh status pill under the current timeline step + on the active
     // state row. 'done' has no current step, so we skip it entirely.
-    const statusInfo = STATE_TO_STATUS[state];
-    if (statusInfo && state !== 'done') {
+    const statusInfo = STATE_TO_STATUS[baseState];
+    if (statusInfo && baseState !== 'done') {
       const currentStep = document.querySelector('.tl-step.is-current');
       setStatusPill(currentStep, statusInfo, false);
 
@@ -3615,12 +3689,21 @@
     // Approval date sub-line — only show once approval has actually been completed
     // (i.e. case is past approval state). During Approval itself, no date yet.
     const approvalIdx = WORKFLOW_STEPS.indexOf('approval');
-    const pastApproval = state === 'done' || (idx !== -1 && idx > approvalIdx);
+    const pastApproval = isDoneVariant || (idx !== -1 && idx > approvalIdx);
     const approvalDateEl = document.getElementById('approvalDateSub');
     if (approvalDateEl) approvalDateEl.classList.toggle('is-hidden', !pastApproval);
 
+    // Done sub-status text below the Done timeline step — shows the variant
+    // (Complete / Shipped / Delivered / Cancelled) when the case is in a Done state.
+    const doneSubEl = document.getElementById('doneSubStatus');
+    if (doneSubEl) {
+      const label = DONE_SUB_STATUS[state];
+      if (label) { doneSubEl.textContent = label; doneSubEl.classList.remove('is-hidden'); }
+      else { doneSubEl.classList.add('is-hidden'); }
+    }
+
     // Filter drawer contents — hide items past the current state
-    filterDrawersByState(state);
+    filterDrawersByState(baseState);
   }
 
   function routeFromHash() {
@@ -3660,6 +3743,69 @@
       searchFiltersBtn.classList.toggle('is-active', willOpen);
     });
   }
+
+  /* All swim lanes: default sort cards by Surgery Date (most recent first).
+     Parses the date out of the visible card text — no per-card data attributes needed. */
+  const MONTH_MAP = { JAN:0, FEB:1, MAR:2, APR:3, MAY:4, JUN:5, JUL:6, AUG:7, SEP:8, OCT:9, NOV:10, DEC:11 };
+  function getCardDate(card) {
+    const m = card.textContent.match(/Surgery Date:\s*(\d{2})([A-Z]{3})(\d{4})/);
+    if (!m) return 0;
+    const [, d, mon, y] = m;
+    return new Date(parseInt(y, 10), MONTH_MAP[mon] || 0, parseInt(d, 10)).getTime();
+  }
+  document.querySelectorAll('.lanes .lane').forEach((lane) => {
+    const body = lane.querySelector('.lane-body');
+    if (!body) return;
+    const cards = Array.from(body.querySelectorAll('.case-card'));
+    cards.sort((a, b) => getCardDate(b) - getCardDate(a));
+    cards.forEach((c) => body.appendChild(c));
+  });
+
+  /* Done lane only: status filter (All / Complete / Shipped / Delivered / Cancelled).
+     Picking a sub-status hides cards that don't match. "All" restores everything. */
+  function applyDoneFilter(laneEl, filterKey) {
+    const cards = laneEl.querySelectorAll('.case-card');
+    let visible = 0;
+    cards.forEach((c) => {
+      const matches = filterKey === 'all' || c.dataset.status === filterKey;
+      c.style.display = matches ? '' : 'none';
+      if (matches) visible++;
+    });
+    const count = laneEl.querySelector('.lane-count');
+    if (count) count.textContent = String(visible);
+  }
+  document.querySelectorAll('[data-lane-filter]').forEach((sort) => {
+    const btn = sort.querySelector('.lane-sort-btn');
+    const menu = sort.querySelector('.lane-sort-menu');
+    const lane = sort.closest('.lane');
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = !sort.classList.contains('open');
+      document.querySelectorAll('[data-lane-filter].open').forEach((other) => { if (other !== sort) other.classList.remove('open'); });
+      sort.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', String(open));
+    });
+    menu.addEventListener('click', (e) => e.stopPropagation());
+    menu.querySelectorAll('.lane-sort-item').forEach((item) => {
+      item.addEventListener('click', () => {
+        menu.querySelectorAll('.lane-sort-item').forEach((other) => other.classList.toggle('is-active', other === item));
+        applyDoneFilter(lane, item.dataset.filter);
+        sort.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+    });
+  });
+  document.addEventListener('click', () => {
+    document.querySelectorAll('[data-lane-filter].open').forEach((sort) => {
+      sort.classList.remove('open');
+      sort.querySelector('.lane-sort-btn')?.setAttribute('aria-expanded', 'false');
+    });
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('[data-lane-filter].open').forEach((sort) => sort.classList.remove('open'));
+    }
+  });
 
   // Collapse / expand the whole sidebar
   const appEl = document.querySelector('.app');
