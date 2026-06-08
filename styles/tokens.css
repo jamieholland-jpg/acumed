@@ -52,9 +52,9 @@
   --status-in-process:  var(--cerulean);      /* blue */
   --status-review:      var(--deluge);         /* purple */
   --status-complete:    var(--rio-grande);     /* green */
-  --status-rework:      #a85a14;               /* dark orange — see note below */
+  --status-rework:      #e88924;               /* brand-aligned orange (was #a85a14) */
   --status-blocked:     var(--pantone-7417);   /* red */
-  --status-on-hold:     var(--gold-tips);      /* gold */
+  --status-on-hold:     #debb46;               /* warm gold — matches status pill */
   --status-canceled:    var(--cerise);         /* pink */
   /* legacy alias — same as --status-complete */
   --status-completed:   var(--rio-grande);
