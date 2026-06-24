@@ -39,7 +39,6 @@
   .sg-tile { background: #fff; border: 1px solid var(--cool-gray-2); border-radius: 10px; padding: 24px; margin-bottom: 16px; }
   .sg-tile-meta { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
   .sg-tile-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--cool-gray-9); }
-  .sg-tile-code { font-family: 'Menlo', 'Monaco', monospace; font-size: 11.5px; color: var(--cool-gray-9); background: var(--bg-subtle); padding: 2px 8px; border-radius: 4px; }
   .sg-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
   .sg-stack { display: flex; flex-direction: column; gap: 12px; }
 
@@ -159,6 +158,36 @@
   .step-alert.is-blocked  { --status-color: #c81717; }
   .step-alert.is-on-hold  { --status-color: #debb46; }
   .step-alert.is-canceled { --status-color: #cb2457; }
+
+  /* Inline confirmation (destructive in-drawer flows) */
+  .inline-confirm { background: #fff; border: 1px solid color-mix(in srgb, #c81717 35%, #fff); border-radius: var(--radius-md); box-shadow: 0 4px 16px rgba(200,23,23,0.10); padding: 12px 14px; max-width: 420px; display: flex; flex-direction: column; gap: 10px; }
+  .inline-confirm .ic-head { display: flex; align-items: flex-start; gap: 9px; }
+  .inline-confirm .ic-icon { width: 18px; height: 18px; color: #c81717; flex-shrink: 0; margin-top: 1px; }
+  .inline-confirm .ic-titlewrap { flex: 1; min-width: 0; }
+  .inline-confirm .ic-title { font-size: 14px; font-weight: 700; color: var(--cool-gray-11); line-height: 1.3; }
+  .inline-confirm .ic-sub { font-size: 12.5px; color: var(--cool-gray-9); line-height: 1.45; margin-top: 2px; }
+  .inline-confirm .ic-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+  /* Case-level Attention banner (Phase 17 — portal On Hold / Cancelled / Action Required) */
+  .case-attention { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-radius: var(--radius-md); font-size: 13.5px; line-height: 1.45; color: var(--cool-gray-11); margin-bottom: 18px; max-width: 540px; background: color-mix(in srgb, var(--status-color, #c81717) 10%, #fff); border: 1px solid color-mix(in srgb, var(--status-color, #c81717) 32%, #fff); }
+  .case-attention .ca-icon { width: 18px; height: 18px; color: var(--status-color, #c81717); flex-shrink: 0; margin-top: 1px; }
+  .case-attention .ca-title { color: var(--status-color, #c81717); font-weight: 700; margin-right: 6px; }
+  .case-attention.is-on-hold  { --status-color: #debb46; }
+  .case-attention.is-canceled { --status-color: #6b7280; }
+  .case-attention.is-blocked  { --status-color: #c81717; }
+
+  /* Meeting link row — input + open-in-new-tab + copy icon buttons (Phase 16) */
+  .sp-link-wrap { display: flex; gap: 6px; align-items: center; max-width: 480px; }
+  .sp-link-wrap input { flex: 1; min-width: 0; border: 1px solid var(--cool-gray-2); border-radius: var(--radius-md); padding: 7px 10px; font: inherit; font-size: 13px; background: #fff; }
+  .sp-link-act { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; background: transparent; border: 1px solid var(--cool-gray-2); border-radius: var(--radius-sm); color: var(--cool-gray-9); cursor: pointer; flex-shrink: 0; }
+  .sp-link-act:hover { color: var(--cool-gray-11); background: var(--hover); }
+  .sp-link-act svg { width: 14px; height: 14px; }
+
+  /* Inline section edit affordance (Phase 15 — portal Proposed meeting) */
+  .sp-section-edit-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+  .sp-section-edit { display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; background: transparent; border: 1px solid var(--cool-gray-2); border-radius: var(--radius-sm); font: inherit; font-size: 12px; font-weight: 600; color: var(--cool-gray-11); cursor: pointer; }
+  .sp-section-edit:hover { background: var(--bg-subtle); border-color: var(--cool-gray-4); }
+  .sp-section-edit svg { width: 11px; height: 11px; }
 
   /* Progress timeline */
   .timeline { display: flex; list-style: none; margin: 0; padding: 24px 16px; background: #fff; border: 1px solid var(--hairline); border-radius: var(--radius-md); }
@@ -435,6 +464,46 @@
   .sp-head-actions { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
   .sp-meeting { background: var(--bg-subtle); border: 1px solid var(--hairline); border-radius: var(--radius-md); padding: 12px 14px; max-width: 480px; }
   .sp-meeting-h { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--cool-gray-7); margin-bottom: 8px; }
+  .sp-plan-card { border: 1px solid var(--hairline); border-radius: var(--radius-md); padding: 16px 18px 18px; background: #fff; max-width: 480px; }
+  .sp-plan-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .sp-plan-title { margin: 0; }
+  .sp-plan-summary { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--hairline); }
+  .sp-plan-add { display: inline-flex; align-items: center; gap: 6px; }
+  .sp-sub-card { background: var(--bg-subtle); border: 1px solid var(--hairline); border-radius: var(--radius-md); padding: 12px 14px; max-width: 480px; }
+  .sp-sub-card-h { font-size: 12.5px; font-weight: 700; color: var(--cool-gray-11); margin-bottom: 10px; }
+
+  /* ===== Device Design card (Phase 13) — count header, collapse chevron, compressed grid ===== */
+  .dd-count { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--cool-gray-9); margin-bottom: 12px; }
+  .dd-card { border: 1px solid var(--hairline); border-radius: var(--radius-md); background: #fff; overflow: hidden; }
+  .dd-card-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg-subtle); border-bottom: 1px solid var(--hairline); }
+  .dd-card.is-collapsed .dd-card-head { border-bottom: 0; }
+  .dd-card-num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--cool-gray-2); color: var(--cool-gray-11); font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .dd-card-part { flex: 1; min-width: 0; font-size: 13px; font-weight: 700; color: var(--cool-gray-11); }
+  .dd-card-desc { display: block; font-size: 12px; font-weight: 500; color: var(--cool-gray-9); margin-top: 2px; }
+  .dd-card-collapse, .dd-card-remove { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: transparent; border: 0; border-radius: var(--radius-sm); color: var(--cool-gray-7); cursor: pointer; }
+  .dd-card-collapse:hover, .dd-card-remove:hover { background: var(--hover); color: var(--cool-gray-11); }
+  .dd-card-collapse svg, .dd-card-remove svg { width: 14px; height: 14px; }
+  .panel-export { width: 100%; }
+
+  /* ===== Order & Fulfillment (Phase 14) — invoiced-item head + ship-to toggle ===== */
+  .of-group { background: #fff; border: 1px solid var(--cool-gray-2); border-radius: var(--radius-md); overflow: hidden; }
+  .of-group-head { padding: 10px 14px; background: var(--bg-subtle); border-bottom: 1px solid var(--hairline); }
+  .of-group-title { font-size: 13.5px; font-weight: 700; color: var(--cool-gray-11); }
+  .of-group-body { padding: 8px 14px 14px; }
+  .of-iv-head { display: grid; grid-template-columns: 1fr 52px 30px; gap: 4px 8px; align-items: center; padding: 4px 14px 12px; border-bottom: 1px dashed var(--hairline); margin: 0 -14px 12px; }
+  .of-iv-head > label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--cool-gray-7); font-weight: 700; margin: 0; }
+  .of-iv-head > select,
+  .of-iv-head > input { border: 1px solid var(--cool-gray-2); border-radius: var(--radius-md); padding: 7px 10px; font: inherit; font-size: 13px; background: #fff; color: var(--text); min-height: 36px; width: 100%; }
+  .of-prow-heads, .of-prow { display: grid; grid-template-columns: 1fr 52px 108px 30px; gap: 8px; }
+  .of-prow-heads { padding: 6px 0 4px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--cool-gray-7); font-weight: 700; }
+  .of-prow { align-items: center; padding: 4px 0; }
+  .of-prow > select,
+  .of-prow > input { border: 1px solid var(--cool-gray-2); border-radius: var(--radius-md); padding: 7px 10px; font: inherit; font-size: 13px; background: #fff; min-height: 36px; width: 100%; }
+  .of-shipment { background: #fff; border: 1px solid var(--cool-gray-2); border-radius: var(--radius-md); }
+  .of-shipment-body { padding: 12px 14px; }
+  .of-shipto-toggle { display: inline-flex; gap: 0; background: var(--cool-gray-1); padding: 3px; border-radius: var(--radius-md); margin-bottom: 8px; }
+  .of-shipto-toggle .ct-btn { padding: 5px 12px; font-size: 12.5px; }
+  .of-shipto-default-meta { font-size: 11.5px; color: var(--cool-gray-9); margin-top: 4px; }
 
   /* Saving spinner */
   .btn-spinner { width: 12px; height: 12px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; display: inline-block; animation: sg-spin 0.7s linear infinite; flex-shrink: 0; }
@@ -579,10 +648,10 @@
       <p class="sg-desc">Common spacing rhythms: 4 / 8 / 12 / 14 / 16 / 24 / 32 px. Card padding is typically 14–20px. Radius scale: sm 6, md 8, lg 12.</p>
       <div class="sg-tile">
         <div class="sg-row">
-          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="background: var(--cerulean); height: 32px; width: 32px; border-radius: var(--radius-sm);"></div><div class="sg-tile-code">--radius-sm · 6</div></div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="background: var(--cerulean); height: 32px; width: 32px; border-radius: var(--radius-md);"></div><div class="sg-tile-code">--radius-md · 8</div></div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="background: var(--cerulean); height: 32px; width: 32px; border-radius: var(--radius-lg);"></div><div class="sg-tile-code">--radius-lg · 12</div></div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="background: var(--cerulean); height: 32px; width: 32px; border-radius: 999px;"></div><div class="sg-tile-code">999px (pill)</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="background: var(--cerulean); height: 32px; width: 32px; border-radius: var(--radius-sm);"></div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="background: var(--cerulean); height: 32px; width: 32px; border-radius: var(--radius-md);"></div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="background: var(--cerulean); height: 32px; width: 32px; border-radius: var(--radius-lg);"></div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div style="background: var(--cerulean); height: 32px; width: 32px; border-radius: 999px;"></div></div>
         </div>
       </div>
     </section>
@@ -594,7 +663,7 @@
       <p class="sg-desc">Three button surfaces: <code>.btn</code> for form/page actions, <code>.action-btn</code> for breadcrumb-row actions next to the case ID, <code>.icon-btn</code> for topbar utilities.</p>
 
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">.btn (default)</span><span class="sg-tile-code">.btn</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">.btn (default)</span></div>
         <div class="sg-row">
           <button class="btn" type="button">Cancel</button>
           <button class="btn btn-primary" type="button">Save Changes</button>
@@ -605,7 +674,7 @@
       </div>
 
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">.action-btn (case-detail header)</span><span class="sg-tile-code">.action-btn</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">.action-btn (case-detail header)</span></div>
         <div class="sg-row">
           <button class="action-btn" type="button">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -623,7 +692,7 @@
       </div>
 
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">.icon-btn (topbar)</span><span class="sg-tile-code">.icon-btn</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">.icon-btn (topbar)</span></div>
         <div class="sg-row">
           <button class="icon-btn" aria-label="Inbox">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
@@ -686,7 +755,7 @@
       <h2 class="sg-h2">Status pills</h2>
       <p class="sg-desc">Solid-fill pill, white text. Used on case cards, sticky breadcrumb, current timeline step, and active state row.</p>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Default (large)</span><span class="sg-tile-code">.status-pill.is-&lt;name&gt;</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Default (large)</span></div>
         <div class="sg-row">
           <span class="status-pill is-in-process">In Process</span>
           <span class="status-pill is-review">Review</span>
@@ -700,11 +769,23 @@
         </div>
       </div>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Small (timeline + state row)</span><span class="sg-tile-code">.status-pill.sm</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Small (timeline + state row)</span></div>
         <div class="sg-row">
           <span class="status-pill sm is-in-process">In Process</span>
           <span class="status-pill sm is-rework">Rework</span>
           <span class="status-pill sm is-blocked">Blocked</span>
+        </div>
+      </div>
+      <div class="sg-tile">
+        <div class="sg-tile-meta"><span class="sg-tile-label">Customer-facing pills</span></div>
+        <p class="sg-desc">Customers (sales rep, surgeon, sales manager) see a trimmed status set. The <b>Blocked</b> status is relabeled <b>Action Required</b> in customer copy — same <code>.is-blocked</code> token, different label — so the wording reads as a clear CTA. Internal-process statuses (In Process / Rework / Review) are suppressed on customer pills; only the statuses a customer needs to act on are visible.</p>
+        <div class="sg-row">
+          <span class="status-pill is-on-hold">On Hold</span>
+          <span class="status-pill is-blocked">Action Required</span>
+          <span class="status-pill is-complete">Complete</span>
+          <span class="status-pill is-shipped">Shipped</span>
+          <span class="status-pill is-delivered">Delivered</span>
+          <span class="status-pill is-cancelled">Cancelled</span>
         </div>
       </div>
     </section>
@@ -761,11 +842,58 @@
       </div>
     </section>
 
+    <section class="sg-section" id="inline-confirm">
+      <h2 class="sg-h2">Inline confirmation</h2>
+      <p class="sg-desc">Lightweight destructive confirmation that renders inline inside the affected card (file card / plan card / device card) instead of opening a modal. Same shape as the External-post composer-confirm but with a red (danger) accent. Cancel restores the card; Confirm runs the destructive action. Used for: <b>File delete</b>, <b>Remove plan</b>, <b>Remove device</b>.</p>
+      <div class="sg-tile">
+        <div class="sg-tile-meta"><span class="sg-tile-label">Default (danger)</span></div>
+        <div class="inline-confirm" role="alertdialog">
+          <div class="ic-head">
+            <svg class="ic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <div class="ic-titlewrap">
+              <div class="ic-title">Remove this device?</div>
+              <div class="ic-sub">7702-6001N will be removed from the case device list.</div>
+            </div>
+          </div>
+          <div class="ic-actions">
+            <button class="btn" type="button">Cancel</button>
+            <button class="btn btn-danger" type="button">Remove device</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sg-section" id="case-attention">
+      <h2 class="sg-h2">Case Attention banner (portal)</h2>
+      <p class="sg-desc">Case-level banner shown at the top of the customer case-detail body (above the progress card) when the case is in a terminal or blocked state. Uses the same tinted-callout pattern as <code>.step-alert</code> but sized for a top-of-page placement. Copy includes a reason pulled from Settings.</p>
+      <div class="sg-tile">
+        <div class="sg-tile-meta"><span class="sg-tile-label">On Hold</span></div>
+        <div class="case-attention is-on-hold">
+          <svg class="ca-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div><b class="ca-title">Attention</b><span>Case placed on hold — awaiting updated CT scan from the imaging center.</span></div>
+        </div>
+      </div>
+      <div class="sg-tile">
+        <div class="sg-tile-meta"><span class="sg-tile-label">Cancelled</span></div>
+        <div class="case-attention is-canceled">
+          <svg class="ca-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div><b class="ca-title">Attention</b><span>Case cancelled — surgery postponed by surgeon; no further action required.</span></div>
+        </div>
+      </div>
+      <div class="sg-tile">
+        <div class="sg-tile-meta"><span class="sg-tile-label">Action Required (Blocked)</span></div>
+        <div class="case-attention is-blocked">
+          <svg class="ca-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div><b class="ca-title">Attention</b><span>Case blocked — please review and approve the report to continue.</span></div>
+        </div>
+      </div>
+    </section>
+
     <section class="sg-section" id="file-card">
       <h2 class="sg-h2">File card</h2>
       <p class="sg-desc">Compact file representation. File cards no longer render inline inside Record substeps — each step shows a single "Open in Files Manager" link below, which deep-links to the matching folder in the Files drawer. The file card itself is still used inside the drawer.</p>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Per-step link</span><span class="sg-tile-code">.step-files-link</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Per-step link</span></div>
         <button class="step-files-link" type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
           <span>Open in Files Manager</span>
@@ -773,6 +901,7 @@
         </button>
       </div>
       <div class="sg-tile">
+        <div class="sg-tile-meta"><span class="sg-tile-label">Admin / Acumed staff — with gear + download</span></div>
         <div class="sg-stack">
           <div class="file-card">
             <div style="flex: 1;">
@@ -789,6 +918,24 @@
             </div>
             <button class="file-act" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
             <button class="file-act" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div class="sg-tile">
+        <div class="sg-tile-meta"><span class="sg-tile-label">Portal / Customer — no per-file actions</span></div>
+        <p class="sg-desc">Per Phase 11: customers see file name + meta only. Download is reached by selecting the file then using the drawer-level Download action (same pattern as admin). Settings (rename / share-who / supersede) is admin-only.</p>
+        <div class="sg-stack">
+          <div class="file-card">
+            <div style="flex: 1;">
+              <div class="f-name">CT-scan.dcm</div>
+              <div class="f-sub">Sarah Chen · 04MAY2026 · CT upload</div>
+            </div>
+          </div>
+          <div class="file-card">
+            <div style="flex: 1;">
+              <div class="f-name">patient-intake-form.pdf</div>
+              <div class="f-sub">Sarah Chen · 04MAY2026 · Patient info</div>
+            </div>
           </div>
         </div>
       </div>
@@ -810,21 +957,21 @@
       <h2 class="sg-h2">Case Type icons</h2>
       <p class="sg-desc">Identifies non-Clinical cases at a glance. Bone glyph = Cadaver case, beaker glyph = Demo case. Clinical cases get no icon. Renders next to the copy-ID / deviation icons on the case-detail breadcrumb row, and inline with the ID on case cards in the lanes view.</p>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Cadaver</span><span class="sg-tile-code">data-case-type="cadaver"</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Cadaver</span></div>
         <div style="display: flex; align-items: center; gap: 8px; color: var(--cool-gray-9);">
           <svg style="width:14px;height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.83 10A3 3 0 1 0 5 12 A3 3 0 1 0 7.83 14 L16.17 14 A3 3 0 1 0 19 12 A3 3 0 1 0 16.17 10 Z"/></svg>
           <span style="font-size: 13px;">Dog-bone glyph</span>
         </div>
       </div>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Demo</span><span class="sg-tile-code">data-case-type="demo"</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Demo</span></div>
         <div style="display: flex; align-items: center; gap: 8px; color: var(--cool-gray-9);">
           <svg style="width:14px;height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 9V3"/><path d="M14 9V3"/><path d="M10 9l-4 9a2 2 0 0 0 2 3h8a2 2 0 0 0 2-3l-4-9"/></svg>
           <span style="font-size: 13px;">Beaker glyph</span>
         </div>
       </div>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Clinical</span><span class="sg-tile-code">data-case-type unset</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Clinical</span></div>
         <div style="font-size: 13px; color: var(--cool-gray-7);">No icon. The default state — Clinical cases stay visually quiet.</div>
       </div>
     </section>
@@ -836,7 +983,7 @@
       <p class="sg-desc">A clickable card on the swim-lane board. Status pill top-right; meta fields in the order <b>Surgery Date → Surgeon → Solution</b>. An "Open in new tab" affordance fades in on hover at the bottom-right.</p>
 
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">In Process</span><span class="sg-tile-code">.case-card</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">In Process</span></div>
         <a class="case-card" href="#">
           <div class="case-card-id"><span><b>ID:</b>26A0098</span><span class="status-pill is-in-process">In Process</span></div>
           <div class="case-card-field"><b>Surgery Date:</b> 28JUN2026</div>
@@ -846,7 +993,8 @@
       </div>
 
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">With deviation flag</span><span class="sg-tile-code">.case-card-dev-icon</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">With deviation flag (admin only)</span></div>
+        <p class="sg-desc">Gold deviation flag next to the case ID. <b>Admin / Acumed staff only</b> — customers (portal) do not see deviation icons per V5.</p>
         <a class="case-card" href="#">
           <div class="case-card-id"><span><b>ID:</b>26A0088<svg class="case-card-dev-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg></span><span class="status-pill is-in-process">In Process</span></div>
           <div class="case-card-field"><b>Surgery Date:</b> 17JUN2026</div>
@@ -856,7 +1004,7 @@
       </div>
 
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">With "open in new tab" icon</span><span class="sg-tile-code">.case-card-newtab</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">With "open in new tab" icon</span></div>
         <div class="sg-card-with-newtab" style="display: inline-block;">
           <a class="case-card" href="#">
             <div class="case-card-id"><span><b>ID:</b>26A0091</span><span class="status-pill is-review">Review</span></div>
@@ -970,7 +1118,7 @@
       </div>
 
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Parallel branch group</span><span class="sg-tile-code">.substep-parallel-group</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Parallel branch group</span></div>
         <p class="sg-desc" style="margin-top:0;">Used in Pre-Production after Submit order. Three substeps run independently — no sequential dependency between them. The wrapper exists in the DOM for layout grouping but is visually transparent (no rail, no pill, no per-step icon). When any of the three is the case's current step, its pp-num uses a sub-letter (<code>2a</code> / <code>2b</code> / <code>2c</code>) to signal the branch relationship.</p>
         <div class="substep-parallel-group">
           <div class="substep">
@@ -997,7 +1145,7 @@
         </div>
       </div>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Sub-letter pp-num (current branch)</span><span class="sg-tile-code">.pp-num</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Sub-letter pp-num (current branch)</span></div>
         <p class="sg-desc" style="margin-top:0;">When the case is actively on a parallel branch, the badge becomes <code>2a</code>/<code>2b</code>/<code>2c</code> — signalling which branch under step 2.</p>
         <div class="pp-step">
           <button class="pp-step-head" type="button">
@@ -1027,13 +1175,13 @@
       <h2 class="sg-h2">Unread indicators</h2>
       <p class="sg-desc">Small red dot signalling unread activity. No counter — internal/external comment splits make a number ambiguous.</p>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Inbox bell — topbar</span><span class="sg-tile-code">.icon-btn.has-unread</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Inbox bell — topbar</span></div>
         <button class="icon-btn has-unread" type="button" aria-label="Inbox">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
         </button>
       </div>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Comments action button</span><span class="sg-tile-code">.action-btn.has-unread</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Comments action button</span></div>
         <button class="action-btn has-unread" type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           Comments
@@ -1045,7 +1193,7 @@
       <h2 class="sg-h2">Lane status filter</h2>
       <p class="sg-desc">Multi-select filter. Attached to every swim-lane head and to every list-view section head. Clicking a status chip toggles it on/off; the lane shows the union of every active chip. Clicking "All" clears the set and restores every card. With no chips active, "All" is implicitly active. Empty statuses are dimmed but still selectable. Menu stays open while selecting — outside click or Esc closes.</p>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Open — nothing selected (= All)</span><span class="sg-tile-code">.lane-sort.open</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Open — nothing selected (= All)</span></div>
         <div class="lane-sort open" style="vertical-align: top;">
           <button class="lane-sort-btn" type="button" aria-label="Filter by status">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
@@ -1061,7 +1209,7 @@
         </div>
       </div>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Open — multiple chips active</span><span class="sg-tile-code">.lane-sort-item.is-active &times; n</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Open — multiple chips active</span></div>
         <div class="lane-sort open" style="vertical-align: top;">
           <button class="lane-sort-btn" type="button" aria-label="Filter by status">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
@@ -1082,14 +1230,14 @@
       <h2 class="sg-h2">QC Pass / Fail</h2>
       <p class="sg-desc">Two-button pattern on every Quality Check step. Default: <b>Fail</b> (secondary, left) + <b>Pass</b> (primary, right). Clicking Fail reveals a "Return case to" + "Reason" sub-form and swaps the actions to <b>Back</b> + <b>Submit</b> (danger). Back returns to the default view; Submit commits the rejection.</p>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Default state</span><span class="sg-tile-code">.qc-actions-default</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Default state</span></div>
         <div style="display: flex; gap: 10px;">
           <button class="btn" type="button">Fail</button>
           <button class="btn btn-primary" type="button">Pass</button>
         </div>
       </div>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Fail mode (rejection being composed)</span><span class="sg-tile-code">.qc-actions-fail</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Fail mode (rejection being composed)</span></div>
         <div style="display: flex; gap: 10px;">
           <button class="btn" type="button">Back</button>
           <button class="btn btn-danger" type="button">Submit</button>
@@ -1101,7 +1249,7 @@
       <h2 class="sg-h2">Confirm modal</h2>
       <p class="sg-desc">Branded confirmation dialog. Replaces native <code>window.confirm</code> for destructive actions (file delete) and important transitions (move-to-next, surgeon reject). Call <code>showConfirm({title, body, confirmLabel, confirmVariant, onConfirm})</code> — variant defaults to <code>danger</code> (red Delete-style button), pass <code>primary</code> for non-destructive advances.</p>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Destructive (default)</span><span class="sg-tile-code">confirmVariant: 'danger'</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Destructive (default)</span></div>
         <div class="modal" style="max-width: 440px;">
           <div class="modal-head">
             <div>
@@ -1116,7 +1264,7 @@
         </div>
       </div>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Advance (primary)</span><span class="sg-tile-code">confirmVariant: 'primary'</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Advance (primary)</span></div>
         <div class="modal" style="max-width: 440px;">
           <div class="modal-head">
             <div>
@@ -1212,14 +1360,14 @@
       <h2 class="sg-h2">Surgeon Approval — 3-outcome decision</h2>
       <p class="sg-desc">The active Surgeon Approval pp-step has three possible outcomes: <b>Approve</b> (advances In Process), <b>Internal reject</b> (returns to Request approval — Rework), <b>Surgeon reject</b> (case is Blocked). Default view shows Approve + Reject. Reject swaps the panel for a radio choice (internal vs surgeon) + reason textarea; Submit fires a confirm dialog with copy that mirrors the chosen outcome.</p>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Default actions</span><span class="sg-tile-code">.surgeon-approval-actions</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Default actions</span></div>
         <div class="sa-row">
           <button class="btn" type="button">Reject</button>
           <button class="btn btn-primary" type="button">Approve &amp; advance</button>
         </div>
       </div>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Reject panel</span><span class="sg-tile-code">.surgeon-reject-panel</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Reject panel</span></div>
         <div class="surgeon-reject-panel">
           <fieldset class="form-row" style="border:0; padding:0; margin:0;">
             <legend style="font-size:13px; font-weight:600; color: var(--cool-gray-11); margin-bottom:8px;">Reject source</legend>
@@ -1242,11 +1390,11 @@
       <h2 class="sg-h2">Inline file link · Files-folder flash</h2>
       <p class="sg-desc">Two small affordances tied to the per-step "Open in Files Manager" pattern. <code>.ss-file-link</code> is the inline cerulean link inside an ss-field row (used in Request approval to surface "File sent: <i>approval-request-v2.pdf</i>"). Clicking either opens the Files drawer; the matching folder briefly flashes with <code>.is-flash</code> to confirm where the user landed.</p>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Inline file link</span><span class="sg-tile-code">.ss-file-link</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Inline file link</span></div>
         <div class="ss-field"><span class="ss-k">File sent:</span> <span class="ss-v"><a class="ss-file-link" href="#">approval-request-v2.pdf</a></span></div>
       </div>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Folder flash highlight</span><span class="sg-tile-code">.files-folder.is-flash</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Folder flash highlight</span></div>
         <p class="sg-desc" style="margin-top:0; font-size:12.5px;">Cerulean tint that fades over ~1.4s when the user opens the drawer from a deep link.</p>
         <div class="ff-flash-demo">
           <b>Case Prep</b> · 6 files
@@ -1276,7 +1424,7 @@
       <h2 class="sg-h2">Saving micro-state</h2>
       <p class="sg-desc">Action buttons that trigger a non-instant operation (file save, multi-file download/zip) morph to "Saving…" with an inline spinner, then snap back when done.</p>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Idle → Saving</span><span class="sg-tile-code">.btn-spinner</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Idle → Saving</span></div>
         <div style="display: flex; gap: 12px; align-items: center;">
           <button class="btn btn-primary" type="button">Save</button>
           <button class="btn btn-primary" type="button" disabled style="display: inline-flex; gap: 6px;"><span class="btn-spinner" aria-hidden="true"></span>Saving…</button>
@@ -1382,7 +1530,7 @@
       <h2 class="sg-h2">Multi-select filter</h2>
       <p class="sg-desc">Drives every dropdown in the cases filter panel. Trigger shows up to 2 chips inline, then a <code>+N</code> overflow indicator. Popover has a search field and checkbox list. Selected chips have an inline <code>×</code> remove button.</p>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Open state with two chips selected</span><span class="sg-tile-code">.ms.open</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Open state with two chips selected</span></div>
         <div class="ms open">
           <button class="ms-trigger" type="button">
             <span class="ms-display">
@@ -1410,7 +1558,7 @@
       <h2 class="sg-h2">Date single / range</h2>
       <p class="sg-desc">Inline segmented control + date input(s). Single mode shows one picker; range shows two with a "to" separator. Surgery Date in the cases filter panel uses this pattern.</p>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Single mode</span><span class="sg-tile-code">.date-range</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Single mode</span></div>
         <div class="date-range">
           <div class="dr-tabs">
             <button class="dr-tab is-active" type="button">Single</button>
@@ -1432,10 +1580,10 @@
     </section>
 
     <section class="sg-section" id="deviation-popover">
-      <h2 class="sg-h2">Deviation popover</h2>
-      <p class="sg-desc">Branch-icon button in the case-detail breadcrumb that opens a popover listing every deviation number on the case. Each row copies its number to clipboard on click. Supports cases with multiple deviation numbers.</p>
+      <h2 class="sg-h2">Deviation popover <span style="font-size: 13px; font-weight: 500; color: var(--cool-gray-9);">— admin only</span></h2>
+      <p class="sg-desc">Branch-icon button in the case-detail breadcrumb that opens a popover listing every deviation number on the case. Each row copies its number to clipboard on click. Supports cases with multiple deviation numbers. <b>Admin / Acumed staff only</b> — the deviation button is permanently hidden in portal.</p>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Open</span><span class="sg-tile-code">.deviation-wrap.open</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Open</span></div>
         <div class="deviation-wrap open">
           <button class="deviation-flag" type="button" aria-haspopup="menu" aria-expanded="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
@@ -1453,12 +1601,26 @@
 
     <section class="sg-section" id="comments-tabs">
       <h2 class="sg-h2">Comments thread tabs</h2>
-      <p class="sg-desc">Internal / External thread toggle in the Comments drawer. Lock icon = internal-only (Acumed team), globe icon = external (visible to surgeon + sales rep). Red unread dot anchors to the icon's top-right and changes border color to match the active state's pill background.</p>
+      <p class="sg-desc">Thread toggle in the Comments drawer. Admin sees three threads — <b>Internal</b> (Acumed team only, lock icon), <b>Sales</b> (Acumed + Sales, surgeon excluded), and <b>External</b> (Acumed + Sales + Surgeon, globe icon). Customers see two of these: rep / manager get Sales + External; surgeon gets External only. Red unread dot anchors to the icon's top-right and changes border color to match the active state's pill background.</p>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Both unread, Internal active</span><span class="sg-tile-code">.ct-btn.has-unread</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Admin — 3 threads, Internal active</span></div>
         <div class="comments-toggle">
           <button class="ct-btn is-active has-unread" type="button"><span class="ct-icon-wrap"><svg class="ct-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>Internal</button>
+          <button class="ct-btn" type="button"><span class="ct-icon-wrap"><svg class="ct-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span>Sales</button>
           <button class="ct-btn has-unread" type="button"><span class="ct-icon-wrap"><svg class="ct-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10z"/></svg></span>External</button>
+        </div>
+      </div>
+      <div class="sg-tile">
+        <div class="sg-tile-meta"><span class="sg-tile-label">Customer (rep / manager) — Sales + External</span></div>
+        <div class="comments-toggle">
+          <button class="ct-btn is-active" type="button"><span class="ct-icon-wrap"><svg class="ct-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span>Sales</button>
+          <button class="ct-btn" type="button"><span class="ct-icon-wrap"><svg class="ct-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10z"/></svg></span>External</button>
+        </div>
+      </div>
+      <div class="sg-tile">
+        <div class="sg-tile-meta"><span class="sg-tile-label">Customer (surgeon) — External only</span></div>
+        <div class="comments-toggle">
+          <button class="ct-btn is-active" type="button"><span class="ct-icon-wrap"><svg class="ct-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10z"/></svg></span>External</button>
         </div>
       </div>
     </section>
@@ -1501,9 +1663,9 @@
 
     <section class="sg-section" id="editable-drawer">
       <h2 class="sg-h2">Editable drawer chrome</h2>
-      <p class="sg-desc">Shared <code>.sp-drawer</code> pattern used by Surgical Plan, Device Design, and Order &amp; Fulfillment. Top row holds the mode label + Edit / Save / Cancel buttons. The Edit button is shown only for editing roles; all other roles see a read-only output. Portal users never see the Edit button; their drawer is permanently <code>.is-readonly</code>.</p>
+      <p class="sg-desc">Shared <code>.sp-drawer</code> pattern used by Surgical Plan, Device Design, and Order &amp; Fulfillment. Top row holds the mode label + Edit / Save / Cancel buttons. <b>Admin / Acumed staff</b> always see Edit; the <b>Portal Surgical Plan</b> is gated by case state (Edit shown only pre-Planning) and Device Design / Order &amp; Fulfillment are permanently <code>.is-readonly</code> in portal. Portal customers edit the Proposed meeting time via the inline section edit pattern (see Meeting info card tile below) regardless of plan-level gating.</p>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Read-only header (default)</span><span class="sg-tile-code">.sp-drawer.is-readonly</span></div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Read-only header — default state, all roles</span></div>
         <div class="sp-head">
           <div class="sp-head-text">
             <div class="sp-head-mode-label">Read-only view</div>
@@ -1528,10 +1690,146 @@
         </div>
       </div>
       <div class="sg-tile">
-        <div class="sg-tile-meta"><span class="sg-tile-label">Meeting info card (Surgical Plan)</span><span class="sg-tile-code">.sp-meeting</span></div>
-        <div class="sp-meeting">
-          <div class="sp-meeting-h">Proposed</div>
+        <div class="sg-tile-meta"><span class="sg-tile-label">Meeting info card (Surgical Plan)</span></div>
+        <p class="sg-desc">Phase 16 splits Date · Time into a 2-col row and lifts Time zone onto its own row so long IANA names ("America/New_York (ET)") read in full. The Scheduled card adds the meeting-link row with copy + open-in-new-tab affordances.</p>
+        <div class="sp-meeting" style="max-width: 480px;">
+          <div class="sp-meeting-h">Scheduled</div>
+          <div class="form-2col">
+            <div class="form-row"><label>Date</label><input type="date" value="2026-06-13" /></div>
+            <div class="form-row"><label>Time</label><input type="time" value="15:30" /></div>
+          </div>
+          <div class="form-row" style="margin-top: 10px;"><label>Time zone</label>
+            <select><option>America/Los_Angeles (PT)</option><option selected>America/New_York (ET)</option><option>America/Chicago (CT)</option><option>UTC</option></select>
+          </div>
+          <div class="form-row" style="margin-top: 10px;">
+            <label>Meeting link</label>
+            <div class="sp-link-wrap">
+              <input type="url" value="https://meet.acumed.example/case-26a0088" />
+              <button class="sp-link-act" type="button" aria-label="Open meeting link in new tab">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </button>
+              <button class="sp-link-act" type="button" aria-label="Copy meeting link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sg-tile">
+        <div class="sg-tile-meta"><span class="sg-tile-label">Inline section edit (portal Proposed meeting)</span></div>
+        <p class="sg-desc">Customers can edit the Proposed meeting time/date independently from the full Surgical Plan edit gate. A compact <code>Edit</code> button sits next to the section header; clicking reveals Cancel + Save (primary). The full-plan Edit button is locked once the case enters Planning.</p>
+        <div class="sp-meeting" style="max-width: 480px;">
+          <div class="sp-section-edit-row">
+            <div class="sp-meeting-h" style="margin: 0;">Proposed</div>
+            <button class="sp-section-edit" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              Edit
+            </button>
+          </div>
           <div style="font-size: 13px; color: var(--cool-gray-11);">12JUN2026 · 02:00 PM · America/New_York (ET)</div>
+        </div>
+      </div>
+      <div class="sg-tile">
+        <div class="sg-tile-meta"><span class="sg-tile-label">Surgical Plan card (multi-plan container)</span></div>
+        <p class="sg-desc">All planning fields (Surgical procedure summary, Solution Set, Orthognathic cascade) live inside a <code>.sp-plan-card</code> labeled "Surgical Plan N". A surgeon can add alternative plans via "+ New plan" in edit mode; each plan keeps its own cascade state. The summary row at the top mirrors what would otherwise be a free-text plan summary downstream.</p>
+        <div class="sp-plan-card" style="background: var(--bg-subtle);">
+          <div class="sp-plan-head">
+            <h4 class="pp-title sp-plan-title" style="margin:0;">Surgical Plan 1</h4>
+          </div>
+          <div class="form-row sp-plan-summary">
+            <label>Surgical procedure</label>
+            <div style="font-size: 13px; color: var(--cool-gray-11);">1-piece Le Fort I, Bilateral Sagittal Splits, Reduction Genioplasty</div>
+          </div>
+          <div class="form-row"><label>Solution Set</label><div style="font-size: 13px; color: var(--cool-gray-11);">Orthognathic Surgery</div></div>
+        </div>
+        <button class="btn sp-plan-add" type="button" style="margin-top: 14px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:14px;height:14px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New plan
+        </button>
+      </div>
+      <div class="sg-tile">
+        <div class="sg-tile-meta"><span class="sg-tile-label">Genio Surgery sub-card</span></div>
+        <p class="sg-desc">Sibling of <code>Maxilla Surgery</code> / <code>Mandible Surgery</code>. Appears when Procedure = Genio Only OR Genio = Yes (single/double jaw).</p>
+        <div class="sp-sub-card">
+          <div class="sp-sub-card-h">Genio Surgery</div>
+          <div class="form-row"><label>Type</label><select><option>Genioplasty</option><option>Genioglossus</option></select></div>
+        </div>
+      </div>
+      <div class="sg-tile">
+        <div class="sg-tile-meta"><span class="sg-tile-label">Include Disclaimers multi-select</span></div>
+        <p class="sg-desc">Multi-select dropdown using the standard <code>.ms-trigger</code> / <code>.ms-popover</code> chrome. Reuses the lane-filter widget visually but with a simpler payload (no search, no "All" placeholder). Selecting "Other" reveals an inline text field below.</p>
+        <div class="form-row">
+          <label>Include Disclaimers</label>
+          <div class="ms ms-disclaimers" style="max-width: 320px;">
+            <button class="ms-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+              <span class="ms-display">
+                <span class="ms-chip">CT Scan date warning</span>
+                <span class="ms-chip">Motion artifact warning</span>
+              </span>
+              <svg class="ms-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="sg-tile">
+        <div class="sg-tile-meta"><span class="sg-tile-label">Device Design card (collapsed)</span></div>
+        <p class="sg-desc">Each device card has a collapse chevron in the head. Collapsed cards show only the part number + description so the drawer can hold more devices at a glance. Reference case + Other are full-width rows below the 2-col field grid; both are optional and hide in read-only when blank. Other is a textarea clamped to 3 lines with a "Show more" toggle when content overflows. Total device count sits above the list.</p>
+        <div class="dd-count">2 devices</div>
+        <div class="dd-card is-collapsed" style="max-width: 480px;">
+          <div class="dd-card-head">
+            <span class="dd-card-num">1</span>
+            <div class="dd-card-part">7702-6001N<span class="dd-card-desc">Splint, traditional family</span></div>
+            <button class="dd-card-collapse" type="button" aria-label="Expand device details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+            <button class="dd-card-remove" type="button" aria-label="Remove device"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button>
+          </div>
+        </div>
+        <button class="btn btn-primary panel-export" type="button" style="margin-top: 14px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export as text
+        </button>
+      </div>
+      <div class="sg-tile">
+        <div class="sg-tile-meta"><span class="sg-tile-label">Order & Fulfillment — Invoiced item head</span></div>
+        <p class="sg-desc">Each Invoiced Item group now has its own top-level part number + qty. This is the billable line. Below it, product rows define which individual PNs ship in which shipment. Invoice contents (read-only) shows only the invoiced-item line; the Shipment summary still breaks down by product PN. Product column is widest; QTY + Shipment ride along the right.</p>
+        <div class="of-group" style="max-width: 480px;">
+          <div class="of-group-head">
+            <div class="of-group-title">Invoiced Item 1</div>
+          </div>
+          <div class="of-group-body">
+            <div class="of-iv-head">
+              <label>Invoiced item</label>
+              <label>QTY</label>
+              <span></span>
+              <select><option>7703-9001N — PTS RECON DSP</option></select>
+              <input type="number" value="1" min="1" />
+              <span></span>
+            </div>
+            <div class="of-prow-heads"><span>Product</span><span>QTY</span><span>Shipment</span><span></span></div>
+            <div class="of-prow"><select><option>7702-6001N — Splint, traditional family</option></select><input type="number" value="1" min="1" /><select><option>Shipment 1</option></select><span></span></div>
+          </div>
+        </div>
+      </div>
+      <div class="sg-tile">
+        <div class="sg-tile-meta"><span class="sg-tile-label">Ship-to default / alternate toggle</span></div>
+        <p class="sg-desc">Per-shipment Ship-to mode toggle. <strong>Default</strong> = dropdown of pre-saved addresses (rep + surgeon profiles). <strong>Alternate</strong> = pair of free-text inputs for a custom address. Selecting a default option auto-resolves the address line below.</p>
+        <div class="of-shipment" style="max-width: 480px;">
+          <div class="of-shipment-body">
+            <div class="form-row">
+              <label>Ship to</label>
+              <div class="of-shipto-toggle" role="tablist" aria-label="Ship-to mode">
+                <button class="ct-btn is-active" type="button" role="tab">Default</button>
+                <button class="ct-btn" type="button" role="tab">Alternate</button>
+              </div>
+              <div class="of-shipto-pane">
+                <select><option>Dr. Lopez (Surgeon)</option><option>Sarah Chen (Sales rep)</option></select>
+                <div class="of-shipto-default-meta">567 Oak St, Houston, TX 77019</div>
+              </div>
+            </div>
+            <div class="form-row" style="margin-top: 12px;">
+              <label>Estimated Ship Date</label>
+              <input type="date" value="2026-06-25" />
+            </div>
+          </div>
         </div>
       </div>
     </section>

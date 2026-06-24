@@ -1138,6 +1138,27 @@
   }
   .composer-confirm .cc-actions { display: flex; gap: 8px; justify-content: flex-end; }
 
+  /* Generalized inline confirmation — lives inside the card being acted on
+     (file card, plan card, device card). Same shape + animation as the
+     composer-confirm but with a danger (red) treatment for destructive ops.
+     Used in place of the modal showConfirm for in-drawer destructive flows. */
+  .inline-confirm {
+    background: #fff;
+    border: 1px solid color-mix(in srgb, var(--status-blocked) 35%, #fff);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 16px rgba(200,23,23,0.10);
+    padding: 12px 14px;
+    margin: 8px 0 4px;
+    display: flex; flex-direction: column; gap: 10px;
+    animation: composer-confirm-in 0.16s ease-out;
+  }
+  .inline-confirm .ic-head { display: flex; align-items: flex-start; gap: 9px; }
+  .inline-confirm .ic-icon { width: 18px; height: 18px; color: var(--status-blocked); flex-shrink: 0; margin-top: 1px; }
+  .inline-confirm .ic-titlewrap { flex: 1; min-width: 0; }
+  .inline-confirm .ic-title { font-size: 14px; font-weight: 700; color: var(--cool-gray-11); line-height: 1.3; }
+  .inline-confirm .ic-sub { font-size: 12.5px; color: var(--cool-gray-9); line-height: 1.45; margin-top: 2px; }
+  .inline-confirm .ic-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
   /* ---------- Buttons ---------- */
   .btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 34px; padding: 0 16px; border-radius: var(--radius-md); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid var(--cool-gray-2); background: #fff; color: var(--cool-gray-10); transition: background 0.12s, border-color 0.12s; }
   .btn:hover { background: var(--hover); }
@@ -1252,7 +1273,7 @@
   .qc-actions-default[hidden], .qc-actions-fail[hidden] { display: none; }
 
   /* ---------- Products drawer ---------- */
-  .drawer { position: fixed; top: 0; right: 0; height: 100vh; width: 440px; max-width: 92vw; background: #fff; transform: translateX(100%); transition: transform 0.25s ease; z-index: 60; display: flex; flex-direction: column; }
+  .drawer { position: fixed; top: 0; right: 0; height: 100vh; width: 540px; max-width: 92vw; background: #fff; transform: translateX(100%); transition: transform 0.25s ease; z-index: 60; display: flex; flex-direction: column; }
   .drawer.open { transform: translateX(0); box-shadow: -16px 0 48px rgba(0,0,0,0.18); }
   .drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid var(--border); }
   .drawer-head h3 { margin: 0; font-size: 19px; color: var(--cool-gray-11); }
@@ -1362,6 +1383,64 @@
     margin-bottom: 8px;
   }
 
+  /* Meeting link row — input + open-in-new-tab + copy icon buttons */
+  .sp-link-wrap { display: flex; gap: 6px; align-items: center; }
+  .sp-link-wrap input { flex: 1; min-width: 0; }
+  .sp-link-act {
+    width: 36px; height: 36px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: transparent; border: 1px solid var(--cool-gray-2); border-radius: var(--radius-sm);
+    color: var(--cool-gray-9); cursor: pointer;
+    flex-shrink: 0; position: relative;
+  }
+  .sp-link-act:hover { color: var(--cool-gray-11); background: var(--hover); }
+  .sp-link-act svg { width: 14px; height: 14px; }
+  .sp-link-act.copied::after {
+    content: 'Copied';
+    position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%);
+    background: var(--cool-gray-11); color: #fff;
+    font-size: 11px; font-weight: 600;
+    padding: 3px 7px; border-radius: var(--radius-sm);
+    white-space: nowrap; pointer-events: none;
+  }
+  .sp-drawer.is-readonly .sp-link-act { border-color: transparent; pointer-events: auto; cursor: pointer; }
+
+  /* Plan card — wraps a single Surgical Plan N. Multiple plans stack
+     vertically with consistent spacing; "+ New plan" inserts another. */
+  .sp-plan-list { display: flex; flex-direction: column; gap: 18px; margin-bottom: 22px; }
+  .sp-plan-card {
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-md);
+    padding: 16px 18px 18px;
+    background: #fff;
+  }
+  .sp-plan-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .sp-plan-title { margin: 0; }
+  .sp-plan-remove {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px;
+    background: transparent; border: 0; border-radius: var(--radius-sm);
+    color: var(--cool-gray-9);
+    cursor: pointer;
+  }
+  .sp-plan-remove:hover { background: var(--bg-subtle); color: var(--danger); }
+  .sp-plan-remove svg { width: 16px; height: 16px; }
+  .sp-plan-remove[hidden] { display: none; }
+  .sp-plan-summary { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--hairline); }
+  /* "+ New plan" button styling — bottom of plan list, edit mode only */
+  .sp-plan-add {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-bottom: 26px;
+  }
+  .sp-plan-add[hidden] { display: none; }
+  /* Read-only refinements for plan cards */
+  .sp-drawer.is-readonly .sp-plan-card { background: transparent; }
+  .sp-drawer.is-readonly .sp-plan-remove { display: none; }
+
   /* Conditional sub-cards (Maxilla Surgery, Mandible Surgery) */
   .sp-sub-card {
     background: var(--bg-subtle);
@@ -1446,9 +1525,36 @@
   }
   .dd-card-remove:hover { background: var(--hover); color: var(--pantone-7417); }
   .dd-card-remove svg { width: 15px; height: 15px; }
-  .dd-card-body { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
-  .dd-card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 16px; }
+  /* Per-card collapse chevron sits between the part-number block and the remove button. */
+  .dd-card-collapse {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px;
+    background: transparent; border: 0; border-radius: var(--radius-sm);
+    color: var(--cool-gray-7); cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .dd-card-collapse:hover { background: var(--hover); color: var(--cool-gray-11); }
+  .dd-card-collapse svg { width: 14px; height: 14px; transition: transform 0.15s; }
+  .dd-card.is-collapsed .dd-card-collapse svg { transform: rotate(-90deg); }
+  .dd-card.is-collapsed .dd-card-body { display: none; }
+  /* Compressed body: tighter padding + grid gap so more fits at a glance. */
+  .dd-card-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+  .dd-card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 14px; }
+  .dd-card-body .form-row label { margin-bottom: 2px; }
+  .dd-card-body .form-row input,
+  .dd-card-body .form-row select,
+  .dd-card-body .form-row textarea { padding: 6px 9px; font-size: 13px; }
+  /* "Other" + "Reference case" span both columns so the textarea can breathe. */
+  .dd-card-grid .form-row.dd-row-full { grid-column: 1 / -1; }
+  .dd-card-body textarea[data-dd-field="other"] { min-height: 56px; resize: vertical; }
+  /* Read-only treatment of "Other": clamp to 3 lines with a "Show more" toggle. */
+  .dd-other-readonly { font-size: 13px; color: var(--cool-gray-11); line-height: 1.45; white-space: pre-wrap; }
+  .dd-other-readonly.is-clamped { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .dd-other-toggle { background: transparent; border: 0; padding: 0; font: inherit; font-size: 12px; color: var(--cerulean); cursor: pointer; margin-top: 4px; }
+  .dd-other-toggle[hidden] { display: none; }
   .dd-card-notes { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--cool-gray-7); font-weight: 700; margin-top: 4px; }
+  /* Total device count header — sits above the list. */
+  .dd-count { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--cool-gray-9); margin-bottom: 12px; }
   /* Inline picker for adding a new device */
   .dd-add-row { margin-top: 16px; }
   .dd-picker {
@@ -1519,10 +1625,11 @@
   .of-ship-remove svg { width: 15px; height: 15px; }
   .of-group-body { padding: 8px 14px 14px; }
 
-  /* Product row header (column labels: Product · QTY · Shipment) */
+  /* Product row header (column labels: Product · QTY · Shipment).
+     Product is the widest column; QTY + Shipment ride along the right edge. */
   .of-prow-heads {
     display: grid;
-    grid-template-columns: 1fr 60px 130px 30px;
+    grid-template-columns: 1fr 52px 108px 30px;
     gap: 8px;
     padding: 6px 0 4px;
     font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em;
@@ -1532,11 +1639,17 @@
   .of-prow-heads span:nth-child(3) { text-align: left; }
   .of-prow {
     display: grid;
-    grid-template-columns: 1fr 60px 130px 30px;
+    grid-template-columns: 1fr 52px 108px 30px;
     gap: 8px;
     align-items: center;
     padding: 4px 0;
   }
+  /* Invoiced item header: PN + qty (the billable line). 3-col grid mirrors the
+     product row's Product · QTY · (trailing) columns so labels line up. */
+  .of-iv-head { display: grid; grid-template-columns: 1fr 52px 30px; gap: 4px 8px; align-items: center; padding: 4px 14px 12px; border-bottom: 1px dashed var(--hairline); margin: 0 -14px 12px; }
+  .of-iv-head > label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--cool-gray-7); font-weight: 700; margin: 0; }
+  .of-iv-head > select,
+  .of-iv-head > input { border: 1px solid var(--cool-gray-2); border-radius: var(--radius-md); padding: 7px 10px; font: inherit; font-size: 13px; background: #fff; color: var(--text); min-height: 36px; width: 100%; }
   .of-prow > select,
   .of-prow > input {
     border: 1px solid var(--cool-gray-2);
@@ -1599,6 +1712,13 @@
     white-space: nowrap; pointer-events: none;
   }
   .of-add-row { margin-top: 12px; }
+
+  /* Ship-to toggle — Default (dropdown of rep/surgeon addresses) vs Alternate
+     (free-text). The wrapper spans both grid columns to keep its sub-form clean. */
+  .of-shipto-toggle { display: inline-flex; gap: 0; background: var(--cool-gray-1); padding: 3px; border-radius: var(--radius-md); margin-bottom: 8px; }
+  .of-shipto-toggle .ct-btn { font-size: 12.5px; padding: 5px 12px; }
+  .of-shipto-pane[hidden] { display: none; }
+  .of-shipto-default-meta { font-size: 11.5px; color: var(--cool-gray-9); margin-top: 4px; }
 
   /* Read-only treatment: swap which view is visible. The summary view (Phase 5)
      is generated by JS from the edit form's current values on every read-only
@@ -3489,6 +3609,12 @@
             </span>
             Internal
           </button>
+          <button class="ct-btn" type="button" role="tab" aria-selected="false" data-channel="sales">
+            <span class="ct-icon-wrap">
+              <svg class="ct-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            </span>
+            Sales
+          </button>
           <button class="ct-btn has-unread" type="button" role="tab" aria-selected="false" data-channel="external">
             <span class="ct-icon-wrap">
               <svg class="ct-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10z"/></svg>
@@ -3600,6 +3726,30 @@
               <span class="like liked"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></span>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Sales channel — Acumed + Sales (surgeon excluded) -->
+      <div class="chat" data-channel="sales" hidden>
+        <div class="msg in">
+          <span class="av av-sc">SC</span>
+          <div class="msg-col">
+            <div class="msg-bubble">Pricing sheet for the cadaver lab is attached — let me know if anything's missing before Friday.</div>
+            <div class="msg-meta">
+              <span class="like"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></span>
+              02JUN2026 09:15 AM
+            </div>
+          </div>
+        </div>
+        <div class="msg out">
+          <div class="msg-col">
+            <div class="msg-bubble">Looks good. I'll loop in the regional manager once we have the PO confirmed.</div>
+            <div class="msg-meta">
+              <span class="like"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></span>
+              02JUN2026 10:02 AM
+            </div>
+          </div>
+          <span class="av av-jh">JH</span>
         </div>
       </div>
 
@@ -4393,169 +4543,221 @@
         <h4 class="pp-title">Planning Meeting Information</h4>
         <div class="sp-meeting">
           <div class="sp-meeting-h">Proposed</div>
-          <div class="form-3col">
+          <div class="form-2col">
             <div class="form-row"><label>Date</label><input type="date" value="2026-06-12" /></div>
             <div class="form-row"><label>Time</label><input type="time" value="14:00" /></div>
-            <div class="form-row"><label>Time zone</label>
-              <select><option>America/Los_Angeles (PT)</option><option selected>America/New_York (ET)</option><option>America/Chicago (CT)</option><option>UTC</option></select>
-            </div>
+          </div>
+          <div class="form-row" style="margin-top: 10px;"><label>Time zone</label>
+            <select><option>America/Los_Angeles (PT)</option><option selected>America/New_York (ET)</option><option>America/Chicago (CT)</option><option>UTC</option></select>
           </div>
         </div>
         <div class="sp-meeting" style="margin-top: 14px;">
           <div class="sp-meeting-h">Scheduled</div>
-          <div class="form-3col">
+          <div class="form-2col">
             <div class="form-row"><label>Date</label><input type="date" value="2026-06-13" /></div>
             <div class="form-row"><label>Time</label><input type="time" value="15:30" /></div>
-            <div class="form-row"><label>Time zone</label>
-              <select><option>America/Los_Angeles (PT)</option><option selected>America/New_York (ET)</option><option>America/Chicago (CT)</option><option>UTC</option></select>
-            </div>
+          </div>
+          <div class="form-row" style="margin-top: 10px;"><label>Time zone</label>
+            <select><option>America/Los_Angeles (PT)</option><option selected>America/New_York (ET)</option><option>America/Chicago (CT)</option><option>UTC</option></select>
           </div>
           <div class="form-row" style="margin-top: 10px;">
             <label>Meeting link</label>
-            <input type="url" value="https://meet.acumed.example/case-26a0088" />
+            <div class="sp-link-wrap">
+              <input type="url" value="https://meet.acumed.example/case-26a0088" data-sp-meeting-link />
+              <button class="sp-link-act tip tip-up" type="button" aria-label="Open meeting link in new tab" data-tip="Open in new tab" data-sp-meeting-open>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </button>
+              <button class="sp-link-act tip tip-up" type="button" aria-label="Copy meeting link" data-tip="Copy link" data-sp-meeting-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- 2. Solution Set (with conditional Orthognathic Surgery flow) -->
-      <div class="pp-section">
-        <h4 class="pp-title">Solution Set</h4>
-        <div class="form-row">
-          <label>Solution Set</label>
-          <select data-sp="solution" id="spSolution">
-            <option>Diagnostic Models</option>
-            <option>Maxillofacial Reconstruction Plates</option>
-            <option>Mandibular Reconstruction</option>
-            <option selected>Orthognathic Surgery</option>
-          </select>
-        </div>
+      <!-- 2. Plan container — one or more Surgical Plan N cards.
+           Each plan is self-contained: Surgical procedure summary at top,
+           then Solution Set + Orthognathic cascade scoped to this plan.
+           "+ New plan" appears below in edit mode and clones Plan 1. -->
+      <div class="sp-plan-list" data-sp-plan-list>
+        <div class="sp-plan-card" data-plan-id="1">
+          <div class="sp-plan-head">
+            <h4 class="pp-title sp-plan-title">Surgical Plan 1</h4>
+            <button class="btn-icon sp-plan-remove" type="button" aria-label="Remove plan" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
 
-        <!-- Orthognathic-specific cascade — visible only when Orthognathic Surgery is the chosen solution -->
-        <div data-sp-when-solution="Orthognathic Surgery">
-          <div class="form-row" style="margin-top: 14px;">
-            <label>Procedure</label>
-            <select data-sp="procedure" id="spProcedure">
-              <option value="single">Single Jaw Surgery</option>
-              <option value="double" selected>Double Jaw Surgery</option>
-              <option value="genio">Genio Only</option>
+          <!-- Plan summary — Surgical procedure free text at top -->
+          <div class="form-row sp-plan-summary">
+            <label>Surgical procedure</label>
+            <textarea data-sp="procedure-text" placeholder="Example: 1-piece Le Fort I, Bilateral Sagittal Splits, Reduction Genioplasty">1-piece Le Fort I, Bilateral Sagittal Splits, Reduction Genioplasty</textarea>
+          </div>
+
+          <div class="form-row">
+            <label>Solution Set</label>
+            <select data-sp="solution">
+              <option>Diagnostic Models</option>
+              <option>Maxillofacial Reconstruction Plates</option>
+              <option>Mandibular Reconstruction</option>
+              <option selected>Orthognathic Surgery</option>
             </select>
           </div>
 
-          <!-- Single Jaw sub-options -->
-          <div data-sp-when-proc="single" hidden>
-            <div class="form-2col">
-              <div class="form-row">
-                <label>Jaw</label>
-                <select data-sp="single-jaw" id="spSingleJaw">
-                  <option value="maxilla" selected>Maxilla</option>
-                  <option value="mandible">Mandible</option>
-                </select>
-              </div>
-              <div class="form-row">
-                <label>Genio</label>
-                <select data-sp="single-genio"><option>No</option><option>Yes</option></select>
+          <!-- Orthognathic-specific cascade — visible only when Orthognathic Surgery is the chosen solution -->
+          <div data-sp-when-solution="Orthognathic Surgery">
+            <div class="form-row" style="margin-top: 14px;">
+              <label>Procedure</label>
+              <select data-sp="procedure">
+                <option value="single">Single Jaw Surgery</option>
+                <option value="double" selected>Double Jaw Surgery</option>
+                <option value="genio">Genio Only</option>
+              </select>
+            </div>
+
+            <!-- Single Jaw sub-options -->
+            <div data-sp-when-proc="single" hidden>
+              <div class="form-2col">
+                <div class="form-row">
+                  <label>Jaw</label>
+                  <select data-sp="single-jaw">
+                    <option value="maxilla" selected>Maxilla</option>
+                    <option value="mandible">Mandible</option>
+                  </select>
+                </div>
+                <div class="form-row">
+                  <label>Genio</label>
+                  <select data-sp="single-genio"><option>No</option><option>Yes</option></select>
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Double Jaw sub-options -->
-          <div data-sp-when-proc="double">
-            <div class="form-2col">
-              <div class="form-row">
-                <label>Sequencing</label>
-                <select data-sp="double-seq" id="spDoubleSeq">
-                  <option value="maxilla-first" selected>Maxilla first</option>
-                  <option value="mandible-first">Mandible first</option>
-                </select>
-              </div>
-              <div class="form-row">
-                <label>Genio</label>
-                <select data-sp="double-genio"><option selected>No</option><option>Yes</option></select>
+            <!-- Double Jaw sub-options -->
+            <div data-sp-when-proc="double">
+              <div class="form-2col">
+                <div class="form-row">
+                  <label>Sequencing</label>
+                  <select data-sp="double-seq">
+                    <option value="maxilla-first" selected>Maxilla first</option>
+                    <option value="mandible-first">Mandible first</option>
+                  </select>
+                </div>
+                <div class="form-row">
+                  <label>Genio</label>
+                  <select data-sp="double-genio"><option selected>No</option><option>Yes</option></select>
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Maxilla Surgery (shown when procedure produces a maxilla osteotomy) -->
-          <div class="sp-sub-card" data-sp-section="maxilla">
-            <div class="sp-sub-card-h">Maxilla Surgery</div>
-            <div class="form-2col">
-              <div class="form-row">
-                <label>Le Fort</label>
-                <select data-sp="lefort">
-                  <option selected>Le Fort I</option>
-                  <option>Le Fort II</option>
-                  <option>Le Fort III</option>
-                </select>
+            <!-- Maxilla Surgery (shown when procedure produces a maxilla osteotomy) -->
+            <div class="sp-sub-card" data-sp-section="maxilla">
+              <div class="sp-sub-card-h">Maxilla Surgery</div>
+              <div class="form-2col">
+                <div class="form-row">
+                  <label>Le Fort</label>
+                  <select data-sp="lefort">
+                    <option selected>Le Fort I</option>
+                    <option>Le Fort II</option>
+                    <option>Le Fort III</option>
+                  </select>
+                </div>
+                <div class="form-row">
+                  <label>Number of segments</label>
+                  <select data-sp="segments">
+                    <option selected>1 Piece</option>
+                    <option>2 Piece</option>
+                    <option>3 Piece</option>
+                  </select>
+                </div>
               </div>
+            </div>
+
+            <!-- Mandible Surgery (shown when procedure produces a mandible osteotomy) -->
+            <div class="sp-sub-card" data-sp-section="mandible">
+              <div class="sp-sub-card-h">Mandible Surgery</div>
+              <div class="form-2col">
+                <div class="form-row">
+                  <label>Right side</label>
+                  <select data-sp-side="right">
+                    <option selected>Sagittal Split</option>
+                    <option>Intraoral Vertical Ramus Osteotomy (IVRO)</option>
+                    <option>Inverted L</option>
+                    <option value="other">Other…</option>
+                  </select>
+                  <input type="text" placeholder="Describe other procedure" data-sp-side-other="right" hidden />
+                </div>
+                <div class="form-row">
+                  <label>Left side</label>
+                  <select data-sp-side="left">
+                    <option selected>Sagittal Split</option>
+                    <option>Intraoral Vertical Ramus Osteotomy (IVRO)</option>
+                    <option>Inverted L</option>
+                    <option value="other">Other…</option>
+                  </select>
+                  <input type="text" placeholder="Describe other procedure" data-sp-side-other="left" hidden />
+                </div>
+              </div>
+            </div>
+
+            <!-- Genio Surgery — appears when Genio = Yes (single/double) or Procedure = Genio Only -->
+            <div class="sp-sub-card" data-sp-section="genio">
+              <div class="sp-sub-card-h">Genio Surgery</div>
               <div class="form-row">
-                <label>Number of segments</label>
-                <select data-sp="segments">
-                  <option selected>1 Piece</option>
-                  <option>2 Piece</option>
-                  <option>3 Piece</option>
+                <label>Type</label>
+                <select data-sp="genio-type">
+                  <option selected>Genioplasty</option>
+                  <option>Genioglossus</option>
                 </select>
               </div>
             </div>
-          </div>
 
-          <!-- Mandible Surgery (shown when procedure produces a mandible osteotomy) -->
-          <div class="sp-sub-card" data-sp-section="mandible">
-            <div class="sp-sub-card-h">Mandible Surgery</div>
-            <div class="form-2col">
-              <div class="form-row">
-                <label>Right side</label>
-                <select data-sp-side="right">
-                  <option selected>Sagittal Split</option>
-                  <option>Intraoral Vertical Ramus Osteotomy (IVRO)</option>
-                  <option>Inverted L</option>
-                  <option value="other">Other…</option>
-                </select>
-                <input type="text" placeholder="Describe other procedure" data-sp-side-other="right" hidden />
+            <!-- CR Correction -->
+            <div class="form-row" style="margin-top: 14px;">
+              <label>CR Correction</label>
+              <div class="radio-group">
+                <label class="radio"><input type="radio" name="spCR1" value="in" /><span>In CR</span></label>
+                <label class="radio"><input type="radio" name="spCR1" value="corrected" checked /><span>Corrected CR</span></label>
+                <label class="radio"><input type="radio" name="spCR1" value="out" /><span>Out of CR</span></label>
               </div>
-              <div class="form-row">
-                <label>Left side</label>
-                <select data-sp-side="left">
-                  <option selected>Sagittal Split</option>
-                  <option>Intraoral Vertical Ramus Osteotomy (IVRO)</option>
-                  <option>Inverted L</option>
-                  <option value="other">Other…</option>
-                </select>
-                <input type="text" placeholder="Describe other procedure" data-sp-side-other="left" hidden />
-              </div>
-            </div>
-          </div>
-
-          <!-- CR Correction -->
-          <div class="form-row" style="margin-top: 14px;">
-            <label>CR Correction</label>
-            <div class="radio-group">
-              <label class="radio"><input type="radio" name="spCR" value="in" /><span>In CR</span></label>
-              <label class="radio"><input type="radio" name="spCR" value="corrected" checked /><span>Corrected CR</span></label>
-              <label class="radio"><input type="radio" name="spCR" value="out" /><span>Out of CR</span></label>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 3. Surgical procedure (free text) -->
-      <div class="pp-section">
-        <h4 class="pp-title">Surgical procedure</h4>
-        <div class="form-row">
-          <label>Describe the surgical procedure</label>
-          <textarea placeholder="Example: 1-piece Le Fort I, Bilateral Sagittal Splits, Reduction Genioplasty">1-piece Le Fort I, Bilateral Sagittal Splits, Reduction Genioplasty</textarea>
-        </div>
-      </div>
+      <!-- "+ New plan" button — visible only in edit mode -->
+      <button class="btn sp-plan-add" type="button" data-sp-add-plan hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:14px;height:14px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New plan
+      </button>
 
-      <!-- 4. Report Preferences -->
+      <!-- 3. Case Report (was: Report Preferences) -->
       <div class="pp-section">
-        <h4 class="pp-title">Report Preferences</h4>
+        <h4 class="pp-title">Case Report</h4>
         <div class="form-row">
+          <label>Include Disclaimers</label>
+          <div class="ms ms-disclaimers">
+            <button class="ms-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" data-ms-btn>
+              <span class="ms-display" data-ms-display></span>
+              <svg class="ms-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="ms-popover" data-ms-menu hidden role="listbox" aria-multiselectable="true">
+              <div class="ms-options">
+                <label class="ms-option"><input type="checkbox" data-ms-opt value="CT Scan date warning" /><span>CT Scan date warning</span></label>
+                <label class="ms-option"><input type="checkbox" data-ms-opt value="Slice thickness warning" /><span>Slice thickness warning</span></label>
+                <label class="ms-option"><input type="checkbox" data-ms-opt value="Motion artifact warning" /><span>Motion artifact warning</span></label>
+                <label class="ms-option"><input type="checkbox" data-ms-opt value="Other" data-ms-opt-other /><span>Other</span></label>
+              </div>
+            </div>
+          </div>
+          <input type="text" class="ms-disclaimer-other" data-ms-disclaimer-other placeholder="Describe other disclaimer" hidden style="margin-top: 8px;" />
+        </div>
+        <div class="form-row" style="margin-top: 14px;">
           <label>Preferences</label>
           <textarea placeholder="Preferred sections, screenshots, measurement breakdowns…"></textarea>
         </div>
       </div>
 
-      <!-- 5. Additional notes -->
+      <!-- 4. Additional notes -->
       <div class="pp-section">
         <h4 class="pp-title">Additional notes</h4>
         <div class="form-row">
@@ -4585,6 +4787,9 @@
         </div>
       </div>
 
+      <!-- Total device count — updates as devices are added/removed -->
+      <div class="dd-count" id="ddCount" aria-live="polite">0 devices</div>
+
       <!-- Device list — populated by JS from DEVICE_SCHEMAS + seed values. -->
       <div class="dd-list" id="ddList" aria-live="polite"></div>
 
@@ -4611,6 +4816,13 @@
           <button class="btn btn-primary" type="button" id="ddPickerConfirm" disabled>Add device</button>
         </div>
       </div>
+
+      <!-- Export as text — mirrors History drawer pattern. Generates a plaintext
+           summary of every device on the case and copies to clipboard. -->
+      <button class="btn btn-primary panel-export" type="button" id="ddExportBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export as text
+      </button>
     </div>
 
     <!-- Create PDF — three template cards -->
@@ -6445,7 +6657,7 @@
      - "Other" osteotomy reveals a fillable text field.
      ================================================================= */
   (function wireSurgicalPlan() {
-    const drawer = document.querySelector('.sp-drawer');
+    const drawer = document.querySelector('.sp-drawer[data-drawer-panel="configureplan"]');
     if (!drawer) return;
 
     const editBtn = drawer.querySelector('[data-sp-edit]');
@@ -6476,48 +6688,200 @@
       editBtn.hidden = editing;
       cancelBtn.hidden = !editing;
       saveBtn.hidden = !editing;
+      // "+ New plan" + per-plan remove buttons are edit-mode only.
+      const addBtn = drawer.querySelector('[data-sp-add-plan]');
+      if (addBtn) addBtn.hidden = !editing;
+      if (typeof renumberPlans === 'function') renumberPlans();
     }
 
     editBtn.addEventListener('click', () => { savedSnap = snapshot(); setMode(true); });
     cancelBtn.addEventListener('click', () => { restore(savedSnap); setMode(false); });
     saveBtn.addEventListener('click', () => { savedSnap = snapshot(); setMode(false); });
 
-    // -------- Conditional reveal --------
-    function applyConditionals() {
-      const solution = drawer.querySelector('[data-sp="solution"]')?.value || '';
-      drawer.querySelectorAll('[data-sp-when-solution]').forEach((el) => {
+    // -------- Conditional reveal (scoped per plan card) --------
+    // Each Surgical Plan N card has its own cascade. Queries are scoped to
+    // the card so adding Plan 2 doesn't cross-wire with Plan 1.
+    function applyConditionalsForCard(card) {
+      const solution = card.querySelector('[data-sp="solution"]')?.value || '';
+      card.querySelectorAll('[data-sp-when-solution]').forEach((el) => {
         el.hidden = el.dataset.spWhenSolution !== solution;
       });
 
-      const proc = drawer.querySelector('[data-sp="procedure"]')?.value || '';
-      drawer.querySelectorAll('[data-sp-when-proc]').forEach((el) => {
+      const proc = card.querySelector('[data-sp="procedure"]')?.value || '';
+      card.querySelectorAll('[data-sp-when-proc]').forEach((el) => {
         el.hidden = el.dataset.spWhenProc !== proc;
       });
 
-      // Maxilla Surgery visibility:
-      //   Single Jaw + Maxilla, OR Double Jaw (any sequencing).
-      const singleJaw = drawer.querySelector('[data-sp="single-jaw"]')?.value || '';
+      const singleJaw = card.querySelector('[data-sp="single-jaw"]')?.value || '';
+      const singleGenio = card.querySelector('[data-sp="single-genio"]')?.value || '';
+      const doubleGenio = card.querySelector('[data-sp="double-genio"]')?.value || '';
+
+      // Maxilla Surgery — Single Jaw + Maxilla, OR Double Jaw (any sequencing).
       const wantsMaxilla = (proc === 'double') || (proc === 'single' && singleJaw === 'maxilla');
-      const maxillaCard = drawer.querySelector('[data-sp-section="maxilla"]');
+      const maxillaCard = card.querySelector('[data-sp-section="maxilla"]');
       if (maxillaCard) maxillaCard.hidden = !wantsMaxilla;
 
-      // Mandible Surgery visibility:
-      //   Single Jaw + Mandible, OR Double Jaw (any).
+      // Mandible Surgery — Single Jaw + Mandible, OR Double Jaw (any).
       const wantsMandible = (proc === 'double') || (proc === 'single' && singleJaw === 'mandible');
-      const mandibleCard = drawer.querySelector('[data-sp-section="mandible"]');
+      const mandibleCard = card.querySelector('[data-sp-section="mandible"]');
       if (mandibleCard) mandibleCard.hidden = !wantsMandible;
 
+      // Genio Surgery — Genio Only procedure, OR Genio=Yes in single/double jaw.
+      const wantsGenio = (proc === 'genio')
+        || (proc === 'single' && singleGenio === 'Yes')
+        || (proc === 'double' && doubleGenio === 'Yes');
+      const genioCard = card.querySelector('[data-sp-section="genio"]');
+      if (genioCard) genioCard.hidden = !wantsGenio;
+
       // Side "Other" reveal — when a side select picks "other", show the inline text field.
-      drawer.querySelectorAll('[data-sp-side]').forEach((sel) => {
+      card.querySelectorAll('[data-sp-side]').forEach((sel) => {
         const side = sel.dataset.spSide;
-        const other = drawer.querySelector(`[data-sp-side-other="${side}"]`);
+        const other = card.querySelector(`[data-sp-side-other="${side}"]`);
         if (other) other.hidden = sel.value !== 'other';
       });
     }
 
-    // Hook every conditional driver so changes ripple.
-    drawer.querySelectorAll('[data-sp], [data-sp-side]').forEach((el) => {
-      el.addEventListener('change', applyConditionals);
+    function applyConditionals() {
+      drawer.querySelectorAll('.sp-plan-card').forEach(applyConditionalsForCard);
+    }
+
+    function wirePlanCard(card) {
+      card.querySelectorAll('[data-sp], [data-sp-side]').forEach((el) => {
+        if (el.dataset.spWired) return;
+        el.dataset.spWired = '1';
+        el.addEventListener('change', applyConditionals);
+      });
+      const removeBtn = card.querySelector('.sp-plan-remove');
+      if (removeBtn && !removeBtn.dataset.wired) {
+        removeBtn.dataset.wired = '1';
+        removeBtn.addEventListener('click', () => {
+          const title = card.querySelector('.sp-plan-title')?.textContent?.trim() || 'this plan';
+          if (typeof window.showInlineConfirm === 'function') {
+            window.showInlineConfirm(card, {
+              title: `Remove ${title}?`,
+              body: 'The plan and all its selections will be discarded.',
+              confirmLabel: 'Remove plan',
+              keepSelector: '.sp-plan-head',
+              onConfirm: () => { card.remove(); renumberPlans(); },
+            });
+          } else {
+            card.remove(); renumberPlans();
+          }
+        });
+      }
+    }
+
+    function renumberPlans() {
+      const list = drawer.querySelector('[data-sp-plan-list]');
+      if (!list) return;
+      const cards = list.querySelectorAll('.sp-plan-card');
+      cards.forEach((c, i) => {
+        const n = i + 1;
+        c.dataset.planId = String(n);
+        const title = c.querySelector('.sp-plan-title');
+        if (title) title.textContent = `Surgical Plan ${n}`;
+        const remove = c.querySelector('.sp-plan-remove');
+        if (remove) remove.hidden = (cards.length === 1) || drawer.classList.contains('is-readonly');
+      });
+    }
+
+    function addPlan() {
+      const list = drawer.querySelector('[data-sp-plan-list]');
+      if (!list) return;
+      const first = list.querySelector('.sp-plan-card');
+      if (!first) return;
+      const clone = first.cloneNode(true);
+      // Reset values to defaults on the clone
+      clone.querySelectorAll('input[type="text"], textarea').forEach((el) => { el.value = ''; });
+      clone.querySelectorAll('select').forEach((sel) => { sel.selectedIndex = 0; });
+      clone.querySelectorAll('input[type="radio"]').forEach((r) => { r.checked = false; });
+      // Give radios a unique group name so they don't bleed across plans
+      const newId = list.querySelectorAll('.sp-plan-card').length + 1;
+      clone.querySelectorAll('input[type="radio"]').forEach((r) => {
+        r.name = r.name.replace(/\d+$/, '') + newId;
+      });
+      // Clear wiring flags from the clone so wirePlanCard reattaches
+      clone.querySelectorAll('[data-sp-wired]').forEach((el) => delete el.dataset.spWired);
+      const removeBtn = clone.querySelector('.sp-plan-remove');
+      if (removeBtn) delete removeBtn.dataset.wired;
+      list.appendChild(clone);
+      renumberPlans();
+      wirePlanCard(clone);
+      applyConditionalsForCard(clone);
+    }
+
+    const addBtn = drawer.querySelector('[data-sp-add-plan]');
+    if (addBtn) addBtn.addEventListener('click', addPlan);
+
+    drawer.querySelectorAll('.sp-plan-card').forEach(wirePlanCard);
+    renumberPlans();
+
+    // -------- Include Disclaimers multi-select + Other reveal --------
+    const ms = drawer.querySelector('.ms-disclaimers');
+    if (ms) {
+      const msBtn = ms.querySelector('[data-ms-btn]');
+      const msMenu = ms.querySelector('[data-ms-menu]');
+      const msDisplay = ms.querySelector('[data-ms-display]');
+      const otherInput = drawer.querySelector('[data-ms-disclaimer-other]');
+      function renderDisplay() {
+        const chosen = Array.from(ms.querySelectorAll('[data-ms-opt]:checked')).map((c) => c.value);
+        msDisplay.innerHTML = '';
+        if (!chosen.length) { msDisplay.textContent = ''; }
+        else {
+          chosen.forEach((v) => {
+            const chip = document.createElement('span');
+            chip.className = 'ms-chip';
+            chip.textContent = v;
+            msDisplay.appendChild(chip);
+          });
+        }
+        const otherChecked = ms.querySelector('[data-ms-opt-other]')?.checked;
+        if (otherInput) otherInput.hidden = !otherChecked;
+      }
+      msBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (drawer.classList.contains('is-readonly')) return;
+        const open = !msMenu.hidden;
+        msMenu.hidden = open;
+        ms.classList.toggle('open', !open);
+        msBtn.setAttribute('aria-expanded', String(!open));
+      });
+      ms.querySelectorAll('[data-ms-opt]').forEach((opt) => {
+        opt.addEventListener('change', renderDisplay);
+      });
+      document.addEventListener('click', (e) => {
+        if (!ms.contains(e.target)) {
+          msMenu.hidden = true; ms.classList.remove('open');
+          msBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+      renderDisplay();
+    }
+
+    // -------- Meeting link copy + open in new tab --------
+    drawer.querySelectorAll('[data-sp-meeting-copy]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const input = btn.parentElement.querySelector('[data-sp-meeting-link]');
+        const url = (input?.value || '').trim();
+        if (!url) return;
+        try { await navigator.clipboard.writeText(url); }
+        catch { /* fallback */
+          const ta = document.createElement('textarea');
+          ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta); ta.select();
+          try { document.execCommand('copy'); } finally { document.body.removeChild(ta); }
+        }
+        btn.classList.add('copied');
+        setTimeout(() => btn.classList.remove('copied'), 1200);
+      });
+    });
+    drawer.querySelectorAll('[data-sp-meeting-open]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const input = btn.parentElement.querySelector('[data-sp-meeting-link]');
+        const url = (input?.value || '').trim();
+        if (!url) return;
+        window.open(url, '_blank', 'noopener,noreferrer');
+      });
     });
 
     applyConditionals();
@@ -6537,11 +6901,20 @@
     const pickerPart = document.getElementById('ddPickerPart');
     const pickerCancel = document.getElementById('ddPickerCancel');
     const pickerConfirm = document.getElementById('ddPickerConfirm');
+    const countEl = document.getElementById('ddCount');
+    const exportBtn = document.getElementById('ddExportBtn');
+    const drawer = document.querySelector('.sp-drawer[data-drawer-panel="configureproduct"]');
     if (!list || !addBtn || !picker) return;
 
     /* Schema: each part number → ordered list of { key, label, options[], type? }.
-       'options' is an array of strings for select-style fields. 'type: text'
-       renders a free-text input. The standard "Other" trailing field is text. */
+       'options' is array of strings for selects. 'type: text' is a single-line
+       input, 'type: textarea' is a multi-line input. Every part has a trailing
+       Reference case (text) + Other (textarea); both optional, both hidden in
+       read-only when blank. */
+    const TRAILING_FIELDS = [
+      { key: 'reference-case', label: 'Reference case', type: 'text',     optional: true, full: true, hideIfBlank: true },
+      { key: 'other',          label: 'Other',          type: 'textarea', optional: true, full: true, hideIfBlank: true },
+    ];
     const DEVICE_SCHEMAS = {
       '7702-6001N': {
         desc: 'Splint, traditional family',
@@ -6550,7 +6923,7 @@
           { key: 'impression',   label: 'Impression',   options: ['Shallow', 'Normal', 'Deep'] },
           { key: 'buccal',       label: 'Buccal Flange',options: ['None', 'Minimal', 'Normal'] },
           { key: 'holes',        label: 'Holes',        options: ['No', 'Yes'] },
-          { key: 'other',        label: 'Other',        type: 'text' },
+          ...TRAILING_FIELDS,
         ],
       },
       '7702-6002N': {
@@ -6560,7 +6933,7 @@
           { key: 'buccal',     label: 'Buccal Flange',  options: ['None', 'Minimal', 'Normal'] },
           { key: 'palatal',    label: 'Palatal Support',options: ['None', 'Normal', 'Thick'] },
           { key: 'holes',      label: 'Holes',          options: ['No', 'Yes'] },
-          { key: 'other',      label: 'Other',          type: 'text' },
+          ...TRAILING_FIELDS,
         ],
       },
       '7703-6005L': {
@@ -6568,7 +6941,7 @@
         fields: [
           { key: 'side',     label: 'Side',         options: ['Left', 'Right'] },
           { key: 'material', label: 'Material',     options: ['Ti', 'PEEK'] },
-          { key: 'other',    label: 'Other',        type: 'text' },
+          ...TRAILING_FIELDS,
         ],
       },
       '7703-1001R': {
@@ -6576,27 +6949,44 @@
         fields: [
           { key: 'side',         label: 'Side',         options: ['Right', 'Left'] },
           { key: 'plate-length', label: 'Plate length', options: ['Short', 'Standard', 'Long'] },
-          { key: 'other',        label: 'Other',        type: 'text' },
+          ...TRAILING_FIELDS,
         ],
       },
     };
 
-    // Seed devices the prototype loads with (mirrors Adam's two examples).
+    // Seed devices the prototype loads with — both seeds carry a reference case
+    // so the new field is visible in the demo immediately; second seed also has
+    // a longer Other note to exercise the read-more clamp.
     const SEED_DEVICES = [
-      { part: '7702-6001N', values: { 'splint-type': 'Traditional', 'impression': 'Normal', 'buccal': 'Minimal', 'holes': 'Yes', 'other': '' } },
-      { part: '7702-6002N', values: { 'impression': 'Deep', 'buccal': 'Normal', 'palatal': 'Normal', 'holes': 'No', 'other': 'Notch lingual for tongue clearance' } },
+      { part: '7702-6001N', values: { 'splint-type': 'Traditional', 'impression': 'Normal', 'buccal': 'Minimal', 'holes': 'Yes', 'reference-case': '25A0042', 'other': '' } },
+      { part: '7702-6002N', values: { 'impression': 'Deep', 'buccal': 'Normal', 'palatal': 'Normal', 'holes': 'No', 'reference-case': '25B0177', 'other': 'Notch lingual for tongue clearance. Surgeon also requested an extra 1.5 mm relief along the palatal seal so the splint can accommodate the patient’s deviated midline.' } },
     ];
+
+    const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
     function renderField(field, valueMap) {
       const v = valueMap?.[field.key] ?? '';
+      const rowCls = `form-row${field.full ? ' dd-row-full' : ''}`;
+      const blankAttr = field.hideIfBlank ? ' data-dd-hide-if-blank' : '';
+      const optionalTag = field.optional
+        ? '<em style="font-style:normal; font-weight:400; color:var(--cool-gray-7); margin-left:6px;">(optional)</em>'
+        : '';
+      if (field.type === 'textarea') {
+        return `<div class="${rowCls}"${blankAttr}>
+          <label>${field.label}${optionalTag}</label>
+          <textarea data-dd-field="${field.key}" rows="3" placeholder="${field.label}…">${esc(v)}</textarea>
+          <div class="dd-other-readonly is-clamped" data-dd-readonly hidden>${esc(v)}</div>
+          <button type="button" class="dd-other-toggle" data-dd-toggle hidden>Show more</button>
+        </div>`;
+      }
       if (field.type === 'text') {
-        return `<div class="form-row">
-          <label>${field.label}<em style="font-style:normal; font-weight:400; color:var(--cool-gray-7); margin-left:6px;">(optional)</em></label>
-          <input type="text" data-dd-field="${field.key}" value="${v.replace(/"/g, '&quot;')}" placeholder="${field.label}…" />
+        return `<div class="${rowCls}"${blankAttr}>
+          <label>${field.label}${optionalTag}</label>
+          <input type="text" data-dd-field="${field.key}" value="${esc(v)}" placeholder="${field.label}…" />
         </div>`;
       }
       const opts = field.options.map((o) =>
-        `<option${o === v ? ' selected' : ''}>${o}</option>`
+        `<option${o === v ? ' selected' : ''}>${esc(o)}</option>`
       ).join('');
       return `<div class="form-row">
         <label>${field.label}</label>
@@ -6613,8 +7003,11 @@
           <span class="dd-card-num">${index + 1}</span>
           <div class="dd-card-part">
             ${device.part}
-            <span class="dd-card-desc">${schema.desc}</span>
+            <span class="dd-card-desc">${esc(schema.desc)}</span>
           </div>
+          <button class="dd-card-collapse" type="button" aria-label="Collapse device details" aria-expanded="true" data-dd-collapse>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
           <button class="dd-card-remove" type="button" aria-label="Remove device" data-dd-remove>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
           </button>
@@ -6626,23 +7019,96 @@
     }
 
     function renumber() {
-      list.querySelectorAll('[data-dd-card]').forEach((card, i) => {
+      const cards = list.querySelectorAll('[data-dd-card]');
+      cards.forEach((card, i) => {
         const num = card.querySelector('.dd-card-num');
         if (num) num.textContent = String(i + 1);
       });
+      if (countEl) countEl.textContent = `${cards.length} ${cards.length === 1 ? 'device' : 'devices'}`;
     }
-    function attachRemove(card) {
-      const btn = card.querySelector('[data-dd-remove]');
-      if (!btn) return;
-      btn.addEventListener('click', () => {
-        card.remove();
-        renumber();
+
+    // ----- Read-only treatment: hide blank optional rows + clamp Other -----
+    function applyReadOnlyFormatting() {
+      const readonly = drawer && drawer.classList.contains('is-readonly');
+      list.querySelectorAll('[data-dd-card]').forEach((card) => {
+        // Hide blank optional rows in read-only; show them in edit.
+        card.querySelectorAll('[data-dd-hide-if-blank]').forEach((row) => {
+          const input = row.querySelector('[data-dd-field]');
+          const val = (input?.value || '').trim();
+          row.hidden = readonly && !val;
+        });
+        // Other textarea: swap in clamped readonly view when read-only + has content
+        card.querySelectorAll('textarea[data-dd-field="other"]').forEach((ta) => {
+          const row = ta.closest('.form-row');
+          const ro = row.querySelector('[data-dd-readonly]');
+          const toggle = row.querySelector('[data-dd-toggle]');
+          if (readonly && ta.value.trim()) {
+            ta.hidden = true;
+            ro.textContent = ta.value;
+            ro.hidden = false;
+            // After paint, decide if "Show more" is needed (clamped overflow).
+            requestAnimationFrame(() => {
+              ro.classList.add('is-clamped');
+              toggle.textContent = 'Show more';
+              toggle.hidden = !(ro.scrollHeight > ro.clientHeight + 1);
+            });
+          } else {
+            ta.hidden = false;
+            if (ro) ro.hidden = true;
+            if (toggle) toggle.hidden = true;
+          }
+        });
+      });
+    }
+
+    function attachCardHandlers(card) {
+      const removeBtn = card.querySelector('[data-dd-remove]');
+      if (removeBtn) removeBtn.addEventListener('click', () => {
+        const partLabel = card.querySelector('.dd-card-part')?.textContent?.trim().split('\n')[0] || 'this device';
+        // Inline confirm replaces the dd-card-body; the head (PN + description)
+        // stays visible so the user sees what they're removing.
+        if (typeof window.showInlineConfirm === 'function') {
+          window.showInlineConfirm(card, {
+            title: 'Remove this device?',
+            body: `${partLabel} will be removed from the case device list.`,
+            confirmLabel: 'Remove device',
+            keepSelector: '.dd-card-head',
+            onConfirm: () => { card.remove(); renumber(); },
+          });
+        } else {
+          card.remove(); renumber();
+        }
+      });
+
+      const collapseBtn = card.querySelector('[data-dd-collapse]');
+      if (collapseBtn) collapseBtn.addEventListener('click', () => {
+        const collapsed = card.classList.toggle('is-collapsed');
+        collapseBtn.setAttribute('aria-expanded', String(!collapsed));
+        collapseBtn.setAttribute('aria-label', collapsed ? 'Expand device details' : 'Collapse device details');
+      });
+
+      // "Show more / Show less" toggle on the Other clamp
+      card.querySelectorAll('[data-dd-toggle]').forEach((tg) => {
+        tg.addEventListener('click', () => {
+          const ro = tg.parentElement.querySelector('[data-dd-readonly]');
+          if (!ro) return;
+          const clamped = ro.classList.toggle('is-clamped');
+          tg.textContent = clamped ? 'Show more' : 'Show less';
+        });
       });
     }
 
     // Initial render
     list.innerHTML = SEED_DEVICES.map((d, i) => renderCard(d, i)).join('');
-    list.querySelectorAll('[data-dd-card]').forEach(attachRemove);
+    list.querySelectorAll('[data-dd-card]').forEach(attachCardHandlers);
+    renumber();
+    applyReadOnlyFormatting();
+
+    // Re-apply read-only formatting whenever the drawer flips mode.
+    if (drawer) {
+      const mo = new MutationObserver(applyReadOnlyFormatting);
+      mo.observe(drawer, { attributes: true, attributeFilter: ['class'] });
+    }
 
     // Add flow
     function openPicker() {
@@ -6665,10 +7131,38 @@
       wrapper.innerHTML = cardHTML.trim();
       const newCard = wrapper.firstElementChild;
       list.appendChild(newCard);
-      attachRemove(newCard);
+      attachCardHandlers(newCard);
       renumber();
+      applyReadOnlyFormatting();
       closePicker();
       newCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    // Export as text — flat plaintext per device, copied to clipboard.
+    if (exportBtn) exportBtn.addEventListener('click', async () => {
+      const lines = [];
+      list.querySelectorAll('[data-dd-card]').forEach((card, i) => {
+        const part = card.dataset.ddPart;
+        const desc = card.querySelector('.dd-card-desc')?.textContent?.trim() || '';
+        lines.push(`Device ${i + 1} — ${part} — ${desc}`);
+        card.querySelectorAll('[data-dd-field]').forEach((field) => {
+          const label = field.closest('.form-row')?.querySelector('label')?.textContent?.replace(/\(optional\)$/, '').trim() || field.dataset.ddField;
+          const val = (field.value || '').trim();
+          if (!val) return;
+          lines.push(`  ${label}: ${val}`);
+        });
+        lines.push('');
+      });
+      const text = lines.join('\n').trimEnd();
+      try {
+        await navigator.clipboard.writeText(text);
+        const original = exportBtn.innerHTML;
+        exportBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied';
+        setTimeout(() => { exportBtn.innerHTML = original; }, 1500);
+      } catch {
+        // Fallback — open a prompt the user can copy from manually.
+        window.prompt('Copy device list:', text);
+      }
     });
   })();
 
@@ -6697,20 +7191,35 @@
       '7703-9001N — PTS RECON DSP',
     ];
 
-    // Seed: two groups, two shipments
+    // Default ship-to options. Mirrors what would otherwise come from the rep's
+    // and surgeon's profile records — hardcoded for the prototype.
+    const DEFAULT_ADDRESSES = [
+      { id: 'rep',     label: 'Sarah Chen (Sales rep)',  address: '1234 Main St, Houston, TX 77002' },
+      { id: 'surgeon', label: 'Dr. Lopez (Surgeon)',     address: '567 Oak St, Houston, TX 77019'   },
+    ];
+
+    // Seed: two groups, each with a billable Invoiced Item PN + the underlying
+    // products that comprise it. Invoice contents shows ONLY the Invoiced Item
+    // line; the Shipment summary still breaks down by individual product PNs.
     const SEED_GROUPS = [
-      { products: [
-        { name: '7702-6001N — Splint, traditional family', qty: 1, shipment: 1 },
-        { name: '7703-6005L — PTS CMF RECON Ti Fibula Guide', qty: 1, shipment: 1 },
-      ]},
-      { products: [
-        { name: '7703-1001R — PTS Mandible RECON Graft Plate', qty: 1, shipment: 2 },
-        { name: '7702-6002N — Splint, palatal family', qty: 1, shipment: 2 },
-      ]},
+      {
+        invoicedItem: { name: '7703-9001N — PTS RECON DSP', qty: 1 },
+        products: [
+          { name: '7702-6001N — Splint, traditional family', qty: 1, shipment: 1 },
+          { name: '7703-6005L — PTS CMF RECON Ti Fibula Guide', qty: 1, shipment: 1 },
+        ],
+      },
+      {
+        invoicedItem: { name: '7701-7001N — PTS Pre-Op Mandible Model', qty: 1 },
+        products: [
+          { name: '7703-1001R — PTS Mandible RECON Graft Plate', qty: 1, shipment: 2 },
+          { name: '7702-6002N — Splint, palatal family', qty: 1, shipment: 2 },
+        ],
+      },
     ];
     const SEED_SHIPMENTS = [
-      { carrier: 'FedEx', speed: 'Priority Overnight', shipTo: 'Cedar Heights Surgical', address: '1234 Main St, Houston, TX 77002', tracking: 'TRK-9988-XYZ', eta: '2026-06-25' },
-      { carrier: 'UPS',   speed: '2nd Day Air',         shipTo: 'Dr. Lopez (case 26A0088)', address: '567 Oak St, Houston, TX 77019', tracking: 'TRK-1122-ABC', eta: '2026-06-27' },
+      { carrier: 'FedEx', speed: 'Priority Overnight', shipToMode: 'default', shipToDefault: 'surgeon', shipTo: 'Dr. Lopez (Surgeon)',  address: '567 Oak St, Houston, TX 77019',  tracking: 'TRK-9988-XYZ', eta: '2026-06-25' },
+      { carrier: 'UPS',   speed: '2nd Day Air',         shipToMode: 'default', shipToDefault: 'rep',     shipTo: 'Sarah Chen (Sales rep)', address: '1234 Main St, Houston, TX 77002', tracking: 'TRK-1122-ABC', eta: '2026-06-27' },
     ];
 
     const trashIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>';
@@ -6760,12 +7269,25 @@
     }
     function buildGroup(group) {
       const productHTML = (group.products || []).map(buildProductRow).join('');
+      const iv = group.invoicedItem || { name: PRODUCT_CATALOG[0], qty: 1 };
+      const ivOpts = PRODUCT_CATALOG.map((name) =>
+        `<option${name === iv.name ? ' selected' : ''}>${name}</option>`
+      ).join('');
       return `<div class="of-group" data-of-group>
         <div class="of-group-head">
           <div class="of-group-title">Invoiced Item</div>
           <button class="of-group-remove" type="button" aria-label="Remove group" data-of-group-remove>${trashIcon}</button>
         </div>
         <div class="of-group-body">
+          <!-- Group-level invoiced PN + qty (the billable line) -->
+          <div class="of-iv-head" data-of-iv-head>
+            <label>Invoiced item</label>
+            <label>QTY</label>
+            <span></span>
+            <select data-of-iv-name aria-label="Invoiced item part number">${ivOpts}</select>
+            <input type="number" min="1" value="${iv.qty || 1}" data-of-iv-qty aria-label="Invoiced item quantity" />
+            <span></span>
+          </div>
           <div class="of-prow-heads"><span>Product</span><span>QTY</span><span>Shipment</span><span></span></div>
           <div class="of-prow-list" data-of-prow-list>${productHTML}</div>
           <button class="of-add-product" type="button" data-of-add-product>+ Add product</button>
@@ -6774,6 +7296,12 @@
     }
     function buildShipment(s) {
       const eta = s.eta || '';
+      const mode = s.shipToMode || 'default';
+      const defaultId = s.shipToDefault || DEFAULT_ADDRESSES[0].id;
+      const defaultOpts = DEFAULT_ADDRESSES.map((a) =>
+        `<option value="${a.id}"${a.id === defaultId ? ' selected' : ''}>${a.label}</option>`
+      ).join('');
+      const defaultAddr = DEFAULT_ADDRESSES.find((a) => a.id === defaultId)?.address || '';
       return `<div class="of-shipment" data-of-shipment>
         <div class="of-shipment-head">
           <div class="of-shipment-title">Shipment</div>
@@ -6787,16 +7315,26 @@
             <div class="form-row"><label>Ship speed</label>
               <select><option${s.speed==='Priority Overnight'?' selected':''}>Priority Overnight</option><option${s.speed==='Standard Overnight'?' selected':''}>Standard Overnight</option><option${s.speed==='2nd Day Air'?' selected':''}>2nd Day Air</option><option${s.speed==='Ground'?' selected':''}>Ground</option></select>
             </div>
-            <div class="form-row"><label>Ship to</label>
-              <input type="text" value="${(s.shipTo || '').replace(/"/g,'&quot;')}" placeholder="Recipient" />
+            <!-- Ship-to: default (rep/surgeon dropdown) vs alternate (custom address) -->
+            <div class="form-row" style="grid-column: 1 / -1;">
+              <label>Ship to</label>
+              <div class="of-shipto-toggle" role="tablist" aria-label="Ship-to mode">
+                <button class="ct-btn${mode === 'default' ? ' is-active' : ''}" type="button" role="tab" data-of-shipto-mode="default">Default</button>
+                <button class="ct-btn${mode === 'alternate' ? ' is-active' : ''}" type="button" role="tab" data-of-shipto-mode="alternate">Alternate</button>
+              </div>
+              <div class="of-shipto-pane" data-of-shipto-pane="default"${mode !== 'default' ? ' hidden' : ''}>
+                <select data-of-shipto-default>${defaultOpts}</select>
+                <div class="of-shipto-default-meta" data-of-shipto-default-addr>${defaultAddr}</div>
+              </div>
+              <div class="of-shipto-pane" data-of-shipto-pane="alternate"${mode !== 'alternate' ? ' hidden' : ''}>
+                <input type="text" value="${(s.shipTo || '').replace(/"/g,'&quot;')}" placeholder="Recipient" data-of-shipto-alt-name />
+                <input type="text" value="${(s.address || '').replace(/"/g,'&quot;')}" placeholder="Street, city, state, ZIP" data-of-shipto-alt-addr style="margin-top: 8px;" />
+              </div>
             </div>
-            <div class="form-row"><label>Estimated delivery</label>
+            <div class="form-row"><label>Estimated Ship Date</label>
               <input type="date" value="${eta}" />
             </div>
-            <div class="form-row" style="grid-column: 1 / -1;"><label>Shipping address</label>
-              <input type="text" value="${(s.address || '').replace(/"/g,'&quot;')}" placeholder="Street, city, state, ZIP" />
-            </div>
-            <div class="form-row" style="grid-column: 1 / -1;"><label>Tracking number</label>
+            <div class="form-row"><label>Tracking number</label>
               <div class="of-track-wrap">
                 <input type="text" value="${(s.tracking || '').replace(/"/g,'&quot;')}" placeholder="Tracking #" data-of-track />
                 <button class="of-track-copy tip tip-up" type="button" aria-label="Copy tracking number" data-tip="Copy tracking #" data-of-track-copy>${copyIcon}</button>
@@ -6838,6 +7376,25 @@
         btn.classList.add('copied');
         setTimeout(() => btn.classList.remove('copied'), 1200);
       });
+
+      // Ship-to toggle: switches between default (dropdown) and alternate (free text).
+      ship.querySelectorAll('[data-of-shipto-mode]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const mode = btn.dataset.ofShiptoMode;
+          ship.querySelectorAll('[data-of-shipto-mode]').forEach((b) =>
+            b.classList.toggle('is-active', b.dataset.ofShiptoMode === mode));
+          ship.querySelectorAll('[data-of-shipto-pane]').forEach((p) => {
+            p.hidden = p.dataset.ofShiptoPane !== mode;
+          });
+        });
+      });
+      // Default dropdown updates the meta line with the matched address.
+      const defaultSel = ship.querySelector('[data-of-shipto-default]');
+      const defaultMeta = ship.querySelector('[data-of-shipto-default-addr]');
+      defaultSel?.addEventListener('change', () => {
+        const addr = DEFAULT_ADDRESSES.find((a) => a.id === defaultSel.value)?.address || '';
+        if (defaultMeta) defaultMeta.textContent = addr;
+      });
     }
 
     // Render shipments FIRST so groups can populate their shipment dropdowns
@@ -6861,30 +7418,42 @@
 
     function readEditState() {
       // Walk the edit-view DOM and pull current values.
-      const products = []; // { name, qty, shipment } across all groups
-      groupsEl.querySelectorAll('[data-of-prow]').forEach((row) => {
-        const sels = row.querySelectorAll('select');
-        const qty = row.querySelector('input[type="number"]')?.value || '1';
-        products.push({
-          name: sels[0]?.value || '',
-          qty,
-          shipment: parseInt(sels[1]?.value, 10) || 1,
+      const invoicedItems = []; // { name, qty } per group — the billable lines
+      const products = []; // { name, qty, shipment } sub-items that ship
+      groupsEl.querySelectorAll('[data-of-group]').forEach((g) => {
+        const ivName = g.querySelector('[data-of-iv-name]')?.value || '';
+        const ivQty = g.querySelector('[data-of-iv-qty]')?.value || '1';
+        if (ivName) invoicedItems.push({ name: ivName, qty: ivQty });
+        g.querySelectorAll('[data-of-prow]').forEach((row) => {
+          const sels = row.querySelectorAll('select');
+          const qty = row.querySelector('input[type="number"]')?.value || '1';
+          products.push({
+            name: sels[0]?.value || '',
+            qty,
+            shipment: parseInt(sels[1]?.value, 10) || 1,
+          });
         });
       });
-      const shipments = []; // [{ carrier, speed, shipTo, eta, address, tracking }]
+      const shipments = [];
       shipsEl.querySelectorAll('[data-of-shipment]').forEach((s) => {
-        const sels = s.querySelectorAll('select');
-        const inputs = s.querySelectorAll('input');
-        shipments.push({
-          carrier: sels[0]?.value || '',
-          speed: sels[1]?.value || '',
-          shipTo: inputs[0]?.value || '',
-          eta: inputs[1]?.value || '',
-          address: inputs[2]?.value || '',
-          tracking: s.querySelector('[data-of-track]')?.value || '',
-        });
+        const carrier = s.querySelectorAll('select')[0]?.value || '';
+        const speed   = s.querySelectorAll('select')[1]?.value || '';
+        const mode = s.querySelector('[data-of-shipto-mode].is-active')?.dataset.ofShiptoMode || 'default';
+        let shipTo = '', address = '', shipToDefault = '';
+        if (mode === 'default') {
+          shipToDefault = s.querySelector('[data-of-shipto-default]')?.value || '';
+          const def = DEFAULT_ADDRESSES.find((a) => a.id === shipToDefault);
+          shipTo = def?.label || '';
+          address = def?.address || '';
+        } else {
+          shipTo = s.querySelector('[data-of-shipto-alt-name]')?.value || '';
+          address = s.querySelector('[data-of-shipto-alt-addr]')?.value || '';
+        }
+        const eta = s.querySelector('input[type="date"]')?.value || '';
+        const tracking = s.querySelector('[data-of-track]')?.value || '';
+        shipments.push({ carrier, speed, shipToMode: mode, shipToDefault, shipTo, address, eta, tracking });
       });
-      return { products, shipments };
+      return { invoicedItems, products, shipments };
     }
 
     function fmtDate(iso) {
@@ -6895,20 +7464,22 @@
       return `${m[3]}${months[parseInt(m[2], 10) - 1]}${m[1]}`;
     }
 
-    function renderInvoiceTable(products) {
-      if (!products.length) {
-        invoiceTableEl.innerHTML = '<div class="of-invoice-row" style="color: var(--cool-gray-7); font-style: italic;">No products on this case yet.</div>';
+    function renderInvoiceTable(invoicedItems) {
+      // Phase 14: Invoice contents shows only the top-level invoiced items
+      // (the billable lines). Per-product shipment breakdown lives in the
+      // Shipments summary below.
+      if (!invoicedItems.length) {
+        invoiceTableEl.innerHTML = '<div class="of-invoice-row" style="color: var(--cool-gray-7); font-style: italic;">No invoiced items on this case yet.</div>';
         return;
       }
-      const rows = products.map((p) =>
+      const rows = invoicedItems.map((iv) =>
         `<div class="of-invoice-row">
-          <span class="of-iv-product">${p.name}</span>
-          <span class="of-iv-qty">${p.qty}</span>
-          <span class="of-iv-ship">Shipment ${p.shipment}</span>
+          <span class="of-iv-product">${iv.name}</span>
+          <span class="of-iv-qty">${iv.qty}</span>
         </div>`
       ).join('');
       invoiceTableEl.innerHTML =
-        '<div class="of-invoice-row is-head"><span>Product</span><span>QTY</span><span>Shipment</span></div>' + rows;
+        '<div class="of-invoice-row is-head"><span>Invoiced item</span><span>QTY</span></div>' + rows;
     }
 
     function renderShipSummary(products, shipments) {
@@ -6937,7 +7508,7 @@
               <div class="of-ship-info-row"><dt>Carrier</dt><dd data-of-field="carrier">${s.carrier || '—'}</dd></div>
               <div class="of-ship-info-row"><dt>Speed</dt><dd data-of-field="speed">${s.speed || '—'}</dd></div>
               <div class="of-ship-info-row"><dt>Ship to</dt><dd data-of-field="shipTo" data-of-editable>${s.shipTo || '—'}</dd></div>
-              <div class="of-ship-info-row"><dt>Estimated delivery</dt><dd data-of-field="eta">${fmtDate(s.eta) || '—'}</dd></div>
+              <div class="of-ship-info-row"><dt>Estimated Ship Date</dt><dd data-of-field="eta">${fmtDate(s.eta) || '—'}</dd></div>
               <div class="of-ship-info-row is-full"><dt>Shipping address</dt><dd data-of-field="address" data-of-editable>${s.address || '—'}</dd></div>
               <div class="of-ship-info-row is-full"><dt>Tracking number</dt><dd>${s.tracking ? `<button class="of-tracking-copy tip tip-up" type="button" data-tip="Copy to clipboard" data-of-tracking="${s.tracking.replace(/"/g, '&quot;')}">${s.tracking} <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>` : '—'}</dd></div>
             </dl>
@@ -6968,17 +7539,30 @@
           card.classList.remove('is-editing');
         });
         saveBtn?.addEventListener('click', () => {
-          // Commit values to the edit-form so a future Edit toggle reflects them
+          // Commit values to the edit-form so a future Edit toggle reflects them.
+          // Inline summary edit always lands in the "alternate" ship-to mode
+          // (custom address) since a rep is overriding the default here.
           const n = parseInt(card.dataset.ofSummaryShip, 10);
           const shipNode = shipsEl.querySelectorAll('[data-of-shipment]')[n - 1];
+          if (shipNode) {
+            // Flip to alternate mode so the custom values stick.
+            shipNode.querySelectorAll('[data-of-shipto-mode]').forEach((b) =>
+              b.classList.toggle('is-active', b.dataset.ofShiptoMode === 'alternate'));
+            shipNode.querySelectorAll('[data-of-shipto-pane]').forEach((p) => {
+              p.hidden = p.dataset.ofShiptoPane !== 'alternate';
+            });
+          }
           card.querySelectorAll('[data-of-editable]').forEach((dd) => {
             const val = dd.querySelector('input')?.value || '';
             dd.textContent = val || '—';
-            // Map field back to the matching edit input on the corresponding shipment
             if (shipNode) {
-              const inputs = shipNode.querySelectorAll('input');
-              if (dd.dataset.ofField === 'shipTo' && inputs[0]) inputs[0].value = val;
-              else if (dd.dataset.ofField === 'address' && inputs[2]) inputs[2].value = val;
+              if (dd.dataset.ofField === 'shipTo') {
+                const inp = shipNode.querySelector('[data-of-shipto-alt-name]');
+                if (inp) inp.value = val;
+              } else if (dd.dataset.ofField === 'address') {
+                const inp = shipNode.querySelector('[data-of-shipto-alt-addr]');
+                if (inp) inp.value = val;
+              }
             }
           });
           card.classList.remove('is-editing');
@@ -6995,8 +7579,8 @@
     }
 
     function renderSummary() {
-      const { products, shipments } = readEditState();
-      renderInvoiceTable(products);
+      const { invoicedItems, products, shipments } = readEditState();
+      renderInvoiceTable(invoicedItems);
       renderShipSummary(products, shipments);
     }
 
@@ -7293,6 +7877,39 @@
       });
     });
   }
+
+  // V5 (Phase 4 + audit): the visible "Move to {next state}" / "Pass" / "Approve & advance"
+  // anchors in the active-body of each step were navigating directly. Intercept them
+  // and route through showConfirm — same pattern as the step-modal advance button —
+  // so every advance affordance asks for confirmation.
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a.btn-primary[href^="#case/"]');
+    if (!link) return;
+    // Only intercept advance affordances inside the active-body of a state row.
+    if (!link.closest('.active-body')) return;
+    // Skip if a sibling handler already prevented default (e.g. surgeon-approval flow)
+    if (e.defaultPrevented) return;
+    e.preventDefault();
+    const href = link.getAttribute('href');
+    // Derive a friendly next-state label from the href (e.g. #case/pre-production → "Pre-Production")
+    const slug = href.replace(/^#case\//, '');
+    const nextLabel = slug
+      .split('-')
+      .map((w) => w === 'qc' ? 'QC' : w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
+    // Derive a current-step label from the closest pp-step / substep / state-head.
+    const stepEl = link.closest('.pp-step, .substep, .state-row');
+    const stepLabel = (stepEl?.querySelector('.pp-title, .substep-title, .state-name')?.textContent
+                       || '').trim() || 'this step';
+    const btnLabel = (link.textContent || '').trim() || 'Save & advance';
+    showConfirm({
+      title: `Advance from ${stepLabel}?`,
+      body: `Saving will mark ${stepLabel} complete and move this case into ${nextLabel}. You can rewind from the case actions menu if needed.`,
+      confirmLabel: btnLabel,
+      confirmVariant: 'primary',
+      onConfirm: () => { window.location.hash = slug ? '#case/' + slug : ''; },
+    });
+  }, true);  // capture phase so we beat other delegated handlers
 
   // File settings — gear expands the panel; rename syncs the displayed name
   document.querySelectorAll('.file-card').forEach((card) => {
@@ -7708,14 +8325,63 @@
     setTimeout(() => cancelBtn.focus(), 0);
   }
 
-  // Delete button inside any file-card's settings — confirm + remove + refresh folder count
+  // ----- Inline confirmation helper -----
+  // Replaces the showConfirm modal for in-drawer destructive flows (file delete,
+  // remove plan, remove device). Inserts an .inline-confirm element inside the
+  // affected card; cancel restores hidden children, confirm runs onConfirm.
+  function showInlineConfirm(host, { title, body, confirmLabel, onConfirm, keepSelector }) {
+    if (!host || host.querySelector(':scope > .inline-confirm')) return;
+    const hidden = [];
+    Array.from(host.children).forEach((c) => {
+      if (keepSelector && c.matches && c.matches(keepSelector)) return;
+      hidden.push([c, c.style.display]);
+      c.style.display = 'none';
+    });
+    const wrap = document.createElement('div');
+    wrap.className = 'inline-confirm';
+    wrap.setAttribute('role', 'alertdialog');
+    wrap.innerHTML = `
+      <div class="ic-head">
+        <svg class="ic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div class="ic-titlewrap">
+          <div class="ic-title"></div>
+          <div class="ic-sub"></div>
+        </div>
+      </div>
+      <div class="ic-actions">
+        <button class="btn" type="button" data-ic-cancel>Cancel</button>
+        <button class="btn btn-danger" type="button" data-ic-confirm></button>
+      </div>
+    `;
+    wrap.querySelector('.ic-title').textContent = title;
+    wrap.querySelector('.ic-sub').textContent = body || '';
+    wrap.querySelector('[data-ic-confirm]').textContent = confirmLabel || 'Remove';
+    host.appendChild(wrap);
+    const restore = () => {
+      wrap.remove();
+      hidden.forEach(([el, prev]) => { el.style.display = prev || ''; });
+    };
+    wrap.querySelector('[data-ic-cancel]').addEventListener('click', restore);
+    wrap.querySelector('[data-ic-confirm]').addEventListener('click', () => {
+      restore();
+      try { onConfirm && onConfirm(); } catch(e){}
+    });
+    setTimeout(() => wrap.querySelector('[data-ic-cancel]')?.focus(), 0);
+  }
+  window.showInlineConfirm = showInlineConfirm;
+
+  // Delete button inside any file-card's settings — inline confirm replaces the
+  // settings body (file head stays visible). Confirm removes the file and refreshes
+  // the folder count.
   document.addEventListener('click', (e) => {
     const delBtn = e.target.closest && e.target.closest('.file-delete');
     if (!delBtn) return;
     const card = delBtn.closest('.file-card');
     if (!card) return;
+    const settings = card.querySelector('.file-settings');
+    if (!settings) return;
     const name = (card.querySelector('.f-name')?.textContent || 'this file').trim();
-    showConfirm({
+    showInlineConfirm(settings, {
       title: `Delete "${name}"?`,
       body: "This can't be undone.",
       confirmLabel: 'Delete file',

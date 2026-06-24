@@ -816,6 +816,44 @@
   .step-alert.is-blocked { --status-color: var(--status-blocked); }
   .step-alert.is-on-hold { --status-color: var(--status-on-hold); }
 
+  /* Inline confirmation pattern — used in-drawer for destructive flows
+     (Remove plan). Mirrors prototype's .inline-confirm. */
+  .inline-confirm {
+    background: #fff;
+    border: 1px solid color-mix(in srgb, var(--status-blocked) 35%, #fff);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 16px rgba(200,23,23,0.10);
+    padding: 12px 14px;
+    margin: 8px 0 4px;
+    display: flex; flex-direction: column; gap: 10px;
+    animation: inline-confirm-in 0.16s ease-out;
+  }
+  @keyframes inline-confirm-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .inline-confirm .ic-head { display: flex; align-items: flex-start; gap: 9px; }
+  .inline-confirm .ic-icon { width: 18px; height: 18px; color: var(--status-blocked); flex-shrink: 0; margin-top: 1px; }
+  .inline-confirm .ic-titlewrap { flex: 1; min-width: 0; }
+  .inline-confirm .ic-title { font-size: 14px; font-weight: 700; color: var(--cool-gray-11); line-height: 1.3; }
+  .inline-confirm .ic-sub { font-size: 12.5px; color: var(--cool-gray-9); line-height: 1.45; margin-top: 2px; }
+  .inline-confirm .ic-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+  /* Case-level Attention banner (Phase 17 — On Hold / Cancelled / Action Required).
+     Sits at top of case-body, above the progress card. Mirrors .step-alert tinting. */
+  .case-attention {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 12px 14px; border-radius: var(--radius-md);
+    font-size: 13.5px; line-height: 1.45; color: var(--cool-gray-11);
+    margin-bottom: 18px;
+    background: color-mix(in srgb, var(--status-color, var(--status-blocked)) 10%, #fff);
+    border: 1px solid color-mix(in srgb, var(--status-color, var(--status-blocked)) 32%, #fff);
+  }
+  .case-attention[hidden] { display: none; }
+  .case-attention .ca-icon { width: 18px; height: 18px; color: var(--status-color, var(--status-blocked)); flex-shrink: 0; margin-top: 1px; }
+  .case-attention .ca-title { color: var(--status-color, var(--status-blocked)); font-weight: 700; margin-right: 6px; }
+  .case-attention .ca-body { color: var(--cool-gray-11); }
+  .case-attention.is-on-hold  { --status-color: var(--status-on-hold); }
+  .case-attention.is-canceled { --status-color: var(--status-cancelled, #6b7280); }
+  .case-attention.is-blocked  { --status-color: var(--status-blocked); }
+
   /* Pre-Production sub-steps (accordion) */
   .pp-steps { display: flex; flex-direction: column; gap: 10px; }
   .pp-step { border: 1px solid var(--hairline); border-radius: var(--radius-md); overflow: hidden; background: #fff; }
@@ -878,9 +916,11 @@
   /* Comments — top bar: channel toggle + filter icon, side-by-side */
   .comments-bar { display: flex; align-items: stretch; gap: 8px; margin-bottom: 22px; flex-shrink: 0; }
   .comments-toggle { display: flex; gap: 0; padding: 3px; background: var(--cool-gray-1); border-radius: var(--radius-md); flex: 1; min-width: 0; }
-  .ct-btn { flex: 1; padding: 7px 14px; background: transparent; border: 0; border-radius: var(--radius-sm); font: inherit; font-size: 13px; font-weight: 600; color: var(--cool-gray-9); cursor: pointer; transition: background 0.15s, color 0.15s; }
+  .ct-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 7px 14px; background: transparent; border: 0; border-radius: var(--radius-sm); font: inherit; font-size: 13px; font-weight: 600; color: var(--cool-gray-9); cursor: pointer; transition: background 0.15s, color 0.15s; }
   .ct-btn:hover:not(.is-active) { color: var(--cool-gray-11); }
   .ct-btn.is-active { background: var(--cerulean); color: #fff; }
+  .ct-icon-wrap { position: relative; display: inline-flex; flex-shrink: 0; }
+  .ct-icon { width: 14px; height: 14px; }
   .chat[hidden] { display: none; }
 
   /* Filter trigger — icon button to the right of the channel toggle */
@@ -1048,7 +1088,7 @@
   .qc-actions-default[hidden], .qc-actions-fail[hidden] { display: none; }
 
   /* ---------- Products drawer ---------- */
-  .drawer { position: fixed; top: 0; right: 0; height: 100vh; width: 440px; max-width: 92vw; background: #fff; transform: translateX(100%); transition: transform 0.25s ease; z-index: 60; display: flex; flex-direction: column; }
+  .drawer { position: fixed; top: 0; right: 0; height: 100vh; width: 540px; max-width: 92vw; background: #fff; transform: translateX(100%); transition: transform 0.25s ease; z-index: 60; display: flex; flex-direction: column; }
   .drawer.open { transform: translateX(0); box-shadow: -16px 0 48px rgba(0,0,0,0.18); }
   .drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid var(--border); }
   .drawer-head h3 { margin: 0; font-size: 19px; color: var(--cool-gray-11); }
@@ -1150,6 +1190,15 @@
     color: var(--cool-gray-7);
     margin-bottom: 8px;
   }
+
+  /* Meeting link row — input + open-in-new-tab + copy icon buttons */
+  .sp-link-wrap { display: flex; gap: 6px; align-items: center; }
+  .sp-link-wrap input { flex: 1; min-width: 0; }
+  .sp-link-act { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; background: transparent; border: 1px solid var(--cool-gray-2); border-radius: var(--radius-sm); color: var(--cool-gray-9); cursor: pointer; flex-shrink: 0; position: relative; }
+  .sp-link-act:hover { color: var(--cool-gray-11); background: var(--hover); }
+  .sp-link-act svg { width: 14px; height: 14px; }
+  .sp-link-act.copied::after { content: 'Copied'; position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%); background: var(--cool-gray-11); color: #fff; font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: var(--radius-sm); white-space: nowrap; pointer-events: none; }
+  .sp-drawer.is-readonly .sp-link-act { border-color: transparent; pointer-events: auto; cursor: pointer; }
   .sp-sub-card {
     background: transparent;
     border: 1px solid var(--hairline);
@@ -1163,6 +1212,65 @@
     color: var(--cool-gray-11);
     margin-bottom: 10px;
   }
+
+  /* Device Design card (Phase 13 parity — read-only on portal) */
+  .dd-count { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--cool-gray-9); margin-bottom: 12px; }
+  .dd-list { display: flex; flex-direction: column; gap: 12px; }
+  .dd-card { border: 1px solid var(--hairline); border-radius: var(--radius-md); background: #fff; overflow: hidden; }
+  .dd-card-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg-subtle); border-bottom: 1px solid var(--hairline); }
+  .dd-card.is-collapsed .dd-card-head { border-bottom: 0; }
+  .dd-card-num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--cool-gray-2); color: var(--cool-gray-11); font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .dd-card-part { flex: 1; min-width: 0; font-size: 13px; font-weight: 700; color: var(--cool-gray-11); }
+  .dd-card-desc { display: block; font-size: 12px; font-weight: 500; color: var(--cool-gray-9); margin-top: 2px; }
+  .dd-card-collapse { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: transparent; border: 0; border-radius: var(--radius-sm); color: var(--cool-gray-7); cursor: pointer; }
+  .dd-card-collapse:hover { background: var(--hover); color: var(--cool-gray-11); }
+  .dd-card-collapse svg { width: 14px; height: 14px; transition: transform 0.15s; }
+  .dd-card.is-collapsed .dd-card-collapse svg { transform: rotate(-90deg); }
+  .dd-card.is-collapsed .dd-card-body { display: none; }
+  .dd-card-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+  .dd-card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 14px; }
+  .dd-card-body .form-row label { margin-bottom: 2px; }
+  .dd-card-grid .form-row.dd-row-full { grid-column: 1 / -1; }
+  .dd-other-readonly { font-size: 13px; color: var(--cool-gray-11); line-height: 1.45; white-space: pre-wrap; }
+  .dd-other-readonly.is-clamped { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .dd-other-toggle { background: transparent; border: 0; padding: 0; font: inherit; font-size: 12px; color: var(--cerulean); cursor: pointer; margin-top: 4px; }
+  .dd-other-toggle[hidden] { display: none; }
+
+  /* Plan container (Phase 12 parity) — wraps each Surgical Plan N card */
+  .sp-plan-list { display: flex; flex-direction: column; gap: 18px; margin-bottom: 22px; }
+  .sp-plan-card { border: 1px solid var(--hairline); border-radius: var(--radius-md); padding: 16px 18px 18px; background: #fff; }
+  .sp-plan-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .sp-plan-title { margin: 0; }
+  .sp-plan-remove { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: transparent; border: 0; border-radius: var(--radius-sm); color: var(--cool-gray-9); cursor: pointer; }
+  .sp-plan-remove:hover { background: var(--bg-subtle); color: var(--danger); }
+  .sp-plan-remove svg { width: 16px; height: 16px; }
+  .sp-plan-remove[hidden] { display: none; }
+  .sp-plan-summary { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--hairline); }
+  .sp-plan-add { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 26px; }
+  .sp-plan-add[hidden] { display: none; }
+  .sp-drawer.is-readonly .sp-plan-card { background: transparent; }
+  .sp-drawer.is-readonly .sp-plan-remove { display: none; }
+
+  /* Per-section edit affordance (Phase 15 — portal). A small Edit button
+     next to a sub-section header that flips JUST that section into editable
+     mode without unlocking the whole drawer. */
+  .sp-section-edit-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+  .sp-section-edit { display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; background: transparent; border: 1px solid var(--cool-gray-2); border-radius: var(--radius-sm); font: inherit; font-size: 12px; font-weight: 600; color: var(--cool-gray-11); cursor: pointer; }
+  .sp-section-edit:hover { background: var(--bg-subtle); border-color: var(--cool-gray-4); }
+  .sp-section-edit svg { width: 11px; height: 11px; }
+  .sp-section-edit[hidden] { display: none; }
+  .sp-section-actions { display: inline-flex; align-items: center; gap: 8px; }
+  .sp-section-actions .btn { padding: 4px 12px; font-size: 12px; }
+  .sp-section-actions[hidden] { display: none; }
+  /* When a meeting card is in inline edit mode, lift its inputs out of read-only. */
+  .sp-meeting.is-editing input,
+  .sp-meeting.is-editing select { border-color: var(--cool-gray-2); background: #fff; pointer-events: auto; padding: 7px 10px; color: var(--text); }
+
+  /* Disclaimers multi-select chip styling (used in Case Report section) */
+  .ms-disclaimers .ms-trigger { width: 100%; }
+  .ms-disclaimer-other { width: 100%; border: 1px solid var(--cool-gray-2); border-radius: var(--radius-md); padding: 7px 10px; font: inherit; font-size: 13px; }
+  .ms-disclaimer-other[hidden] { display: none; }
+
   /* Read-only treatment — flatten every input/select/textarea so they read
      like plain text. Portal users never enter edit mode, so this applies always. */
   .sp-drawer .form-row select,
@@ -1254,6 +1362,15 @@
   .of-ship-card-action:hover { background: var(--hover); color: var(--cool-gray-11); }
   .of-ship-card-action.is-primary { background: var(--cerulean); color: #fff; border-color: var(--cerulean); }
   .of-ship-card-action.is-primary:hover { background: var(--cerulean-hover); color: #fff; }
+  /* Inline ship-to edit panel (Phase 15 — customer inline edit) */
+  .of-shipto-edit { padding: 12px 14px; background: var(--bg-subtle); border: 1px solid var(--hairline); border-radius: var(--radius-md); margin-bottom: 12px; }
+  .of-shipto-edit-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--cool-gray-7); font-weight: 700; margin-bottom: 6px; }
+  .of-shipto-toggle { display: inline-flex; gap: 0; background: var(--cool-gray-1); padding: 3px; border-radius: var(--radius-md); margin-bottom: 8px; }
+  .of-shipto-toggle .ct-btn { padding: 5px 12px; font-size: 12.5px; flex: 0 0 auto; }
+  .of-shipto-pane[hidden] { display: none; }
+  .of-shipto-pane select,
+  .of-shipto-pane input { width: 100%; border: 1px solid var(--cool-gray-2); border-radius: var(--radius-md); padding: 7px 10px; font: inherit; font-size: 13px; background: #fff; }
+  .of-shipto-default-meta { font-size: 11.5px; color: var(--cool-gray-9); margin-top: 4px; }
   .of-ship-card-edit-actions { display: none; align-items: center; gap: 6px; }
   .of-ship-card.is-editing > .of-ship-card-head > .of-ship-card-edit { display: none; }
   .of-ship-card.is-editing > .of-ship-card-head > .of-ship-card-edit-actions { display: inline-flex; }
@@ -1365,6 +1482,10 @@
   .file-act { background: transparent; border: 0; padding: 6px; border-radius: var(--radius-sm); color: var(--cool-gray-7); cursor: pointer; display: inline-flex; transition: background 0.12s, color 0.12s; }
   .file-act:hover { background: var(--hover); color: var(--cool-gray-11); }
   .file-act svg { width: 16px; height: 16px; }
+  /* Customer scope: drop the per-file gear + download. Download is bulk-select-only.
+     Settings panel + file-supersede toggle also hidden — customers don't manage these. */
+  .drawer-panel[data-drawer-panel="files"] .file-actions,
+  .drawer-panel[data-drawer-panel="files"] .file-settings { display: none; }
   .panel-export { margin-top: 14px; width: 100%; }
   .panel-foot { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--hairline); }
 
@@ -1447,6 +1568,17 @@
   .upload-filename.has-file { color: var(--cool-gray-11); font-weight: 500; }
   .form-hint { font-size: 11px; font-weight: 400; color: var(--text-muted); text-transform: none; letter-spacing: 0; margin-left: 4px; }
 
+  /* Upload progress bar — shown while a file uploads, success-tinted when done */
+  .upload-progress { margin-top: 12px; background: #fff; border: 1px solid var(--cool-gray-2); border-radius: var(--radius-md); padding: 10px 12px; }
+  .upload-progress[hidden] { display: none; }
+  .upload-progress-row { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--cool-gray-11); }
+  .upload-progress-row .btn-spinner { color: var(--cerulean); }
+  .upload-progress-name { flex: 1; min-width: 0; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .upload-progress-pct { font-variant-numeric: tabular-nums; color: var(--cool-gray-9); font-size: 12px; flex-shrink: 0; }
+  .upload-progress-bar { height: 4px; margin-top: 8px; background: var(--cool-gray-1); border-radius: 2px; overflow: hidden; }
+  .upload-progress-fill { height: 100%; width: 0; background: var(--cerulean); transition: width 0.2s linear; }
+  .upload-progress.is-done .upload-progress-fill { background: var(--notify-green); }
+
   /* Create PDF — template cards */
   .pdf-intro { margin: 0 0 16px; font-size: 13px; color: var(--text-muted); }
   .pdf-template { display: flex; align-items: flex-start; gap: 12px; width: 100%; padding: 14px; background: #fff; border: 1px solid var(--cool-gray-2); border-radius: var(--radius-md); cursor: pointer; text-align: left; font: inherit; color: var(--cool-gray-11); margin-bottom: 10px; transition: border-color 0.12s, background 0.12s, transform 0.06s; }
@@ -1494,6 +1626,12 @@
   /* Cases sticky toolbar */
   .header-topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
   .cases-actions-left { display: flex; align-items: center; gap: 8px; }
+  /* Standalone search on the Cases toolbar — sits next to the Filters button */
+  .cases-search { display: inline-flex; align-items: center; gap: 8px; width: 320px; height: 36px; background: #fff; border: 1px solid var(--cool-gray-2); border-radius: var(--radius-md); padding: 0 12px; }
+  .cases-search:focus-within { border-color: var(--cerulean); }
+  .cases-search .cfs-icon { width: 16px; height: 16px; color: var(--cool-gray-7); flex-shrink: 0; }
+  .cases-search input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: inherit; font-size: 14px; color: var(--text); padding: 0; }
+  .cases-search input::placeholder { color: var(--cool-gray-7); }
   .cases-actions-right { display: flex; align-items: center; gap: 14px; }
 
   /* Filter panel */
@@ -1504,8 +1642,58 @@
   .cases-filters-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--hairline); }
 
   /* Legacy/Hide demo toggle */
-  .legacy-toggle { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
-  .legacy-label { font-size: 13px; color: var(--cool-gray-10); font-weight: 500; }
+  .cases-filters-foot-actions { display: inline-flex; align-items: center; gap: 8px; }
+
+  /* Portal Comments tab role-conditional visibility (Adam V5 06.22.2026):
+     surgeon sees only the External (all-party) thread — Sales tab is hidden. */
+  body[data-portal-role="surgeon"] .ct-btn[data-portal-role-hide="surgeon"] { display: none; }
+  body[data-portal-role="surgeon"] .ct-btn[data-channel="external"] { flex: 1; }
+
+  /* Portal role-conditional filter visibility (Adam V5 06.22.2026):
+       rep      → hides own Sales rep filter
+       surgeon  → hides both Surgeon + Sales rep filters
+       manager  → shows everything */
+  body[data-portal-role="rep"] .form-row:has(.ms[data-ms="salesrep"]) { display: none; }
+  body[data-portal-role="surgeon"] .form-row:has(.ms[data-ms="surgeon"]),
+  body[data-portal-role="surgeon"] .form-row:has(.ms[data-ms="salesrep"]) { display: none; }
+
+  /* Multi-select widget — drives the filter panel dropdowns */
+  .ms { position: relative; }
+  .ms-trigger { width: 100%; display: flex; align-items: center; gap: 8px; border: 1px solid var(--cool-gray-2); border-radius: var(--radius-md); background: #fff; padding: 8px 10px; font: inherit; font-size: 14px; color: var(--text); cursor: pointer; min-height: 38px; }
+  .ms-trigger:hover { border-color: var(--cool-gray-4); }
+  .ms.open .ms-trigger { border-color: var(--cerulean); }
+  .ms-display { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 4px; color: var(--text); line-height: 1.2; text-align: left; overflow: hidden; }
+  .ms-display:empty::before { content: 'All'; color: var(--cool-gray-7); }
+  .ms-chev { width: 14px; height: 14px; color: var(--cool-gray-9); flex-shrink: 0; transition: transform 0.12s; }
+  .ms.open .ms-chev { transform: rotate(180deg); }
+  .ms-chip { display: inline-flex; align-items: center; gap: 4px; background: var(--cool-gray-1); color: var(--cool-gray-11); font-size: 12px; font-weight: 500; border-radius: 4px; padding: 2px 4px 2px 7px; line-height: 1.2; }
+  .ms-chip-x { width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; border-radius: 3px; cursor: pointer; color: var(--cool-gray-9); background: transparent; border: 0; padding: 0; }
+  .ms-chip-x:hover { background: var(--cool-gray-2); color: var(--cool-gray-11); }
+  .ms-chip-x svg { width: 10px; height: 10px; }
+  .ms-more { font-size: 12px; color: var(--cool-gray-9); padding: 2px 4px; }
+  .ms-popover { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #fff; border: 1px solid var(--cool-gray-2); border-radius: var(--radius-md); box-shadow: 0 8px 24px rgba(52,55,65,0.14); z-index: 5; max-height: 260px; overflow: hidden; display: flex; flex-direction: column; }
+  .ms-popover[hidden] { display: none; }
+  .ms-search-row { padding: 8px; border-bottom: 1px solid var(--cool-gray-1); }
+  .ms-search { width: 100%; border: 1px solid var(--cool-gray-2); border-radius: var(--radius-sm); padding: 6px 10px; font: inherit; font-size: 13px; outline: none; }
+  .ms-search:focus { border-color: var(--cerulean); }
+  .ms-options { flex: 1; overflow-y: auto; padding: 4px; }
+  .ms-option { display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: var(--radius-sm); font-size: 13px; color: var(--cool-gray-11); cursor: pointer; }
+  .ms-option:hover { background: var(--hover); }
+  .ms-option input[type="checkbox"] { width: 14px; height: 14px; margin: 0; flex-shrink: 0; accent-color: var(--cerulean); }
+  .ms-option span { flex: 1; min-width: 0; }
+  .ms-option.is-hidden { display: none; }
+
+  /* Surgery date — single/range toggle inline with the input(s) */
+  .date-range { display: flex; align-items: stretch; gap: 6px; min-width: 0; }
+  .dr-tabs { display: inline-flex; align-items: center; background: var(--bg-subtle); border: 1px solid var(--cool-gray-2); border-radius: var(--radius-md); padding: 2px; flex-shrink: 0; }
+  .dr-tab { border: 0; background: transparent; padding: 4px 10px; font: inherit; font-size: 12px; font-weight: 600; color: var(--cool-gray-9); cursor: pointer; border-radius: var(--radius-sm); }
+  .dr-tab:hover { color: var(--cool-gray-11); }
+  .dr-tab.is-active { background: #fff; color: var(--cool-gray-11); box-shadow: 0 1px 2px rgba(52,55,65,0.08); }
+  .dr-pane { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; }
+  .dr-pane[hidden] { display: none; }
+  .dr-pane input[type="date"] { flex: 1; min-width: 0; width: 100%; border: 1px solid var(--cool-gray-2); border-radius: var(--radius-md); padding: 8px 10px; font: inherit; font-size: 14px; color: var(--text); background: #fff; min-height: 38px; }
+  .dr-pane input[type="date"]:focus { outline: none; border-color: var(--cerulean); }
+  .dr-sep { font-size: 12px; color: var(--cool-gray-9); flex-shrink: 0; }
 
   /* Lanes wrap + lanes (tinted column + free title) */
   .lanes-wrap { flex: 1; overflow-x: auto; overflow-y: hidden; padding: 24px 24px 32px; }
@@ -1562,9 +1750,6 @@
   .case-card-field { font-size: 12px; color: var(--cool-gray-10); line-height: 1.55; }
   .case-card-field b { font-weight: 600; color: var(--cool-gray-11); margin-right: 4px; }
 
-  /* Deviation flag inline with the ID label on a case card */
-  .case-card-dev-icon { width: 13px; height: 13px; color: var(--gold-tips); margin-left: 5px; vertical-align: -2px; flex-shrink: 0; }
-
   /* ---------- View toggle (Board ↔ List) ---------- */
   .view-toggle {
     display: inline-flex; align-items: center;
@@ -1587,7 +1772,7 @@
   /* ---------- List view ---------- */
   /* Mirrors .case-body max-width + horizontal padding so the list view's
      content edge lines up with the case detail page. */
-  .cases-list-wrap { width: 100%; max-width: 1440px; margin: 0 auto; padding: 24px 32px 56px; }
+  .cases-list-wrap { flex: 1; min-width: 0; width: 100%; max-width: 1440px; margin: 0 auto; padding: 24px 32px 56px; overflow-y: auto; }
   .cases-list-wrap[hidden] { display: none; }
   .cases-list { display: flex; flex-direction: column; gap: 14px; }
   .cases-list-section {
@@ -1634,7 +1819,6 @@
     background: color-mix(in srgb, var(--cerulean) 3%, #fff);
   }
   .cl-id { font-size: 13px; font-weight: 600; color: var(--cool-gray-11); display: inline-flex; align-items: center; gap: 6px; }
-  .cl-id .case-card-dev-icon { margin-left: 0; }
   .cl-date, .cl-surgeon, .cl-solution, .cl-patient { font-size: 13px; color: var(--cool-gray-10); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .cases-privacy-toggle { margin-left: 8px; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid var(--cool-gray-2); background: #fff; border-radius: var(--radius-md); color: var(--cool-gray-10); cursor: pointer; transition: background .12s, color .12s, border-color .12s; }
   .cases-privacy-toggle:hover { background: var(--hover); color: var(--cool-gray-11); }
@@ -1660,7 +1844,14 @@
   .cl-spacer { flex: 1; }
 </style>
 </head>
-<body>
+<!-- Portal role drives which filter rows, comments tabs, and status pills the customer sees.
+     "rep"      → hides the Sales rep filter (rep doesn't filter by themselves)
+     "surgeon"  → hides BOTH Surgeon and Sales rep filters; Comments shows only External tab
+     "manager"  → shows everything (sales manager view)
+     Default is "rep"; change this attribute to demo the other roles.
+     Lives on <body> (not .app) so the rule reaches the side drawer (#sidePanel),
+     which sits as a sibling of .app, not a child. -->
+<body data-portal-role="rep">
 
 <div class="app">
 
@@ -1789,9 +1980,13 @@
             <div class="cases-actions-left">
               <button class="btn" type="button" id="searchFiltersBtn" aria-controls="casesFilters" aria-expanded="false">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-                Search filters
+                Filters
               </button>
-              <!-- Export removed for portal scope per Adam, 09JUN2026: "They don't need to export." -->
+              <!-- Standalone search next to the Filters button (no longer inside the panel). -->
+              <div class="cases-search">
+                <svg class="cfs-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input id="fSearch" type="search" placeholder="Search patient name or case ID" />
+              </div>
             </div>
             <div class="cases-actions-right">
               <!-- Board ↔ List view toggle -->
@@ -1806,36 +2001,110 @@
               <button class="cases-privacy-toggle tip" id="casesPrivacyToggle" type="button" aria-pressed="false" aria-label="Hide patient details" data-tip="Hide patient details">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
-              <button class="btn" type="button">New Case</button>
+              <button class="btn btn-primary" type="button">New Case</button>
 
           </div>
         </header>
 
-        <!-- Filter panel -->
+        <!-- Filter panel: V5 8-field multi-select layout (admin parity; Export omitted for portal scope). -->
         <div class="cases-filters" id="casesFilters" hidden>
           <div class="cases-filters-grid">
-            <div class="form-row"><label for="fPatient">Patient</label><select id="fPatient"><option value="">All</option></select></div>
-            <div class="form-row"><label for="fSurgeon">Surgeon</label><select id="fSurgeon"><option value="">All</option></select></div>
-            <div class="form-row"><label for="fSalesMgr">Sales manager</label><select id="fSalesMgr"><option value="">All</option></select></div>
-            <div class="form-row"><label for="fDesignEng">Design Engineer</label><select id="fDesignEng"><option value="">All</option></select></div>
-            <div class="form-row"><label for="fMfgEng">Manufacture Engineer</label><select id="fMfgEng"><option value="">All</option></select></div>
-            <div class="form-row"><label for="fMedRep">Med sales rep</label><select id="fMedRep"><option value="">All</option></select></div>
-            <div class="form-row"><label for="fHospital">Hospital</label><select id="fHospital"><option value="">All</option></select></div>
-            <div class="form-row"><label for="fProcedure">Procedure</label><select id="fProcedure"><option value="">All</option></select></div>
-            <div class="form-row"><label for="fCaseId">Case Id</label><input id="fCaseId" type="text" placeholder="e.g. 26A0089" /></div>
-            <div class="form-row"><label for="fSurgeryDate">Surgery date</label><input id="fSurgeryDate" type="date" /></div>
-            <div class="form-row"><label for="fCountry">Country</label><select id="fCountry"><option value="">All</option></select></div>
-            <div class="form-row"><label for="fSalesAdmin">Sales Administrator</label><select id="fSalesAdmin"><option value="">All</option></select></div>
+            <!-- Customer scope (Adam, 22JUN): only Surgeon · Sales rep · Surgery Date · Solution · Hospital. -->
+            <!-- Row 1: Surgeon · Sales rep -->
+            <div class="form-row">
+              <label>Surgeon</label>
+              <div class="ms" data-ms="surgeon">
+                <button class="ms-trigger" type="button" aria-haspopup="listbox" aria-expanded="false"><span class="ms-display" data-ms-display>All</span><svg class="ms-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="ms-popover" role="listbox" aria-multiselectable="true" hidden>
+                  <div class="ms-search-row"><input class="ms-search" type="text" placeholder="Search…" /></div>
+                  <div class="ms-options">
+                    <label class="ms-option"><input type="checkbox" value="Dr. Reyes" /><span>Dr. Reyes</span></label>
+                    <label class="ms-option"><input type="checkbox" value="Dr. Yoon" /><span>Dr. Yoon</span></label>
+                    <label class="ms-option"><input type="checkbox" value="Dr. Lopez" /><span>Dr. Lopez</span></label>
+                    <label class="ms-option"><input type="checkbox" value="Dr. Chen" /><span>Dr. Chen</span></label>
+                    <label class="ms-option"><input type="checkbox" value="Dr. Patel" /><span>Dr. Patel</span></label>
+                    <label class="ms-option"><input type="checkbox" value="Dr. Singh" /><span>Dr. Singh</span></label>
+                    <label class="ms-option"><input type="checkbox" value="Dr. R. Alvarez" /><span>Dr. R. Alvarez</span></label>
+                    <label class="ms-option"><input type="checkbox" value="Dr. Park" /><span>Dr. Park</span></label>
+                    <label class="ms-option"><input type="checkbox" value="Dr. Holm" /><span>Dr. Holm</span></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <label>Sales rep</label>
+              <div class="ms" data-ms="salesrep">
+                <button class="ms-trigger" type="button" aria-haspopup="listbox" aria-expanded="false"><span class="ms-display" data-ms-display>All</span><svg class="ms-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="ms-popover" role="listbox" aria-multiselectable="true" hidden>
+                  <div class="ms-search-row"><input class="ms-search" type="text" placeholder="Search…" /></div>
+                  <div class="ms-options">
+                    <label class="ms-option"><input type="checkbox" value="A. Martinez" /><span>A. Martinez</span></label>
+                    <label class="ms-option"><input type="checkbox" value="B. Schultz" /><span>B. Schultz</span></label>
+                    <label class="ms-option"><input type="checkbox" value="C. Nguyen" /><span>C. Nguyen</span></label>
+                    <label class="ms-option"><input type="checkbox" value="D. O'Connor" /><span>D. O'Connor</span></label>
+                    <label class="ms-option"><input type="checkbox" value="E. Patel" /><span>E. Patel</span></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 2: Surgery date (single/range) · Solution · Hospital -->
+            <div class="form-row">
+              <label>Surgery date</label>
+              <div class="date-range" data-date-range>
+                <div class="dr-tabs" role="tablist">
+                  <button class="dr-tab is-active" type="button" data-date-mode="single" aria-pressed="true">Single</button>
+                  <button class="dr-tab" type="button" data-date-mode="range" aria-pressed="false">Range</button>
+                </div>
+                <div class="dr-pane" data-date-mode-pane="single">
+                  <input type="date" aria-label="Surgery date" />
+                </div>
+                <div class="dr-pane" data-date-mode-pane="range" hidden>
+                  <input type="date" aria-label="From" />
+                  <span class="dr-sep">to</span>
+                  <input type="date" aria-label="To" />
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <label>Solution</label>
+              <div class="ms" data-ms="solution">
+                <button class="ms-trigger" type="button" aria-haspopup="listbox" aria-expanded="false"><span class="ms-display" data-ms-display>All</span><svg class="ms-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="ms-popover" role="listbox" aria-multiselectable="true" hidden>
+                  <div class="ms-search-row"><input class="ms-search" type="text" placeholder="Search…" /></div>
+                  <div class="ms-options">
+                    <label class="ms-option"><input type="checkbox" value="Orthognathic Surgery" /><span>Orthognathic Surgery</span></label>
+                    <label class="ms-option"><input type="checkbox" value="Maxillofacial Reconstruction Plates" /><span>Maxillofacial Reconstruction Plates</span></label>
+                    <label class="ms-option"><input type="checkbox" value="Mandibular Reconstruction" /><span>Mandibular Reconstruction</span></label>
+                    <label class="ms-option"><input type="checkbox" value="Diagnostic Models" /><span>Diagnostic Models</span></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <label>Hospital</label>
+              <div class="ms" data-ms="hospital">
+                <button class="ms-trigger" type="button" aria-haspopup="listbox" aria-expanded="false"><span class="ms-display" data-ms-display>All</span><svg class="ms-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="ms-popover" role="listbox" aria-multiselectable="true" hidden>
+                  <div class="ms-search-row"><input class="ms-search" type="text" placeholder="Search…" /></div>
+                  <div class="ms-options">
+                    <label class="ms-option"><input type="checkbox" value="Cedar Heights Surgical" /><span>Cedar Heights Surgical (105782)</span></label>
+                    <label class="ms-option"><input type="checkbox" value="University Medical" /><span>University Medical (103490)</span></label>
+                    <label class="ms-option"><input type="checkbox" value="St. Vincent Medical" /><span>St. Vincent Medical (101675)</span></label>
+                    <label class="ms-option"><input type="checkbox" value="Mercy Surgical Center" /><span>Mercy Surgical Center (101284)</span></label>
+                    <label class="ms-option"><input type="checkbox" value="Northwest Regional" /><span>Northwest Regional (102219)</span></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
+
           <div class="cases-filters-foot">
-            <label class="legacy-toggle">
-              <span class="switch"><input type="checkbox" checked /><span class="track"></span></span>
-              <span class="legacy-label">Hide demo cases</span>
-            </label>
-            <button class="btn btn-primary" type="button">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              Apply
-            </button>
+            <div class="cases-filters-foot-actions">
+              <button class="btn" type="button" id="clearFiltersBtn">Clear filters</button>
+              <button class="btn btn-primary" type="button">Apply</button>
+            </div>
           </div>
         </div>
 
@@ -1877,7 +2146,7 @@
               <div class="lane-head"><span class="lane-name">Planning</span><span class="lane-count">2</span></div>
               <div class="lane-body">
                 <a class="case-card" data-status="in-process" data-id="26A0088" data-surgery-date="2026-06-17" href="#case/planning">
-                  <div class="case-card-id"><span><b>ID:</b>26A0088<svg class="case-card-dev-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Has deviation"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg></span><span class="status-pill is-in-process">In Process</span></div>
+                  <div class="case-card-id"><span><b>ID:</b>26A0088</span><span class="status-pill is-in-process">In Process</span></div>
                   <div class="case-card-field"><b>Surgery Date:</b> 17JUN2026</div>
                   <div class="case-card-detail">
                     <div class="case-card-field"><b>Surgeon:</b> Dr. Lopez</div>
@@ -1931,7 +2200,7 @@
               <div class="lane-head"><span class="lane-name">Pre-Production</span><span class="lane-count">1</span></div>
               <div class="lane-body">
                 <a class="case-card" data-status="blocked" data-id="26A0069" data-surgery-date="2026-06-06" href="#case/pre-production">
-                  <div class="case-card-id"><span><b>ID:</b>26A0069</span><span class="status-pill is-blocked">Blocked</span></div>
+                  <div class="case-card-id"><span><b>ID:</b>26A0069</span><span class="status-pill is-blocked">Action Required</span></div>
                   <div class="case-card-field"><b>Surgery Date:</b> 06JUN2026</div>
                   <div class="case-card-detail">
                     <div class="case-card-field"><b>Surgeon:</b> Dr. Lopez</div>
@@ -1958,7 +2227,7 @@
             </div>
 
             <div class="lane">
-              <div class="lane-head"><span class="lane-name">Done</span><span class="lane-count">1</span></div>
+              <div class="lane-head"><span class="lane-name">Done</span><span class="lane-count">2</span></div>
               <div class="lane-body">
                 <a class="case-card" data-status="complete" data-id="26A0058" data-surgery-date="2026-06-02" href="#case/done" data-case-type="demo">
                   <div class="case-card-id"><span><b>ID:</b>26A0058</span><span class="status-pill is-complete">Complete</span></div>
@@ -1969,8 +2238,23 @@
                     <div class="case-card-field"><b>Patient:</b> Isabella Ward</div>
                   </div>
                 </a>
+                <a class="case-card" data-status="cancelled" data-id="26A0044" data-surgery-date="2026-05-19" href="#case/cancelled">
+                  <div class="case-card-id"><span><b>ID:</b>26A0044</span><span class="status-pill is-canceled">Cancelled</span></div>
+                  <div class="case-card-field"><b>Surgery Date:</b> 19MAY2026</div>
+                  <div class="case-card-detail">
+                    <div class="case-card-field"><b>Surgeon:</b> Dr. Patel</div>
+                    <div class="case-card-field"><b>Solution:</b> Orthognathic Surgery</div>
+                    <div class="case-card-field"><b>Patient:</b> Marcus Hill</div>
+                  </div>
+                </a>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- List view target — populated by wireViewToggle.renderList() when active. -->
+        <div class="cases-list-wrap" hidden>
+          <div class="cases-list" id="casesList"></div>
         </div>
 
       </section>
@@ -2035,6 +2319,16 @@
       </header>
 
       <div class="case-body">
+        <!-- Case-level attention banner (Phase 17 — On Hold / Cancelled / Action Required).
+             Populated by setCaseState() with status-specific copy + reason. -->
+        <div class="case-attention" id="caseAttention" hidden>
+          <svg class="ca-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div class="ca-text">
+            <b class="ca-title">Attention</b>
+            <span class="ca-body" id="caseAttentionBody"></span>
+          </div>
+        </div>
+
         <section class="progress-card">
                 <div class="progress-card-head">
                   <h2 class="progress-card-title">Progress</h2>
@@ -2264,7 +2558,23 @@
 
     <!-- Comments — portal scope: external channel only (internal is Acumed-side) -->
     <div class="drawer-panel" data-drawer-panel="comments">
-      <div class="comments-bar" style="justify-content: flex-end;">
+      <div class="comments-bar">
+        <div class="comments-toggle" role="tablist" aria-label="Comment channel">
+          <!-- Sales thread (Acumed + Sales, surgeon excluded). Hidden when user is the surgeon. -->
+          <button class="ct-btn is-active" type="button" role="tab" aria-selected="true" data-channel="sales" data-portal-role-hide="surgeon">
+            <span class="ct-icon-wrap">
+              <svg class="ct-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            </span>
+            Sales
+          </button>
+          <!-- External thread (Acumed + Sales + Surgeon — all parties). Always visible to customers. -->
+          <button class="ct-btn" type="button" role="tab" aria-selected="false" data-channel="external">
+            <span class="ct-icon-wrap">
+              <svg class="ct-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10z"/></svg>
+            </span>
+            External
+          </button>
+        </div>
         <button class="cf-toggle" type="button" id="cfToggle" aria-expanded="false" aria-controls="cfPanel" aria-label="Search &amp; filter">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <span class="cf-active-count" id="cfActiveCount" hidden>0</span>
@@ -2372,8 +2682,32 @@
         </div>
       </div>
 
-      <!-- External channel — sales rep + surgeon -->
-      <div class="chat" data-channel="external">
+      <!-- Sales channel — Acumed + Sales (surgeon excluded). Default visible for rep/manager. -->
+      <div class="chat" data-channel="sales">
+        <div class="msg in">
+          <span class="av av-sc">SC</span>
+          <div class="msg-col">
+            <div class="msg-bubble">Pricing sheet for the cadaver lab is attached — let me know if anything's missing before Friday.</div>
+            <div class="msg-meta">
+              <span class="like"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></span>
+              02JUN2026 09:15 AM
+            </div>
+          </div>
+        </div>
+        <div class="msg out">
+          <div class="msg-col">
+            <div class="msg-bubble">Looks good. I'll loop in the regional manager once we have the PO confirmed.</div>
+            <div class="msg-meta">
+              <span class="like"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></span>
+              02JUN2026 10:02 AM
+            </div>
+          </div>
+          <span class="av av-jh">JH</span>
+        </div>
+      </div>
+
+      <!-- External channel — Acumed + Sales + Surgeon (all parties). Hidden by default; tab switches to it. -->
+      <div class="chat" data-channel="external" hidden>
         <!-- Sarah Chen (sales rep) — incoming -->
         <div class="msg in">
           <span class="av av-sc">SC</span>
@@ -2659,26 +2993,8 @@
         <svg class="upload-prev-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         <span class="upload-prev-label">Upload file</span>
       </button>
+      <!-- Customer scope (Adam, 22JUN): just drag/drop or browse — all uploads route to Intake. -->
       <div class="upload-prev-panel" id="upPrevPanel" hidden>
-        <div class="form-2col">
-          <div class="form-row">
-            <label for="upPrevState">State</label>
-            <select id="upPrevState">
-              <option value="" disabled selected>Choose a state…</option>
-              <option>Intake</option>
-              <option>Case Prep</option>
-              <option>Planning</option>
-              <option>Design</option>
-              <option>Approval</option>
-            </select>
-          </div>
-          <div class="form-row">
-            <label for="upPrevStep">Step</label>
-            <select id="upPrevStep" disabled>
-              <option value="" disabled selected>Pick a state first</option>
-            </select>
-          </div>
-        </div>
         <div class="form-row">
           <label>File</label>
           <div class="upload-drop">
@@ -2686,29 +3002,29 @@
             <label for="upPrevFile" class="upload-btn">Choose file</label>
             <span class="upload-filename" id="upPrevFilename">No file chosen</span>
           </div>
-        </div>
-        <label class="checkbox-row">
-          <input type="checkbox" id="upPrevReplaces" />
-          This file replaces an existing file
-        </label>
-        <div class="form-row upload-replaces-target" hidden>
-          <label for="upPrevReplaceTarget">File being replaced</label>
-          <select id="upPrevReplaceTarget" disabled>
-            <option value="" disabled selected>Pick a state first</option>
-          </select>
+          <p style="margin: 6px 0 0; font-size: 12px; color: var(--text-muted);">Uploads are routed to the Intake folder.</p>
         </div>
         <div class="upload-prev-foot">
           <button class="btn" type="button" id="upPrevCancel">Cancel</button>
           <button class="btn btn-primary" type="button" id="upPrevSubmit">Upload</button>
         </div>
+        <!-- Upload progress (carried over from admin). Reveals once Upload is clicked. -->
+        <div class="upload-progress" id="upPrevProgress" hidden role="status" aria-live="polite">
+          <div class="upload-progress-row">
+            <span class="btn-spinner" aria-hidden="true"></span>
+            <span class="upload-progress-name" id="upPrevProgressName">Uploading…</span>
+            <span class="upload-progress-pct" id="upPrevProgressPct">0%</span>
+          </div>
+          <div class="upload-progress-bar"><div class="upload-progress-fill" id="upPrevProgressFill"></div></div>
+        </div>
       </div>
-      <!-- Folders by state — accordion. Each file is templated below; gear/download/checkbox + settings drawer all wired by existing JS. -->
+      <!-- Customer scope: only Intake + Public folders, both always expanded. -->
 
       <!-- Intake -->
-      <section class="files-folder collapsed">
+      <section class="files-folder">
         <div class="files-folder-head">
           <label class="ff-select"><input type="checkbox" class="ff-pick" aria-label="Select all files in this folder" /></label>
-          <button class="ff-toggle" type="button" aria-expanded="false">
+          <button class="ff-toggle" type="button" aria-expanded="true">
 <span class="files-folder-name">Intake</span>
           <span class="files-folder-count">3 files</span>
           <svg class="files-folder-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
@@ -2720,98 +3036,18 @@
           <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">Pre-op questionnaire.pdf</div><div class="f-sub">Sarah Chen · 04MAY2026 · Patient info</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
         </div>
       </section>
-
-      <!-- Case Prep -->
-      <section class="files-folder collapsed">
+      <!-- Public — customer-uploaded content that's visible to all parties. Empty by default. -->
+      <section class="files-folder">
         <div class="files-folder-head">
           <label class="ff-select"><input type="checkbox" class="ff-pick" aria-label="Select all files in this folder" /></label>
-          <button class="ff-toggle" type="button" aria-expanded="false">
-<span class="files-folder-name">Case Prep</span>
-          <span class="files-folder-count">6 files</span>
+          <button class="ff-toggle" type="button" aria-expanded="true">
+<span class="files-folder-name">Public</span>
+          <span class="files-folder-count">0 files</span>
           <svg class="files-folder-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
         </div>
         <div class="files-folder-body">
-          <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">input-review.pdf</div><div class="f-sub">John Doe · 05MAY2026 · Input review</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
-          <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">segmentation.stl</div><div class="f-sub">John Doe · 05MAY2026 · Segmentation</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
-          <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">segmentation-overlay.png</div><div class="f-sub">John Doe · 05MAY2026 · Segmentation</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
-          <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">preparation-notes.pdf</div><div class="f-sub">Steve Smith · 06MAY2026 · Preparation</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
-          <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">osteotomy-planes.stl</div><div class="f-sub">Steve Smith · 06MAY2026 · Preparation</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
-          <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">qc-report.pdf</div><div class="f-sub">Michael Jordan · 07MAY2026 · Quality check</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
-        </div>
-      </section>
-
-      <!-- Planning -->
-      <section class="files-folder collapsed">
-        <div class="files-folder-head">
-          <label class="ff-select"><input type="checkbox" class="ff-pick" aria-label="Select all files in this folder" /></label>
-          <button class="ff-toggle" type="button" aria-expanded="false">
-<span class="files-folder-name">Planning</span>
-          <span class="files-folder-count">3 files</span>
-          <svg class="files-folder-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-        </div>
-        <div class="files-folder-body">
-          <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">surgical-plan.pdf</div><div class="f-sub">Dr. Lin · 10MAY2026 · Planning</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
-          <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">planning-notes.docx</div><div class="f-sub">Dr. Lin · 08MAY2026 · Planning</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
-          <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">plan-confirmation.pdf</div><div class="f-sub">Dr. R. Alvarez · 10MAY2026 · Planning</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
-        </div>
-      </section>
-
-      <!-- Design -->
-      <section class="files-folder collapsed">
-        <div class="files-folder-head">
-          <label class="ff-select"><input type="checkbox" class="ff-pick" aria-label="Select all files in this folder" /></label>
-          <button class="ff-toggle" type="button" aria-expanded="false">
-<span class="files-folder-name">Design</span>
-          <span class="files-folder-count">8 files</span>
-          <svg class="files-folder-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-        </div>
-        <div class="files-folder-body">
-          <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">implant-design-v1.stl</div><div class="f-sub">Priya Nair · 12MAY2026 · Design</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
-          <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">implant-design-v2.stl</div><div class="f-sub">Priya Nair · 17MAY2026 · Design</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
-          <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">design-rationale.pdf</div><div class="f-sub">Priya Nair · 12MAY2026 · Design</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
-          <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">design-qc-report.pdf</div><div class="f-sub">Marcus Webb · 13MAY2026 · Design quality check</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
-          <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">case-report-draft.pdf</div><div class="f-sub">Priya Nair · 14MAY2026 · Case report</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
-          <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">case-report-final.pdf</div><div class="f-sub">Priya Nair · 14MAY2026 · Case report</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
-          <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">case-report-qc.pdf</div><div class="f-sub">Marcus Webb · 14MAY2026 · Case report quality check</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
-          <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">design-screenshots.zip</div><div class="f-sub">Priya Nair · 12MAY2026 · Design</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
-        </div>
-      </section>
-
-      <!-- Approval -->
-      <section class="files-folder collapsed">
-        <div class="files-folder-head">
-          <label class="ff-select"><input type="checkbox" class="ff-pick" aria-label="Select all files in this folder" /></label>
-          <button class="ff-toggle" type="button" aria-expanded="false">
-<span class="files-folder-name">Approval</span>
-          <span class="files-folder-count">4 files</span>
-          <svg class="files-folder-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-        </div>
-        <div class="files-folder-body">
-          <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">approval-request-v1.pdf</div><div class="f-sub">Sarah Chen · 15MAY2026 · Request approval</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
-          <div class="file-card" data-superseded="approval-sign-off-v2.pdf"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">approval-rejection-v1.pdf</div><div class="f-sub">Dr. R. Alvarez · 16MAY2026 · Surgeon approval</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
-          <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">approval-request-v2.pdf</div><div class="f-sub">Sarah Chen · 17MAY2026 · Request approval</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
-          <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">approval-sign-off-v2.pdf</div><div class="f-sub">Dr. R. Alvarez · 18MAY2026 · Surgeon approval</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
-        </div>
-      </section>
-
-      <!-- Pre-Production (current state) -->
-      <section class="files-folder collapsed">
-        <div class="files-folder-head">
-          <label class="ff-select"><input type="checkbox" class="ff-pick" aria-label="Select all files in this folder" /></label>
-          <button class="ff-toggle" type="button" aria-expanded="false">
-<span class="files-folder-name">Pre-Production</span>
-          <span class="files-folder-count">3 files</span>
-          <svg class="files-folder-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-        </div>
-        <div class="files-folder-body">
-          <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">production-spec.pdf</div><div class="f-sub">Steve Smith · 19MAY2026 · Pre-Production</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
-          <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">material-checklist.pdf</div><div class="f-sub">Steve Smith · 19MAY2026 · Pre-Production</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
-          <div class="file-card"><div class="file-line"><label class="file-check"><input type="checkbox" class="file-pick" aria-label="Select file" /></label><div class="file-info"><div class="f-name">tooling-prep.pdf</div><div class="f-sub">Steve Smith · 20MAY2026 · Pre-Production</div></div><div class="file-actions"><button class="file-act file-settings-btn" type="button" aria-label="File settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button class="file-act" type="button" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div></div><div class="file-settings"><div class="form-row file-rename"><label>File name</label><input type="text" /></div><div class="who-title">Choose who can view</div><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Rep</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Sales Manager</label><label class="who-row"><span class="switch"><input type="checkbox" checked /><span class="track"></span></span> Surgeon</label><label class="who-row supersede-row"><span class="switch"><input type="checkbox" class="file-supersede-toggle" /><span class="track"></span></span> Mark as superseded</label><div class="file-save-row"><button class="btn btn-danger file-delete" type="button">Delete file</button><button class="btn btn-primary file-save" type="button">Save</button></div></div></div>
+          <div class="files-folder-empty" style="padding: 16px 4px; font-size: 13px; color: var(--text-muted); text-align: center;">No public files yet.</div>
         </div>
       </section>
     </div>
@@ -2976,176 +3212,246 @@
     <!-- Surgical Plan (Portal — read-only). Same layout + conditional dropdowns
          as prototype.html Phase 2 but without the Edit button: surgeons / sales
          reps only view the finalized plan. -->
-    <div class="drawer-panel sp-drawer" data-drawer-panel="configureplan">
+    <!-- Surgical Plan (Phase 15 portal port of Phase 12 admin design).
+         Customers see read-only by default. Edit full plan is gated by
+         case state (pre-Planning only); Proposed meeting can be edited
+         separately at any time. -->
+    <div class="drawer-panel sp-drawer is-readonly" data-drawer-panel="configureplan" data-case-state="case-prep">
       <div class="sp-head">
         <div class="sp-head-text">
           <div class="sp-head-mode-label">Finalized plan</div>
-          <div class="sp-head-mode-sub">Editable by Acumed staff. Reach out via the Comments thread for changes.</div>
+          <div class="sp-head-mode-sub">Editable while the case is pre-Planning. Use Comments to request changes after that.</div>
+        </div>
+        <div class="sp-head-actions">
+          <button class="btn" type="button" data-sp-edit>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            Edit
+          </button>
+          <button class="btn" type="button" data-sp-cancel hidden>Cancel</button>
+          <button class="btn btn-primary" type="button" data-sp-save hidden>Save</button>
         </div>
       </div>
 
-      <!-- 1. Planning Meeting Information -->
+      <!-- 1. Planning Meeting Information — Proposed has its own inline Edit
+           that customers can use even after the case enters Planning. -->
       <div class="pp-section">
         <h4 class="pp-title">Planning Meeting Information</h4>
-        <div class="sp-meeting">
-          <div class="sp-meeting-h">Proposed</div>
-          <div class="form-3col">
+        <div class="sp-meeting" data-sp-meeting="proposed">
+          <div class="sp-section-edit-row">
+            <div class="sp-meeting-h" style="margin: 0;">Proposed</div>
+            <button class="sp-section-edit" type="button" data-sp-meeting-edit>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              Edit
+            </button>
+            <span class="sp-section-actions" hidden>
+              <button class="btn" type="button" data-sp-meeting-cancel>Cancel</button>
+              <button class="btn btn-primary" type="button" data-sp-meeting-save>Save</button>
+            </span>
+          </div>
+          <div class="form-2col">
             <div class="form-row"><label>Date</label><input type="date" value="2026-06-12" /></div>
             <div class="form-row"><label>Time</label><input type="time" value="14:00" /></div>
-            <div class="form-row"><label>Time zone</label>
-              <select><option>America/Los_Angeles (PT)</option><option selected>America/New_York (ET)</option><option>America/Chicago (CT)</option><option>UTC</option></select>
-            </div>
+          </div>
+          <div class="form-row" style="margin-top: 10px;"><label>Time zone</label>
+            <select><option>America/Los_Angeles (PT)</option><option selected>America/New_York (ET)</option><option>America/Chicago (CT)</option><option>UTC</option></select>
           </div>
         </div>
         <div class="sp-meeting" style="margin-top: 14px;">
           <div class="sp-meeting-h">Scheduled</div>
-          <div class="form-3col">
+          <div class="form-2col">
             <div class="form-row"><label>Date</label><input type="date" value="2026-06-13" /></div>
             <div class="form-row"><label>Time</label><input type="time" value="15:30" /></div>
-            <div class="form-row"><label>Time zone</label>
-              <select><option>America/Los_Angeles (PT)</option><option selected>America/New_York (ET)</option><option>America/Chicago (CT)</option><option>UTC</option></select>
-            </div>
+          </div>
+          <div class="form-row" style="margin-top: 10px;"><label>Time zone</label>
+            <select><option>America/Los_Angeles (PT)</option><option selected>America/New_York (ET)</option><option>America/Chicago (CT)</option><option>UTC</option></select>
           </div>
           <div class="form-row" style="margin-top: 10px;">
             <label>Meeting link</label>
-            <input type="url" value="https://meet.acumed.example/case-26a0088" />
+            <div class="sp-link-wrap">
+              <input type="url" value="https://meet.acumed.example/case-26a0088" data-sp-meeting-link />
+              <button class="sp-link-act tip tip-up" type="button" aria-label="Open meeting link in new tab" data-tip="Open in new tab" data-sp-meeting-open>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </button>
+              <button class="sp-link-act tip tip-up" type="button" aria-label="Copy meeting link" data-tip="Copy link" data-sp-meeting-copy>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- 2. Solution Set (with conditional Orthognathic Surgery flow) -->
-      <div class="pp-section">
-        <h4 class="pp-title">Solution Set</h4>
-        <div class="form-row">
-          <label>Solution Set</label>
-          <select data-sp="solution" id="spSolution">
-            <option>Diagnostic Models</option>
-            <option>Maxillofacial Reconstruction Plates</option>
-            <option>Mandibular Reconstruction</option>
-            <option selected>Orthognathic Surgery</option>
-          </select>
-        </div>
+      <!-- 2. Plan container — Phase 12 design ported -->
+      <div class="sp-plan-list" data-sp-plan-list>
+        <div class="sp-plan-card" data-plan-id="1">
+          <div class="sp-plan-head">
+            <h4 class="pp-title sp-plan-title">Surgical Plan 1</h4>
+            <button class="sp-plan-remove" type="button" aria-label="Remove plan" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
 
-        <div data-sp-when-solution="Orthognathic Surgery">
-          <div class="form-row" style="margin-top: 14px;">
-            <label>Procedure</label>
-            <select data-sp="procedure" id="spProcedure">
-              <option value="single">Single Jaw Surgery</option>
-              <option value="double" selected>Double Jaw Surgery</option>
-              <option value="genio">Genio Only</option>
+          <div class="form-row sp-plan-summary">
+            <label>Surgical procedure</label>
+            <textarea data-sp="procedure-text" placeholder="Example: 1-piece Le Fort I, Bilateral Sagittal Splits, Reduction Genioplasty">1-piece Le Fort I, Bilateral Sagittal Splits, Reduction Genioplasty</textarea>
+          </div>
+
+          <div class="form-row">
+            <label>Solution Set</label>
+            <select data-sp="solution">
+              <option>Diagnostic Models</option>
+              <option>Maxillofacial Reconstruction Plates</option>
+              <option>Mandibular Reconstruction</option>
+              <option selected>Orthognathic Surgery</option>
             </select>
           </div>
 
-          <div data-sp-when-proc="single" hidden>
-            <div class="form-2col">
-              <div class="form-row">
-                <label>Jaw</label>
-                <select data-sp="single-jaw" id="spSingleJaw">
-                  <option value="maxilla" selected>Maxilla</option>
-                  <option value="mandible">Mandible</option>
-                </select>
-              </div>
-              <div class="form-row">
-                <label>Genio</label>
-                <select data-sp="single-genio"><option>No</option><option>Yes</option></select>
+          <div data-sp-when-solution="Orthognathic Surgery">
+            <div class="form-row" style="margin-top: 14px;">
+              <label>Procedure</label>
+              <select data-sp="procedure">
+                <option value="single">Single Jaw Surgery</option>
+                <option value="double" selected>Double Jaw Surgery</option>
+                <option value="genio">Genio Only</option>
+              </select>
+            </div>
+
+            <div data-sp-when-proc="single" hidden>
+              <div class="form-2col">
+                <div class="form-row">
+                  <label>Jaw</label>
+                  <select data-sp="single-jaw">
+                    <option value="maxilla" selected>Maxilla</option>
+                    <option value="mandible">Mandible</option>
+                  </select>
+                </div>
+                <div class="form-row">
+                  <label>Genio</label>
+                  <select data-sp="single-genio"><option>No</option><option>Yes</option></select>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div data-sp-when-proc="double">
-            <div class="form-2col">
-              <div class="form-row">
-                <label>Sequencing</label>
-                <select data-sp="double-seq" id="spDoubleSeq">
-                  <option value="maxilla-first" selected>Maxilla first</option>
-                  <option value="mandible-first">Mandible first</option>
-                </select>
-              </div>
-              <div class="form-row">
-                <label>Genio</label>
-                <select data-sp="double-genio"><option selected>No</option><option>Yes</option></select>
+            <div data-sp-when-proc="double">
+              <div class="form-2col">
+                <div class="form-row">
+                  <label>Sequencing</label>
+                  <select data-sp="double-seq">
+                    <option value="maxilla-first" selected>Maxilla first</option>
+                    <option value="mandible-first">Mandible first</option>
+                  </select>
+                </div>
+                <div class="form-row">
+                  <label>Genio</label>
+                  <select data-sp="double-genio"><option selected>No</option><option>Yes</option></select>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="sp-sub-card" data-sp-section="maxilla">
-            <div class="sp-sub-card-h">Maxilla Surgery</div>
-            <div class="form-2col">
-              <div class="form-row">
-                <label>Le Fort</label>
-                <select data-sp="lefort">
-                  <option selected>Le Fort I</option>
-                  <option>Le Fort II</option>
-                  <option>Le Fort III</option>
-                </select>
+            <div class="sp-sub-card" data-sp-section="maxilla">
+              <div class="sp-sub-card-h">Maxilla Surgery</div>
+              <div class="form-2col">
+                <div class="form-row">
+                  <label>Le Fort</label>
+                  <select data-sp="lefort">
+                    <option selected>Le Fort I</option>
+                    <option>Le Fort II</option>
+                    <option>Le Fort III</option>
+                  </select>
+                </div>
+                <div class="form-row">
+                  <label>Number of segments</label>
+                  <select data-sp="segments">
+                    <option selected>1 Piece</option>
+                    <option>2 Piece</option>
+                    <option>3 Piece</option>
+                  </select>
+                </div>
               </div>
+            </div>
+
+            <div class="sp-sub-card" data-sp-section="mandible">
+              <div class="sp-sub-card-h">Mandible Surgery</div>
+              <div class="form-2col">
+                <div class="form-row">
+                  <label>Right side</label>
+                  <select data-sp-side="right">
+                    <option selected>Sagittal Split</option>
+                    <option>Intraoral Vertical Ramus Osteotomy (IVRO)</option>
+                    <option>Inverted L</option>
+                    <option value="other">Other…</option>
+                  </select>
+                  <input type="text" placeholder="Describe other procedure" data-sp-side-other="right" hidden />
+                </div>
+                <div class="form-row">
+                  <label>Left side</label>
+                  <select data-sp-side="left">
+                    <option selected>Sagittal Split</option>
+                    <option>Intraoral Vertical Ramus Osteotomy (IVRO)</option>
+                    <option>Inverted L</option>
+                    <option value="other">Other…</option>
+                  </select>
+                  <input type="text" placeholder="Describe other procedure" data-sp-side-other="left" hidden />
+                </div>
+              </div>
+            </div>
+
+            <div class="sp-sub-card" data-sp-section="genio">
+              <div class="sp-sub-card-h">Genio Surgery</div>
               <div class="form-row">
-                <label>Number of segments</label>
-                <select data-sp="segments">
-                  <option selected>1 Piece</option>
-                  <option>2 Piece</option>
-                  <option>3 Piece</option>
+                <label>Type</label>
+                <select data-sp="genio-type">
+                  <option selected>Genioplasty</option>
+                  <option>Genioglossus</option>
                 </select>
               </div>
             </div>
-          </div>
 
-          <div class="sp-sub-card" data-sp-section="mandible">
-            <div class="sp-sub-card-h">Mandible Surgery</div>
-            <div class="form-2col">
-              <div class="form-row">
-                <label>Right side</label>
-                <select data-sp-side="right">
-                  <option selected>Sagittal Split</option>
-                  <option>Intraoral Vertical Ramus Osteotomy (IVRO)</option>
-                  <option>Inverted L</option>
-                  <option value="other">Other…</option>
-                </select>
-                <input type="text" placeholder="Describe other procedure" data-sp-side-other="right" hidden />
+            <div class="form-row" style="margin-top: 14px;">
+              <label>CR Correction</label>
+              <div class="radio-group">
+                <label class="radio"><input type="radio" name="spCR1" value="in" /><span>In CR</span></label>
+                <label class="radio"><input type="radio" name="spCR1" value="corrected" checked /><span>Corrected CR</span></label>
+                <label class="radio"><input type="radio" name="spCR1" value="out" /><span>Out of CR</span></label>
               </div>
-              <div class="form-row">
-                <label>Left side</label>
-                <select data-sp-side="left">
-                  <option selected>Sagittal Split</option>
-                  <option>Intraoral Vertical Ramus Osteotomy (IVRO)</option>
-                  <option>Inverted L</option>
-                  <option value="other">Other…</option>
-                </select>
-                <input type="text" placeholder="Describe other procedure" data-sp-side-other="left" hidden />
-              </div>
-            </div>
-          </div>
-
-          <div class="form-row" style="margin-top: 14px;">
-            <label>CR Correction</label>
-            <div class="radio-group">
-              <label class="radio"><input type="radio" name="spCR" value="in" /><span>In CR</span></label>
-              <label class="radio"><input type="radio" name="spCR" value="corrected" checked /><span>Corrected CR</span></label>
-              <label class="radio"><input type="radio" name="spCR" value="out" /><span>Out of CR</span></label>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 3. Surgical procedure (free text) -->
-      <div class="pp-section">
-        <h4 class="pp-title">Surgical procedure</h4>
-        <div class="form-row">
-          <label>Description</label>
-          <textarea>1-piece Le Fort I, Bilateral Sagittal Splits, Reduction Genioplasty</textarea>
-        </div>
-      </div>
+      <!-- + New plan — full plan edit mode only -->
+      <button class="btn sp-plan-add" type="button" data-sp-add-plan hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:14px;height:14px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New plan
+      </button>
 
-      <!-- 4. Case Report Preferences -->
+      <!-- 3. Case Report (renamed from "Case Report Preferences") -->
       <div class="pp-section">
-        <h4 class="pp-title">Case Report Preferences</h4>
+        <h4 class="pp-title">Case Report</h4>
         <div class="form-row">
+          <label>Include Disclaimers</label>
+          <div class="ms ms-disclaimers">
+            <button class="ms-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" data-ms-btn>
+              <span class="ms-display" data-ms-display></span>
+              <svg class="ms-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="ms-popover" data-ms-menu hidden role="listbox" aria-multiselectable="true">
+              <div class="ms-options">
+                <label class="ms-option"><input type="checkbox" data-ms-opt value="CT Scan date warning" /><span>CT Scan date warning</span></label>
+                <label class="ms-option"><input type="checkbox" data-ms-opt value="Slice thickness warning" /><span>Slice thickness warning</span></label>
+                <label class="ms-option"><input type="checkbox" data-ms-opt value="Motion artifact warning" /><span>Motion artifact warning</span></label>
+                <label class="ms-option"><input type="checkbox" data-ms-opt value="Other" data-ms-opt-other /><span>Other</span></label>
+              </div>
+            </div>
+          </div>
+          <input type="text" class="ms-disclaimer-other" data-ms-disclaimer-other placeholder="Describe other disclaimer" hidden style="margin-top: 8px;" />
+        </div>
+        <div class="form-row" style="margin-top: 14px;">
           <label>Preferences</label>
           <textarea placeholder="Preferred sections, screenshots, measurement breakdowns…"></textarea>
         </div>
       </div>
 
-      <!-- 5. Additional notes -->
+      <!-- 4. Additional notes -->
       <div class="pp-section">
         <h4 class="pp-title">Additional notes</h4>
         <div class="form-row">
@@ -3155,115 +3461,17 @@
       </div>
     </div>
 
-    <!-- Configure Product -->
-    <div class="drawer-panel" data-drawer-panel="configureproduct">
-      <!-- Invoiced Products (top) — flat list, one row per product -->
-      <div class="pp-section">
-        <h4 class="pp-title">Invoiced Products</h4>
-        <div class="pp-row">
-          <select><option selected>ADS-CC-031E - RECON Man: DSP+Gd+Fib Gd+Impl+Pre Mdl</option></select>
-          <input type="number" min="1" value="1" aria-label="Quantity" />
-          <button class="pp-del" type="button" aria-label="Remove product"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <!-- Device Design (Phase 15 portal — Phase 13 .dd-card pattern, read-only).
+         Customers see the finalized device list. No Edit / Remove / Add. -->
+    <div class="drawer-panel sp-drawer is-readonly" data-drawer-panel="configureproduct">
+      <div class="sp-head">
+        <div class="sp-head-text">
+          <div class="sp-head-mode-label">Read-only view</div>
+          <div class="sp-head-mode-sub">Acumed staff configure devices. Use Comments to request a change.</div>
         </div>
-        <div class="pp-row">
-          <select><option selected>7703-8001L - Demo Bench Model Fibula L</option></select>
-          <input type="number" min="1" value="1" aria-label="Quantity" />
-          <button class="pp-del" type="button" aria-label="Remove product"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-        </div>
-        <div class="pp-row">
-          <select><option selected>7701-7001N - PTS Pre-Op Mandible Model</option></select>
-          <input type="number" min="1" value="1" aria-label="Quantity" />
-          <button class="pp-del" type="button" aria-label="Remove product"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-        </div>
-        <button class="pp-add-link" type="button">+ Add product</button>
       </div>
-
-      <!-- Manufactured Products — grouped by bundle. Each group: bundle code header + product rows + add link. -->
-      <div class="pp-section">
-        <h4 class="pp-title">Manufactured Products</h4>
-
-        <div class="pp-bundle">
-          <div class="pp-bundle-head">
-            <span class="pp-bundle-label">Bundle</span>
-            <select class="pp-bundle-code"><option selected>7701-7001N</option><option>7703-8001L</option><option>ADS-CC-031E</option></select>
-            <button class="pp-del" type="button" aria-label="Remove bundle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-          </div>
-          <span class="pp-products-label">Products</span>
-          <div class="pp-row">
-            <select><option selected>7701-8001N - Demo Bench Model Mandible</option></select>
-            <input type="number" min="1" value="1" aria-label="Quantity" />
-            <button class="pp-del" type="button" aria-label="Remove product"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-          </div>
-          <button class="pp-add-link" type="button">+ Add product</button>
-        </div>
-
-        <div class="pp-bundle">
-          <div class="pp-bundle-head">
-            <span class="pp-bundle-label">Bundle</span>
-            <select class="pp-bundle-code"><option>7701-7001N</option><option selected>7703-8001L</option><option>ADS-CC-031E</option></select>
-            <button class="pp-del" type="button" aria-label="Remove bundle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-          </div>
-          <span class="pp-products-label">Products</span>
-          <div class="pp-row">
-            <select><option selected>7703-8001L - Demo Bench Model Fibula L</option></select>
-            <input type="number" min="1" value="1" aria-label="Quantity" />
-            <button class="pp-del" type="button" aria-label="Remove product"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-          </div>
-          <button class="pp-add-link" type="button">+ Add product</button>
-        </div>
-
-        <div class="pp-bundle">
-          <div class="pp-bundle-head">
-            <span class="pp-bundle-label">Bundle</span>
-            <select class="pp-bundle-code"><option>7701-7001N</option><option>7703-8001L</option><option selected>ADS-CC-031E</option></select>
-            <button class="pp-del" type="button" aria-label="Remove bundle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-          </div>
-          <span class="pp-products-label">Products</span>
-          <div class="pp-row">
-            <select><option selected>7703-9001N - PTS RECON DSP</option></select>
-            <input type="number" min="1" value="1" aria-label="Quantity" />
-            <button class="pp-del" type="button" aria-label="Remove product"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-          </div>
-          <div class="pp-row">
-            <select><option selected>7703-6005L - PTS CMF RECON Ti Fibula Guide L</option></select>
-            <input type="number" min="1" value="1" aria-label="Quantity" />
-            <button class="pp-del" type="button" aria-label="Remove product"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-          </div>
-          <div class="pp-row">
-            <select><option selected>7703-1001R - PTS Mandible RECON Graft Plate R</option></select>
-            <input type="number" min="1" value="1" aria-label="Quantity" />
-            <button class="pp-del" type="button" aria-label="Remove product"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-          </div>
-          <div class="pp-row">
-            <select><option selected>7703-6001R - PTS Ti Mandible RECON Guide R Anterior</option></select>
-            <input type="number" min="1" value="1" aria-label="Quantity" />
-            <button class="pp-del" type="button" aria-label="Remove product"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-          </div>
-          <div class="pp-row">
-            <select><option selected>7703-6002R - PTS Ti Mandible RECON Guide R Posterior</option></select>
-            <input type="number" min="1" value="1" aria-label="Quantity" />
-            <button class="pp-del" type="button" aria-label="Remove product"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-          </div>
-          <div class="pp-row">
-            <select><option selected>7703-6006N - PTS CMF RECON Cut Guide Aligner</option></select>
-            <input type="number" min="1" value="2" aria-label="Quantity" />
-            <button class="pp-del" type="button" aria-label="Remove product"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-          </div>
-          <div class="pp-row">
-            <select><option selected>7701-7001N - PTS Pre-Op Mandible Model</option></select>
-            <input type="number" min="1" value="1" aria-label="Quantity" />
-            <button class="pp-del" type="button" aria-label="Remove product"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-          </div>
-          <button class="pp-add-link" type="button">+ Add product</button>
-        </div>
-
-        <button class="pp-add-bundle" type="button">+ Add bundle</button>
-      </div>
-
-      <div class="panel-foot">
-        <button class="btn" data-panel-close>Cancel</button>
-        <button class="btn btn-primary" data-panel-close>Save changes</button>
-      </div>
+      <div class="dd-count" id="ddCount" aria-live="polite">0 devices</div>
+      <div class="dd-list" id="ddList" aria-live="polite"></div>
     </div>
 
     <!-- Create PDF — three template cards -->
@@ -3315,7 +3523,8 @@
     'pre-production': '26A0069',
     'production': '26A0067',
     'done': '26A0058',
-    'inactive': '26A0023'
+    'inactive':  '26A0023',
+    'cancelled': '26A0044'
   };
 
   // Map state slug → status of the case in that lane (drives the status pill
@@ -3327,10 +3536,20 @@
     'planning':       { class: 'is-in-process', label: 'In Process' },
     'design':         { class: 'is-in-process', label: 'In Process' },
     'approval':       { class: 'is-rework',     label: 'Rework' },
-    'pre-production': { class: 'is-blocked',    label: 'Blocked' },
+    'pre-production': { class: 'is-blocked',    label: 'Action Required' },
     'production':     { class: 'is-in-process', label: 'In Process' },
     'done':           { class: 'is-complete',   label: 'Complete' },
-    'inactive':       { class: 'is-on-hold',    label: 'On Hold' }
+    'inactive':       { class: 'is-on-hold',    label: 'On Hold' },
+    'cancelled':      { class: 'is-canceled',   label: 'Cancelled' }
+  };
+
+  // Attention banner copy + reason per terminal/blocked state (V5 — customer-facing).
+  // {Reason from settings} placeholder is shown inline; in a real impl it'd come from
+  // the case's settings drawer.
+  const STATE_TO_ATTENTION = {
+    'inactive':       { class: 'is-on-hold',  text: 'Case placed on hold — awaiting updated CT scan from the imaging center.' },
+    'cancelled':      { class: 'is-canceled', text: 'Case cancelled — surgery postponed by surgeon; no further action required.' },
+    'pre-production': { class: 'is-blocked',  text: 'Case blocked — please review and approve the report to continue.' },
   };
 
   // Case type per state (V5, Adam): bone = Cadaver, beaker = Demo, none for Clinical.
@@ -3613,7 +3832,7 @@
           <div class="pp-step-body">
             <div class="step-alert is-blocked">
               <svg class="sa-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-              <div class="sa-text"><b>Attention</b> Case blocked, please provide report approval to continue.</div>
+              <div class="sa-text"><b>Action Required</b> Please review and approve the report to continue.</div>
             </div>
 
             <div class="pp-section-title">Quality Control: Case Preparation</div>
@@ -3796,8 +4015,9 @@
 
   function applyStateToTimeline(state) {
     // Done: everything is_done; no current
-    // Inactive: freeze at INACTIVE_FREEZE_STATE
-    const targetStep = state === 'inactive' ? INACTIVE_FREEZE_STATE : state;
+    // Inactive / Cancelled: freeze the timeline at INACTIVE_FREEZE_STATE
+    const FROZEN_STATES = new Set(['inactive', 'cancelled']);
+    const targetStep = FROZEN_STATES.has(state) ? INACTIVE_FREEZE_STATE : state;
     const idx = WORKFLOW_STEPS.indexOf(targetStep);
 
     // Status-color classes that may have been attached to the original
@@ -3863,7 +4083,9 @@
     const statusInfo = STATE_TO_STATUS[state];
     // Portal scope: only show status pills the surgeon/sales rep needs to act on.
     // Internal-process statuses are silenced on both the timeline and active-row.
-    const PORTAL_HIDDEN = new Set(['is-in-process', 'is-rework', 'is-review', 'is-on-hold']);
+    // V5: customers see On Hold + Cancelled status pills (kept visible).
+    // Internal-process statuses (In Process / Rework / Review) stay hidden.
+    const PORTAL_HIDDEN = new Set(['is-in-process', 'is-rework', 'is-review']);
     const showPill = statusInfo && state !== 'done' && !PORTAL_HIDDEN.has(statusInfo.class);
     if (statusInfo && state !== 'done') {
       const currentStep = document.querySelector('.tl-step.is-current');
@@ -3886,13 +4108,30 @@
       });
     }
 
+    // Case-level Attention banner — On Hold / Cancelled / Action Required.
+    // Shown above the progress card with status-specific copy + reason.
+    const attention = document.getElementById('caseAttention');
+    const attentionBody = document.getElementById('caseAttentionBody');
+    if (attention && attentionBody) {
+      const cfg = STATE_TO_ATTENTION[state];
+      attention.classList.remove('is-on-hold', 'is-canceled', 'is-blocked');
+      if (cfg) {
+        attention.classList.add(cfg.class);
+        attentionBody.textContent = cfg.text;
+        attention.hidden = false;
+      } else {
+        attention.hidden = true;
+      }
+    }
+
     // Update the breadcrumb case ID so it matches the card the user clicked
     const idEl = document.getElementById('caseId');
     if (idEl && STATE_TO_ID[state]) idEl.textContent = STATE_TO_ID[state];
 
-    // Deviation flag visibility — Planning is the only card with a deviation
+    // Deviation flag — V5: customers do not need to see deviation icons.
+    // Keep it permanently hidden on portal regardless of state.
     const devFlag = document.getElementById('devUrlBtn');
-    if (devFlag) devFlag.classList.toggle('is-hidden', state !== 'planning');
+    if (devFlag) devFlag.classList.add('is-hidden');
 
     // Case type flag (V5, Adam) — show bone/beaker when this state has a mapped type
     const typeFlag = document.getElementById('caseTypeFlag');
@@ -3984,7 +4223,8 @@
     const checkIcon = `<svg class="lane-sort-item-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
 
     const PORTAL_STATUSES = [
-      { key: 'blocked',   label: 'Blocked' },
+      { key: 'on-hold',   label: 'On Hold' },
+      { key: 'blocked',   label: 'Action Required' },
       { key: 'complete',  label: 'Complete' },
       { key: 'shipped',   label: 'Shipped' },
       { key: 'delivered', label: 'Delivered' },
@@ -4018,8 +4258,8 @@
           const href = c.getAttribute('href') || '#';
           const idText = (c.querySelector('.case-card-id b')?.nextSibling?.textContent || '').trim()
             || (c.dataset.id || '').trim();
-          const devIcon = c.querySelector('.case-card-dev-icon');
-          const devHTML = devIcon ? devIcon.outerHTML : '';
+          // V5: customers do not see deviation icons.
+          const devHTML = '';
           const fields = Array.from(c.querySelectorAll('.case-card-field')).reduce((acc, el) => {
             const k = (el.querySelector('b')?.textContent || '').replace(':', '').trim();
             const v = (el.textContent || '').replace(k + ':', '').trim();
@@ -4163,6 +4403,123 @@
     });
   }
 
+  /* Multi-select widget — drives the eight filter dropdowns. */
+  const msCloseIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+  function renderMsChips(ms) {
+    const display = ms.querySelector('[data-ms-display]');
+    const checked = Array.from(ms.querySelectorAll('.ms-option input[type="checkbox"]:checked'));
+    if (!checked.length) { display.innerHTML = '<span style="color: var(--cool-gray-7);">All</span>'; return; }
+    const MAX = 2;
+    const visible = checked.slice(0, MAX);
+    const overflow = checked.length - visible.length;
+    display.innerHTML = visible.map((cb) =>
+      `<span class="ms-chip">${cb.parentElement.querySelector('span').textContent.replace(/\s*\(\d+\)\s*$/, '')}<button class="ms-chip-x" type="button" data-ms-uncheck="${cb.value.replace(/"/g, '&quot;')}" aria-label="Remove">${msCloseIcon}</button></span>`
+    ).join('') + (overflow > 0 ? `<span class="ms-more">+${overflow}</span>` : '');
+  }
+  document.querySelectorAll('.ms').forEach((ms) => {
+    const trigger = ms.querySelector('.ms-trigger');
+    const popover = ms.querySelector('.ms-popover');
+    const search = ms.querySelector('.ms-search');
+    const options = ms.querySelectorAll('.ms-option');
+    if (!trigger || !popover) return;
+    renderMsChips(ms);
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const willOpen = popover.hidden;
+      document.querySelectorAll('.ms.open').forEach((other) => {
+        if (other !== ms) { other.classList.remove('open'); other.querySelector('.ms-popover').hidden = true; }
+      });
+      popover.hidden = !willOpen;
+      ms.classList.toggle('open', willOpen);
+      trigger.setAttribute('aria-expanded', String(willOpen));
+      if (willOpen && search) setTimeout(() => search.focus(), 0);
+    });
+    popover.addEventListener('click', (e) => e.stopPropagation());
+    options.forEach((opt) => {
+      const cb = opt.querySelector('input[type="checkbox"]');
+      cb.addEventListener('change', () => renderMsChips(ms));
+    });
+    trigger.addEventListener('click', (e) => {
+      const x = e.target.closest('[data-ms-uncheck]');
+      if (!x) return;
+      e.stopPropagation();
+      const val = x.dataset.msUncheck;
+      const cb = Array.from(ms.querySelectorAll('.ms-option input[type="checkbox"]'))
+        .find((c) => c.value === val);
+      if (cb) { cb.checked = false; renderMsChips(ms); }
+    });
+    if (search) {
+      search.addEventListener('input', () => {
+        const q = search.value.trim().toLowerCase();
+        options.forEach((opt) => {
+          const label = opt.querySelector('span').textContent.toLowerCase();
+          opt.classList.toggle('is-hidden', q && !label.includes(q));
+        });
+      });
+    }
+  });
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.ms.open').forEach((ms) => {
+      ms.classList.remove('open');
+      const pop = ms.querySelector('.ms-popover');
+      if (pop) pop.hidden = true;
+      ms.querySelector('.ms-trigger')?.setAttribute('aria-expanded', 'false');
+    });
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.ms.open').forEach((ms) => {
+        ms.classList.remove('open');
+        const pop = ms.querySelector('.ms-popover');
+        if (pop) pop.hidden = true;
+      });
+    }
+  });
+
+  /* Surgery date — single / range pane toggle */
+  document.querySelectorAll('[data-date-range]').forEach((group) => {
+    const tabs = group.querySelectorAll('.dr-tab');
+    const panes = group.querySelectorAll('.dr-pane');
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const mode = tab.dataset.dateMode;
+        tabs.forEach((t) => {
+          const active = t === tab;
+          t.classList.toggle('is-active', active);
+          t.setAttribute('aria-pressed', String(active));
+        });
+        panes.forEach((p) => { p.hidden = p.dataset.dateModePane !== mode; });
+      });
+    });
+  });
+
+  /* Clear filters — uncheck multi-selects, clear search + dates, reset Case type default, snap to single date mode. */
+  const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+  if (clearFiltersBtn) {
+    clearFiltersBtn.addEventListener('click', () => {
+      document.querySelectorAll('.ms').forEach((ms) => {
+        ms.querySelectorAll('.ms-option input[type="checkbox"]').forEach((cb) => { cb.checked = false; });
+        if (ms.dataset.ms === 'casetype') {
+          const clinical = ms.querySelector('.ms-option input[value="Clinical"]');
+          if (clinical) clinical.checked = true;
+        }
+        renderMsChips(ms);
+        const s = ms.querySelector('.ms-search'); if (s) s.value = '';
+        ms.querySelectorAll('.ms-option').forEach((o) => o.classList.remove('is-hidden'));
+      });
+      const search = document.getElementById('fSearch'); if (search) search.value = '';
+      document.querySelectorAll('[data-date-range]').forEach((group) => {
+        group.querySelectorAll('input[type="date"]').forEach((inp) => { inp.value = ''; });
+        group.querySelectorAll('.dr-tab').forEach((t) => {
+          const active = t.dataset.dateMode === 'single';
+          t.classList.toggle('is-active', active);
+          t.setAttribute('aria-pressed', String(active));
+        });
+        group.querySelectorAll('.dr-pane').forEach((p) => { p.hidden = p.dataset.dateModePane !== 'single'; });
+      });
+    });
+  }
+
   /* Portal status scope — surgeons/sales reps only see statuses that require
      their attention or describe a terminal state. Internal-process statuses
      (in-process, review, rework, on-hold) are hidden on the swim-lane cards
@@ -4183,7 +4540,7 @@
      doesn't already have one. Mirrors prototype.html's pattern. */
   (function injectLaneFilters() {
     const STATUSES = [
-      { key: 'blocked',   label: 'Blocked' },
+      { key: 'blocked',   label: 'Action Required' },
       { key: 'complete',  label: 'Complete' },
       { key: 'shipped',   label: 'Shipped' },
       { key: 'delivered', label: 'Delivered' },
@@ -4635,7 +4992,15 @@
     });
   });
 
-  // Init: populate the user dropdown for the default-visible channel
+  // Init: if the default-active tab is hidden by role (surgeon → Sales hidden),
+  // activate the first visible tab instead. Then populate the user dropdown.
+  document.querySelectorAll('.comments-toggle').forEach((group) => {
+    const active = group.querySelector('.ct-btn.is-active');
+    if (active && active.offsetParent === null) {
+      const fallback = Array.from(group.querySelectorAll('.ct-btn')).find((b) => b.offsetParent !== null);
+      if (fallback) fallback.click();
+    }
+  });
   populateUserDropdown();
 
   // History — per-state section headers toggle collapse
@@ -4658,16 +5023,28 @@
     const shipSummaryEl = drawer.querySelector('#ofShipSummary');
     if (!invoiceTableEl || !shipSummaryEl) return;
 
+    // Default ship-to options come from the rep + surgeon profiles.
+    const DEFAULT_ADDRESSES = [
+      { id: 'rep',     label: 'Sarah Chen (Sales rep)', address: '1234 Main St, Houston, TX 77002' },
+      { id: 'surgeon', label: 'Dr. Lopez (Surgeon)',    address: '567 Oak St, Houston, TX 77019'   },
+    ];
+
     // Seed values mirror the prototype (so the demo reads consistently across both files).
+    // Phase 14 parity — Invoice contents shows top-level invoiced items only;
+    // individual products break down per-shipment in the Shipment summary.
+    const INVOICED_ITEMS = [
+      { name: '7703-9001N — PTS RECON DSP',        qty: 1 },
+      { name: '7701-7001N — PTS Pre-Op Mandible Model', qty: 1 },
+    ];
     const INVOICE_PRODUCTS = [
-      { name: '7702-6001N — Splint, traditional family', qty: 1, shipment: 1 },
+      { name: '7702-6001N — Splint, traditional family',     qty: 1, shipment: 1 },
       { name: '7703-6005L — PTS CMF RECON Ti Fibula Guide', qty: 1, shipment: 1 },
       { name: '7703-1001R — PTS Mandible RECON Graft Plate', qty: 1, shipment: 2 },
-      { name: '7702-6002N — Splint, palatal family', qty: 1, shipment: 2 },
+      { name: '7702-6002N — Splint, palatal family',         qty: 1, shipment: 2 },
     ];
     const SHIPMENTS = [
-      { carrier: 'FedEx', speed: 'Priority Overnight', shipTo: 'Cedar Heights Surgical', address: '1234 Main St, Houston, TX 77002', tracking: 'TRK-9988-XYZ', eta: '2026-06-25' },
-      { carrier: 'UPS',   speed: '2nd Day Air',         shipTo: 'Dr. Lopez (case 26A0088)', address: '567 Oak St, Houston, TX 77019', tracking: 'TRK-1122-ABC', eta: '2026-06-27' },
+      { carrier: 'FedEx', speed: 'Priority Overnight', shipToMode: 'default', shipToDefault: 'surgeon', shipTo: 'Dr. Lopez (Surgeon)',    address: '567 Oak St, Houston, TX 77019',  tracking: 'TRK-9988-XYZ', eta: '2026-06-25' },
+      { carrier: 'UPS',   speed: '2nd Day Air',         shipToMode: 'default', shipToDefault: 'rep',     shipTo: 'Sarah Chen (Sales rep)', address: '1234 Main St, Houston, TX 77002', tracking: 'TRK-1122-ABC', eta: '2026-06-27' },
     ];
 
     const editIconSm = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';
@@ -4692,14 +5069,13 @@
       return `${m[3]}${months[parseInt(m[2], 10) - 1]}${m[1]}`;
     }
 
-    // 1) Invoice contents
+    // 1) Invoice contents — Phase 14: invoiced items only (top-level billable lines).
     invoiceTableEl.innerHTML =
-      '<div class="of-invoice-row is-head"><span>Product</span><span>QTY</span><span>Shipment</span></div>' +
-      INVOICE_PRODUCTS.map((p) =>
+      '<div class="of-invoice-row is-head"><span>Invoiced item</span><span>QTY</span></div>' +
+      INVOICED_ITEMS.map((iv) =>
         `<div class="of-invoice-row">
-          <span class="of-iv-product">${p.name}</span>
-          <span class="of-iv-qty">${p.qty}</span>
-          <span class="of-iv-ship">Shipment ${p.shipment}</span>
+          <span class="of-iv-product">${iv.name}</span>
+          <span class="of-iv-qty">${iv.qty}</span>
         </div>`).join('');
 
     // 2) Per-shipment cards
@@ -4724,7 +5100,7 @@
             <div class="of-ship-info-row"><dt>Carrier</dt><dd data-of-field="carrier">${s.carrier || '—'}</dd></div>
             <div class="of-ship-info-row"><dt>Speed</dt><dd data-of-field="speed">${s.speed || '—'}</dd></div>
             <div class="of-ship-info-row"><dt>Ship to</dt><dd data-of-field="shipTo" data-of-editable>${s.shipTo || '—'}</dd></div>
-            <div class="of-ship-info-row"><dt>Estimated delivery</dt><dd data-of-field="eta">${fmtDate(s.eta) || '—'}</dd></div>
+            <div class="of-ship-info-row"><dt>Estimated Ship Date</dt><dd data-of-field="eta">${fmtDate(s.eta) || '—'}</dd></div>
             <div class="of-ship-info-row is-full"><dt>Shipping address</dt><dd data-of-field="address" data-of-editable>${s.address || '—'}</dd></div>
             <div class="of-ship-info-row is-full"><dt>Tracking number</dt><dd>${s.tracking ? `<button class="of-tracking-copy tip tip-up" type="button" data-tip="Copy to clipboard" data-of-tracking="${s.tracking.replace(/"/g, '&quot;')}">${s.tracking} <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>` : '—'}</dd></div>
           </dl>
@@ -4732,32 +5108,112 @@
       </div>`;
     }).join('');
 
-    // Wire per-card Edit shipping (sales rep updates ship-to / shipping address)
-    shipSummaryEl.querySelectorAll('[data-of-summary-ship]').forEach((card) => {
+    // Wire per-card Edit shipping (customer updates ship-to / shipping address).
+    // Phase 15 — Default/Alternate toggle lives inside the inline edit panel.
+    shipSummaryEl.querySelectorAll('[data-of-summary-ship]').forEach((card, idx) => {
       const editBtn = card.querySelector('[data-of-summary-edit]');
       const cancelBtn = card.querySelector('[data-of-summary-cancel]');
       const saveBtn = card.querySelector('[data-of-summary-save]');
-      let snapshot = {};
-      editBtn?.addEventListener('click', () => {
-        card.querySelectorAll('[data-of-editable]').forEach((dd) => {
-          const v = dd.textContent === '—' ? '' : dd.textContent;
-          snapshot[dd.dataset.ofField] = v;
-          dd.innerHTML = `<input type="text" value="${v.replace(/"/g, '&quot;')}" />`;
-          dd.querySelector('input').focus();
+      const shipToDD = card.querySelector('dd[data-of-field="shipTo"]');
+      const addrDD = card.querySelector('dd[data-of-field="address"]');
+      let snapshot = null;
+      let editPanel = null;
+
+      function buildPanel() {
+        const seed = SHIPMENTS[idx] || {};
+        const mode = seed.shipToMode || 'default';
+        const defId = seed.shipToDefault || DEFAULT_ADDRESSES[0].id;
+        const opts = DEFAULT_ADDRESSES.map((a) =>
+          `<option value="${a.id}"${a.id === defId ? ' selected' : ''}>${a.label}</option>`
+        ).join('');
+        const defAddr = DEFAULT_ADDRESSES.find((a) => a.id === defId)?.address || '';
+        const altName = mode === 'alternate' ? (shipToDD?.textContent === '—' ? '' : shipToDD?.textContent || '') : '';
+        const altAddr = mode === 'alternate' ? (addrDD?.textContent === '—' ? '' : addrDD?.textContent || '') : '';
+        const panel = document.createElement('div');
+        panel.className = 'of-shipto-edit';
+        panel.innerHTML = `
+          <div class="of-shipto-edit-label">Ship to</div>
+          <div class="of-shipto-toggle" role="tablist" aria-label="Ship-to mode">
+            <button class="ct-btn${mode === 'default' ? ' is-active' : ''}" type="button" data-of-shipto-mode="default">Default</button>
+            <button class="ct-btn${mode === 'alternate' ? ' is-active' : ''}" type="button" data-of-shipto-mode="alternate">Alternate</button>
+          </div>
+          <div class="of-shipto-pane" data-of-shipto-pane="default"${mode !== 'default' ? ' hidden' : ''}>
+            <select data-of-shipto-default>${opts}</select>
+            <div class="of-shipto-default-meta" data-of-shipto-default-addr>${defAddr}</div>
+          </div>
+          <div class="of-shipto-pane" data-of-shipto-pane="alternate"${mode !== 'alternate' ? ' hidden' : ''}>
+            <input type="text" placeholder="Recipient" data-of-shipto-alt-name value="${altName.replace(/"/g, '&quot;')}" />
+            <input type="text" placeholder="Street, city, state, ZIP" data-of-shipto-alt-addr value="${altAddr.replace(/"/g, '&quot;')}" style="margin-top: 8px;" />
+          </div>`;
+        // Toggle handler
+        panel.querySelectorAll('[data-of-shipto-mode]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const m = btn.dataset.ofShiptoMode;
+            panel.querySelectorAll('[data-of-shipto-mode]').forEach((b) =>
+              b.classList.toggle('is-active', b.dataset.ofShiptoMode === m));
+            panel.querySelectorAll('[data-of-shipto-pane]').forEach((p) => {
+              p.hidden = p.dataset.ofShiptoPane !== m;
+            });
+          });
         });
+        // Default dropdown updates the meta line
+        const defSel = panel.querySelector('[data-of-shipto-default]');
+        const defMeta = panel.querySelector('[data-of-shipto-default-addr]');
+        defSel?.addEventListener('change', () => {
+          const addr = DEFAULT_ADDRESSES.find((a) => a.id === defSel.value)?.address || '';
+          if (defMeta) defMeta.textContent = addr;
+        });
+        return panel;
+      }
+
+      editBtn?.addEventListener('click', () => {
+        snapshot = { shipTo: shipToDD?.textContent || '', address: addrDD?.textContent || '' };
+        const shipToRow = shipToDD?.closest('.of-ship-info-row');
+        const addrRow = addrDD?.closest('.of-ship-info-row');
+        if (shipToRow) shipToRow.hidden = true;
+        if (addrRow) addrRow.hidden = true;
+        editPanel = buildPanel();
+        card.querySelector('.of-ship-card-body').insertBefore(editPanel, card.querySelector('dl.of-ship-info'));
         card.classList.add('is-editing');
       });
       cancelBtn?.addEventListener('click', () => {
-        card.querySelectorAll('[data-of-editable]').forEach((dd) => {
-          dd.textContent = snapshot[dd.dataset.ofField] || '—';
-        });
+        if (snapshot) {
+          if (shipToDD) shipToDD.textContent = snapshot.shipTo;
+          if (addrDD) addrDD.textContent = snapshot.address;
+        }
+        editPanel?.remove();
+        const shipToRow = shipToDD?.closest('.of-ship-info-row');
+        const addrRow = addrDD?.closest('.of-ship-info-row');
+        if (shipToRow) shipToRow.hidden = false;
+        if (addrRow) addrRow.hidden = false;
         card.classList.remove('is-editing');
       });
       saveBtn?.addEventListener('click', () => {
-        card.querySelectorAll('[data-of-editable]').forEach((dd) => {
-          const val = dd.querySelector('input')?.value || '';
-          dd.textContent = val || '—';
-        });
+        if (!editPanel) return;
+        const mode = editPanel.querySelector('[data-of-shipto-mode].is-active')?.dataset.ofShiptoMode || 'default';
+        let shipTo = '', address = '';
+        if (mode === 'default') {
+          const id = editPanel.querySelector('[data-of-shipto-default]')?.value;
+          const def = DEFAULT_ADDRESSES.find((a) => a.id === id);
+          shipTo = def?.label || ''; address = def?.address || '';
+        } else {
+          shipTo = editPanel.querySelector('[data-of-shipto-alt-name]')?.value || '';
+          address = editPanel.querySelector('[data-of-shipto-alt-addr]')?.value || '';
+        }
+        // Commit to the seed object too so a re-open reflects state
+        if (SHIPMENTS[idx]) {
+          SHIPMENTS[idx].shipToMode = mode;
+          if (mode === 'default') SHIPMENTS[idx].shipToDefault = editPanel.querySelector('[data-of-shipto-default]')?.value;
+          SHIPMENTS[idx].shipTo = shipTo;
+          SHIPMENTS[idx].address = address;
+        }
+        if (shipToDD) shipToDD.textContent = shipTo || '—';
+        if (addrDD) addrDD.textContent = address || '—';
+        editPanel.remove(); editPanel = null;
+        const shipToRow = shipToDD?.closest('.of-ship-info-row');
+        const addrRow = addrDD?.closest('.of-ship-info-row');
+        if (shipToRow) shipToRow.hidden = false;
+        if (addrRow) addrRow.hidden = false;
         card.classList.remove('is-editing');
       });
     });
@@ -4777,32 +5233,358 @@
   (function wireSurgicalPlanPortal() {
     const drawer = document.querySelector('.sp-drawer[data-drawer-panel="configureplan"]');
     if (!drawer) return;
-    function applyConditionals() {
-      const solution = drawer.querySelector('[data-sp="solution"]')?.value || '';
-      drawer.querySelectorAll('[data-sp-when-solution]').forEach((el) => {
+
+    // Full-plan Edit is gated by case state. Pre-Planning = editable; once the
+    // case enters Planning or beyond, customers lose Edit (Comments only).
+    const PRE_PLANNING_STATES = ['intake', 'case-prep'];
+    const state = (drawer.dataset.caseState || '').toLowerCase();
+    const fullEditAllowed = PRE_PLANNING_STATES.includes(state);
+
+    const editBtn = drawer.querySelector('[data-sp-edit]');
+    const cancelBtn = drawer.querySelector('[data-sp-cancel]');
+    const saveBtn = drawer.querySelector('[data-sp-save]');
+    if (!fullEditAllowed && editBtn) editBtn.hidden = true;
+
+    function setMode(editing) {
+      drawer.classList.toggle('is-readonly', !editing);
+      if (editBtn) editBtn.hidden = editing || !fullEditAllowed;
+      if (cancelBtn) cancelBtn.hidden = !editing;
+      if (saveBtn) saveBtn.hidden = !editing;
+      const addBtn = drawer.querySelector('[data-sp-add-plan]');
+      if (addBtn) addBtn.hidden = !editing;
+      renumberPlans();
+    }
+
+    function snapshot() {
+      return Array.from(drawer.querySelectorAll('input, select, textarea')).map((el) => ({
+        el,
+        value: (el.type === 'checkbox' || el.type === 'radio') ? el.checked : el.value,
+      }));
+    }
+    function restore(snap) {
+      snap.forEach(({ el, value }) => {
+        if (el.type === 'checkbox' || el.type === 'radio') el.checked = value; else el.value = value;
+      });
+      applyConditionals();
+    }
+    let savedSnap = snapshot();
+    editBtn?.addEventListener('click', () => { savedSnap = snapshot(); setMode(true); });
+    cancelBtn?.addEventListener('click', () => { restore(savedSnap); setMode(false); });
+    saveBtn?.addEventListener('click', () => { savedSnap = snapshot(); setMode(false); });
+
+    // Per-plan cascade visibility — scoped to each .sp-plan-card.
+    function applyConditionalsForCard(card) {
+      const solution = card.querySelector('[data-sp="solution"]')?.value || '';
+      card.querySelectorAll('[data-sp-when-solution]').forEach((el) => {
         el.hidden = el.dataset.spWhenSolution !== solution;
       });
-      const proc = drawer.querySelector('[data-sp="procedure"]')?.value || '';
-      drawer.querySelectorAll('[data-sp-when-proc]').forEach((el) => {
+      const proc = card.querySelector('[data-sp="procedure"]')?.value || '';
+      card.querySelectorAll('[data-sp-when-proc]').forEach((el) => {
         el.hidden = el.dataset.spWhenProc !== proc;
       });
-      const singleJaw = drawer.querySelector('[data-sp="single-jaw"]')?.value || '';
+      const singleJaw = card.querySelector('[data-sp="single-jaw"]')?.value || '';
+      const singleGenio = card.querySelector('[data-sp="single-genio"]')?.value || '';
+      const doubleGenio = card.querySelector('[data-sp="double-genio"]')?.value || '';
       const wantsMaxilla = (proc === 'double') || (proc === 'single' && singleJaw === 'maxilla');
       const wantsMandible = (proc === 'double') || (proc === 'single' && singleJaw === 'mandible');
-      const maxCard = drawer.querySelector('[data-sp-section="maxilla"]');
-      const mandCard = drawer.querySelector('[data-sp-section="mandible"]');
+      const wantsGenio = (proc === 'genio')
+        || (proc === 'single' && singleGenio === 'Yes')
+        || (proc === 'double' && doubleGenio === 'Yes');
+      const maxCard = card.querySelector('[data-sp-section="maxilla"]');
+      const mandCard = card.querySelector('[data-sp-section="mandible"]');
+      const genioCard = card.querySelector('[data-sp-section="genio"]');
       if (maxCard) maxCard.hidden = !wantsMaxilla;
       if (mandCard) mandCard.hidden = !wantsMandible;
-      drawer.querySelectorAll('[data-sp-side]').forEach((sel) => {
+      if (genioCard) genioCard.hidden = !wantsGenio;
+      card.querySelectorAll('[data-sp-side]').forEach((sel) => {
         const side = sel.dataset.spSide;
-        const other = drawer.querySelector(`[data-sp-side-other="${side}"]`);
+        const other = card.querySelector(`[data-sp-side-other="${side}"]`);
         if (other) other.hidden = sel.value !== 'other';
       });
     }
-    drawer.querySelectorAll('[data-sp], [data-sp-side]').forEach((el) => {
-      el.addEventListener('change', applyConditionals);
+    function applyConditionals() {
+      drawer.querySelectorAll('.sp-plan-card').forEach(applyConditionalsForCard);
+    }
+
+    function wirePlanCard(card) {
+      card.querySelectorAll('[data-sp], [data-sp-side]').forEach((el) => {
+        if (el.dataset.spWired) return;
+        el.dataset.spWired = '1';
+        el.addEventListener('change', applyConditionals);
+      });
+      const removeBtn = card.querySelector('.sp-plan-remove');
+      if (removeBtn && !removeBtn.dataset.wired) {
+        removeBtn.dataset.wired = '1';
+        removeBtn.addEventListener('click', () => {
+          const title = card.querySelector('.sp-plan-title')?.textContent?.trim() || 'this plan';
+          showInlineConfirm(card, {
+            title: `Remove ${title}?`,
+            body: 'The plan and all its selections will be discarded.',
+            confirmLabel: 'Remove plan',
+            keepSelector: '.sp-plan-head',
+            onConfirm: () => { card.remove(); renumberPlans(); },
+          });
+        });
+      }
+    }
+
+    function showInlineConfirm(host, { title, body, confirmLabel, onConfirm, keepSelector }) {
+      if (!host || host.querySelector(':scope > .inline-confirm')) return;
+      const hidden = [];
+      Array.from(host.children).forEach((c) => {
+        if (keepSelector && c.matches && c.matches(keepSelector)) return;
+        hidden.push([c, c.style.display]);
+        c.style.display = 'none';
+      });
+      const wrap = document.createElement('div');
+      wrap.className = 'inline-confirm';
+      wrap.setAttribute('role', 'alertdialog');
+      wrap.innerHTML = `
+        <div class="ic-head">
+          <svg class="ic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div class="ic-titlewrap"><div class="ic-title"></div><div class="ic-sub"></div></div>
+        </div>
+        <div class="ic-actions">
+          <button class="btn" type="button" data-ic-cancel>Cancel</button>
+          <button class="btn btn-danger" type="button" data-ic-confirm></button>
+        </div>
+      `;
+      wrap.querySelector('.ic-title').textContent = title;
+      wrap.querySelector('.ic-sub').textContent = body || '';
+      wrap.querySelector('[data-ic-confirm]').textContent = confirmLabel || 'Remove';
+      host.appendChild(wrap);
+      const restore = () => {
+        wrap.remove();
+        hidden.forEach(([el, prev]) => { el.style.display = prev || ''; });
+      };
+      wrap.querySelector('[data-ic-cancel]').addEventListener('click', restore);
+      wrap.querySelector('[data-ic-confirm]').addEventListener('click', () => {
+        restore();
+        try { onConfirm && onConfirm(); } catch(e){}
+      });
+      setTimeout(() => wrap.querySelector('[data-ic-cancel]')?.focus(), 0);
+    }
+
+    function renumberPlans() {
+      const list = drawer.querySelector('[data-sp-plan-list]');
+      if (!list) return;
+      const cards = list.querySelectorAll('.sp-plan-card');
+      cards.forEach((c, i) => {
+        const n = i + 1;
+        c.dataset.planId = String(n);
+        const title = c.querySelector('.sp-plan-title');
+        if (title) title.textContent = `Surgical Plan ${n}`;
+        const remove = c.querySelector('.sp-plan-remove');
+        if (remove) remove.hidden = (cards.length === 1) || drawer.classList.contains('is-readonly');
+      });
+    }
+
+    function addPlan() {
+      const list = drawer.querySelector('[data-sp-plan-list]');
+      if (!list) return;
+      const first = list.querySelector('.sp-plan-card');
+      if (!first) return;
+      const clone = first.cloneNode(true);
+      clone.querySelectorAll('input[type="text"], textarea').forEach((el) => { el.value = ''; });
+      clone.querySelectorAll('select').forEach((sel) => { sel.selectedIndex = 0; });
+      clone.querySelectorAll('input[type="radio"]').forEach((r) => { r.checked = false; });
+      const newId = list.querySelectorAll('.sp-plan-card').length + 1;
+      clone.querySelectorAll('input[type="radio"]').forEach((r) => {
+        r.name = r.name.replace(/\d+$/, '') + newId;
+      });
+      clone.querySelectorAll('[data-sp-wired]').forEach((el) => delete el.dataset.spWired);
+      const removeBtn = clone.querySelector('.sp-plan-remove');
+      if (removeBtn) delete removeBtn.dataset.wired;
+      list.appendChild(clone);
+      renumberPlans();
+      wirePlanCard(clone);
+      applyConditionalsForCard(clone);
+    }
+    drawer.querySelector('[data-sp-add-plan]')?.addEventListener('click', addPlan);
+    drawer.querySelectorAll('.sp-plan-card').forEach(wirePlanCard);
+
+    // -------- Proposed meeting inline edit (always available to customers) --------
+    const meetingCard = drawer.querySelector('[data-sp-meeting="proposed"]');
+    if (meetingCard) {
+      const mEdit = meetingCard.querySelector('[data-sp-meeting-edit]');
+      const mCancel = meetingCard.querySelector('[data-sp-meeting-cancel]');
+      const mSave = meetingCard.querySelector('[data-sp-meeting-save]');
+      const mActions = meetingCard.querySelector('.sp-section-actions');
+      let mSnap = [];
+      function meetingSnapshot() {
+        return Array.from(meetingCard.querySelectorAll('input, select')).map((el) => ({ el, value: el.value }));
+      }
+      function meetingRestore(snap) { snap.forEach(({ el, value }) => { el.value = value; }); }
+      function setMeetingEditing(on) {
+        meetingCard.classList.toggle('is-editing', on);
+        if (mEdit) mEdit.hidden = on;
+        if (mActions) mActions.hidden = !on;
+      }
+      mEdit?.addEventListener('click', () => { mSnap = meetingSnapshot(); setMeetingEditing(true); });
+      mCancel?.addEventListener('click', () => { meetingRestore(mSnap); setMeetingEditing(false); });
+      mSave?.addEventListener('click', () => { setMeetingEditing(false); });
+    }
+
+    // -------- Disclaimers multi-select --------
+    const ms = drawer.querySelector('.ms-disclaimers');
+    if (ms) {
+      const msBtn = ms.querySelector('[data-ms-btn]');
+      const msMenu = ms.querySelector('[data-ms-menu]');
+      const msDisplay = ms.querySelector('[data-ms-display]');
+      const otherInput = drawer.querySelector('[data-ms-disclaimer-other]');
+      function renderDisplay() {
+        const chosen = Array.from(ms.querySelectorAll('[data-ms-opt]:checked')).map((c) => c.value);
+        msDisplay.innerHTML = '';
+        if (chosen.length) {
+          chosen.forEach((v) => {
+            const chip = document.createElement('span');
+            chip.className = 'ms-chip';
+            chip.textContent = v;
+            msDisplay.appendChild(chip);
+          });
+        } else {
+          msDisplay.textContent = '';
+        }
+        const otherChecked = ms.querySelector('[data-ms-opt-other]')?.checked;
+        if (otherInput) otherInput.hidden = !otherChecked;
+      }
+      msBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (drawer.classList.contains('is-readonly')) return;
+        const open = !msMenu.hidden;
+        msMenu.hidden = open;
+        ms.classList.toggle('open', !open);
+        msBtn.setAttribute('aria-expanded', String(!open));
+      });
+      ms.querySelectorAll('[data-ms-opt]').forEach((opt) => opt.addEventListener('change', renderDisplay));
+      document.addEventListener('click', (e) => {
+        if (!ms.contains(e.target)) {
+          msMenu.hidden = true; ms.classList.remove('open');
+          msBtn?.setAttribute('aria-expanded', 'false');
+        }
+      });
+      renderDisplay();
+    }
+
+    // -------- Meeting link copy + open in new tab --------
+    drawer.querySelectorAll('[data-sp-meeting-copy]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const input = btn.parentElement.querySelector('[data-sp-meeting-link]');
+        const url = (input?.value || '').trim();
+        if (!url) return;
+        try { await navigator.clipboard.writeText(url); }
+        catch {
+          const ta = document.createElement('textarea');
+          ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta); ta.select();
+          try { document.execCommand('copy'); } finally { document.body.removeChild(ta); }
+        }
+        btn.classList.add('copied');
+        setTimeout(() => btn.classList.remove('copied'), 1200);
+      });
     });
+    drawer.querySelectorAll('[data-sp-meeting-open]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const input = btn.parentElement.querySelector('[data-sp-meeting-link]');
+        const url = (input?.value || '').trim();
+        if (!url) return;
+        window.open(url, '_blank', 'noopener,noreferrer');
+      });
+    });
+
+    renumberPlans();
     applyConditionals();
+    setMode(false);
+  })();
+
+  /* =================================================================
+     DEVICE DESIGN drawer (Phase 15 portal — read-only Phase 13 .dd-card).
+     Renders the seeded devices with collapse + Other-clamp; no add/remove.
+     ================================================================= */
+  (function wireDeviceDesignPortal() {
+    const list = document.getElementById('ddList');
+    const countEl = document.getElementById('ddCount');
+    const drawer = document.querySelector('.sp-drawer[data-drawer-panel="configureproduct"]');
+    if (!list || !drawer) return;
+
+    const DEVICE_SCHEMAS = {
+      '7702-6001N': { desc: 'Splint, traditional family',          fields: [
+        { key: 'splint-type', label: 'Splint Type' },
+        { key: 'impression',  label: 'Impression' },
+        { key: 'buccal',      label: 'Buccal Flange' },
+        { key: 'holes',       label: 'Holes' },
+      ]},
+      '7702-6002N': { desc: 'Splint, palatal family',              fields: [
+        { key: 'impression', label: 'Impression' },
+        { key: 'buccal',     label: 'Buccal Flange' },
+        { key: 'palatal',    label: 'Palatal Support' },
+        { key: 'holes',      label: 'Holes' },
+      ]},
+    };
+    const SEED_DEVICES = [
+      { part: '7702-6001N', values: { 'splint-type': 'Traditional', 'impression': 'Normal', 'buccal': 'Minimal', 'holes': 'Yes', 'reference-case': '25A0042', 'other': '' } },
+      { part: '7702-6002N', values: { 'impression': 'Deep', 'buccal': 'Normal', 'palatal': 'Normal', 'holes': 'No', 'reference-case': '25B0177', 'other': 'Notch lingual for tongue clearance. Surgeon also requested an extra 1.5 mm relief along the palatal seal so the splint can accommodate the patient’s deviated midline.' } },
+    ];
+    const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    function renderCard(device, index) {
+      const schema = DEVICE_SCHEMAS[device.part];
+      if (!schema) return '';
+      const baseFieldsHTML = schema.fields.map((f) => {
+        const v = device.values?.[f.key] ?? '';
+        return `<div class="form-row"><label>${f.label}</label><input type="text" value="${esc(v)}" readonly /></div>`;
+      }).join('');
+      const ref = (device.values?.['reference-case'] || '').trim();
+      const other = (device.values?.['other'] || '').trim();
+      const refHTML = ref ? `<div class="form-row dd-row-full"><label>Reference case</label><input type="text" value="${esc(ref)}" readonly /></div>` : '';
+      const otherHTML = other
+        ? `<div class="form-row dd-row-full">
+            <label>Other</label>
+            <div class="dd-other-readonly is-clamped" data-dd-readonly>${esc(other)}</div>
+            <button type="button" class="dd-other-toggle" data-dd-toggle hidden>Show more</button>
+          </div>`
+        : '';
+      return `<div class="dd-card" data-dd-card data-dd-part="${device.part}">
+        <div class="dd-card-head">
+          <span class="dd-card-num">${index + 1}</span>
+          <div class="dd-card-part">
+            ${device.part}
+            <span class="dd-card-desc">${esc(schema.desc)}</span>
+          </div>
+          <button class="dd-card-collapse" type="button" aria-label="Collapse device details" aria-expanded="true" data-dd-collapse>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+        <div class="dd-card-body">
+          <div class="dd-card-grid">${baseFieldsHTML}${refHTML}${otherHTML}</div>
+        </div>
+      </div>`;
+    }
+
+    list.innerHTML = SEED_DEVICES.map((d, i) => renderCard(d, i)).join('');
+    if (countEl) countEl.textContent = `${SEED_DEVICES.length} ${SEED_DEVICES.length === 1 ? 'device' : 'devices'}`;
+
+    // Wire collapse + Show more per card
+    list.querySelectorAll('[data-dd-card]').forEach((card) => {
+      card.querySelector('[data-dd-collapse]')?.addEventListener('click', () => {
+        const collapsed = card.classList.toggle('is-collapsed');
+        const btn = card.querySelector('[data-dd-collapse]');
+        btn.setAttribute('aria-expanded', String(!collapsed));
+        btn.setAttribute('aria-label', collapsed ? 'Expand device details' : 'Collapse device details');
+      });
+      card.querySelectorAll('[data-dd-toggle]').forEach((tg) => {
+        const ro = tg.parentElement.querySelector('[data-dd-readonly]');
+        if (!ro) return;
+        // Show the toggle only when the clamped text actually overflows.
+        requestAnimationFrame(() => {
+          tg.hidden = !(ro.scrollHeight > ro.clientHeight + 1);
+        });
+        tg.addEventListener('click', () => {
+          const clamped = ro.classList.toggle('is-clamped');
+          tg.textContent = clamped ? 'Show more' : 'Show less';
+        });
+      });
+    });
   })();
 
   // Settings panel — each checkbox reveals/hides its sub-section
@@ -5117,22 +5899,37 @@
   }
   if (upPrevCancel) upPrevCancel.addEventListener('click', closeUpPrev);
   if (upPrevSubmit) upPrevSubmit.addEventListener('click', () => {
-    // If "replaces" was checked + a target picked, mark that file card as superseded and refresh the folder
-    if (upPrevReplaces?.checked && upPrevReplaceTarget?.value) {
-      const folder = folderForState(upPrevState?.value || '');
-      const targetName = upPrevReplaceTarget.value;
-      const targetCard = folder && Array.from(folder.querySelectorAll('.file-card'))
-        .find((c) => (c.querySelector('.f-name')?.textContent || '').trim() === targetName);
-      if (targetCard) {
-        const newFileName = (upPrevFile?.files && upPrevFile.files[0]?.name) || 'replacement';
-        targetCard.setAttribute('data-superseded', newFileName);
-        // Sync the target card's "Mark as superseded" toggle to reflect the change
-        const tgl = targetCard.querySelector('.file-supersede-toggle');
-        if (tgl) tgl.checked = true;
-        refreshFolder(folder);
-      }
+    // Show a fake progress bar while the upload "runs" (real backend would drive the percent).
+    const progressEl = document.getElementById('upPrevProgress');
+    const nameEl = document.getElementById('upPrevProgressName');
+    const pctEl = document.getElementById('upPrevProgressPct');
+    const fillEl = document.getElementById('upPrevProgressFill');
+    const fileName = (upPrevFile?.files && upPrevFile.files[0]?.name)
+      || (upPrevFilename?.textContent && upPrevFilename.textContent !== 'No file chosen' ? upPrevFilename.textContent : '')
+      || 'file';
+    if (progressEl && nameEl && pctEl && fillEl) {
+      progressEl.hidden = false;
+      progressEl.classList.remove('is-done');
+      nameEl.textContent = 'Uploading ' + fileName + '…';
+      pctEl.textContent = '0%';
+      fillEl.style.width = '0%';
+      upPrevSubmit.disabled = true;
+      let pct = 0;
+      const tick = setInterval(() => {
+        pct = Math.min(100, pct + (8 + Math.random() * 14));
+        fillEl.style.width = pct + '%';
+        pctEl.textContent = Math.round(pct) + '%';
+        if (pct >= 100) {
+          clearInterval(tick);
+          progressEl.classList.add('is-done');
+          nameEl.textContent = 'Uploaded ' + fileName;
+          upPrevSubmit.disabled = false;
+          setTimeout(() => { progressEl.hidden = true; closeUpPrev(); }, 900);
+        }
+      }, 200);
+    } else {
+      closeUpPrev();
     }
-    closeUpPrev();
   });
 
   if (upPrevState && upPrevStep) {
